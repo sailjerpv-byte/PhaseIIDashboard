@@ -1150,7 +1150,15 @@
 
         // Render results
         function renderResults(results, regimeMode) {
+            console.log(`📊 renderResults called with ${results.length} results`);
             const resultsDiv = document.getElementById('results');
+            
+            if (!resultsDiv) {
+                console.error('❌ Results div not found!');
+                return;
+            }
+            
+            console.log(`✓ Results div found, rendering...`);
             
             // Sort by score descending
             const sorted = [...results].sort((a, b) => b.score - a.score);
@@ -1308,6 +1316,7 @@
             `;
             
             resultsDiv.innerHTML = cardsHTML + summaryHTML;
+            console.log(`✅ Results rendered successfully! Check page for ${results.length} position cards.`);
         }
 
         // Process a single batch
@@ -1379,7 +1388,11 @@
                     });
                     
                     // Render incrementally
+                    console.log(`✓ ${ticker} processed - Score: ${score}/4 - ${perfAnalysis}`);
+                    console.log(`Total results so far: ${batchState.results.length}`);
                     renderResults(batchState.results, batchState.regimeMode);
+                } else {
+                    console.warn(`⚠ Failed to fetch data for ${ticker}`);
                 }
                 
                 if (i < batchTickers.length - 1) {
