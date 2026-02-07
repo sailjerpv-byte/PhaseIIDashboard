@@ -176,56 +176,6 @@
             border-color: var(--accent-blue);
         }
 
-        /* Mode Toggle */
-        .mode-toggle {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-        }
-
-        .mode-toggle label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: var(--border);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-switch.active {
-            background: var(--accent-green);
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 24px;
-            height: 24px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(30px);
-        }
-
-        .mode-label {
-            font-weight: 700;
-            color: var(--accent-green);
-        }
-
         button {
             padding: 0.75rem 2rem;
             background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
@@ -253,309 +203,377 @@
             cursor: not-allowed;
         }
 
-        button.pause-button {
-            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));
-        }
-
         /* Countdown Timer */
         .countdown-timer {
             display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
             text-align: center;
-            padding: 1.5rem;
-            background: var(--bg-card);
             border: 2px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 2rem;
         }
 
         .countdown-timer.active {
             display: block;
-            animation: slideDown 0.3s ease-out;
         }
 
-        .countdown-display {
+        .countdown-timer.ready {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .countdown-timer.waiting {
+            border-color: var(--accent-yellow);
+            background: rgba(255, 217, 61, 0.1);
+        }
+
+        .timer-display {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--accent-green);
             margin-bottom: 0.5rem;
         }
 
-        .countdown-text {
+        .timer-display.waiting {
+            color: var(--accent-yellow);
+        }
+
+        .timer-message {
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
-        /* Progress Container */
-        .progress-container {
-            display: none;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .progress-container.active {
-            display: block;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-secondary);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        /* Batch Info */
+        /* Batch Processing */
         .batch-info {
             display: none;
-            text-align: center;
+            margin-top: 1rem;
             padding: 1rem;
             background: var(--bg-secondary);
             border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--accent-blue);
+            border-left: 4px solid var(--accent-blue);
         }
 
         .batch-info.active {
             display: block;
         }
 
-        /* Pause Notice */
-        .pause-notice {
-            display: none;
-            background: var(--bg-card);
-            border: 2px solid var(--accent-yellow);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .pause-notice.active {
-            display: block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .pause-notice h3 {
-            color: var(--accent-yellow);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        .pause-notice p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .pause-notice .countdown-display {
-            font-size: 4rem;
-            color: var(--accent-yellow);
-            margin: 1rem 0;
-        }
-
-        /* Auto Mode Status */
-        .auto-status {
-            display: none;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-left: 4px solid var(--accent-green);
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .auto-status.active {
-            display: block;
-        }
-
-        .auto-status p {
-            font-size: 0.85rem;
+        .batch-status {
+            font-size: 0.9rem;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
         }
 
-        .auto-status p:last-child {
-            margin-bottom: 0;
+        .batch-progress {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
         }
 
-        /* Results */
-        .results {
-            animation: fadeIn 0.6s ease-out 0.6s both;
+        .continue-button {
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-blue));
         }
 
-        .result-card {
+        .pause-notice {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 217, 61, 0.1);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .pause-notice.active {
+            display: block;
+        }
+
+        .pause-notice h3 {
+            color: var(--accent-yellow);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pause-notice p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--bg-primary);
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        /* Ticker Cards */
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .ticker-card {
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            animation: slideUp 0.3s ease-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .result-card.deploy {
-            border-color: var(--accent-green);
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.2);
+        .ticker-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px var(--shadow);
         }
 
-        .result-card.small {
-            border-color: var(--accent-yellow);
-        }
-
-        .result-card.late {
-            border-color: var(--accent-red);
-        }
-
-        .card-header {
+        .ticker-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: start;
             margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
-        .ticker-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .ticker-name {
+        .ticker-symbol {
             font-family: 'JetBrains Mono', monospace;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--accent-green);
+            color: var(--text-primary);
         }
 
-        .asset-badge {
-            padding: 0.25rem 0.75rem;
-            background: var(--bg-secondary);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
+        .ticker-meta {
+            text-align: right;
+            font-size: 0.8rem;
         }
 
-        .score-display {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .score-4 { color: var(--accent-green); }
-        .score-3 { color: var(--accent-blue); }
-        .score-2 { color: var(--accent-yellow); }
-        .score-1 { color: var(--accent-red); }
-        .score-0 { color: var(--accent-red); }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .metric {
-            background: var(--bg-secondary);
-            padding: 0.75rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .metric-label {
-            font-size: 0.75rem;
+        .asset-type {
             color: var(--text-secondary);
             margin-bottom: 0.25rem;
         }
 
-        .metric-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .metric-value.positive { color: var(--accent-green); }
-        .metric-value.negative { color: var(--accent-red); }
-
-        .breakdown {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .breakdown-item {
-            padding: 0.5rem 1rem;
+        .active-mode {
+            padding: 0.25rem 0.5rem;
             background: var(--bg-secondary);
-            border-radius: 6px;
-            font-size: 0.85rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .mode-a { color: var(--accent-green); }
+        .mode-b { color: var(--accent-yellow); }
+
+        .score-display {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .breakdown-item.pass {
-            border-left: 3px solid var(--accent-green);
-        }
-
-        .breakdown-item.fail {
-            border-left: 3px solid var(--accent-red);
-        }
-
-        .action-box {
-            margin-top: 1rem;
+            gap: 1rem;
+            margin-bottom: 1rem;
             padding: 1rem;
+            background: var(--bg-secondary);
             border-radius: 8px;
+        }
+
+        .score-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
             font-weight: 700;
+        }
+
+        .score-0, .score-1 { color: var(--accent-red); }
+        .score-2 { color: var(--accent-yellow); }
+        .score-3, .score-4 { color: var(--accent-green); }
+
+        .score-info {
+            flex: 1;
+        }
+
+        .signal {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .signal.deploy { color: var(--accent-green); }
+        .signal.watch { color: var(--accent-yellow); }
+        .signal.hold { color: var(--accent-red); }
+        .signal.exit { color: var(--accent-red); }
+
+        .breakdown {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+
+        .breakdown li {
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            border-left: 3px solid var(--border);
+        }
+
+        .breakdown li.pass {
+            border-left-color: var(--accent-green);
+            color: var(--text-primary);
+        }
+
+        .breakdown li.fail {
+            border-left-color: var(--accent-red);
+            color: var(--text-secondary);
+        }
+
+        .breakdown li.pending {
+            border-left-color: var(--accent-yellow);
+            background: rgba(255, 217, 61, 0.1);
+            color: var(--text-primary);
+        }
+
+        .volume-pending-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: rgba(255, 217, 61, 0.2);
+            border: 1px solid var(--accent-yellow);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            margin-left: 0.5rem;
+        }
+
+        /* Performance Warnings */
+        .performance-metrics {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .performance-metrics.warning {
+            border-left-color: var(--accent-yellow);
+            background: rgba(255, 217, 61, 0.1);
+        }
+
+        .performance-metrics.danger {
+            border-left-color: var(--accent-red);
+            background: rgba(255, 51, 102, 0.1);
+        }
+
+        .perf-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .perf-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .perf-stat {
             text-align: center;
+            padding: 0.5rem;
+            background: var(--bg-card);
+            border-radius: 4px;
         }
 
-        .action-box.deploy {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid var(--accent-green);
-            color: var(--accent-green);
+        .perf-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
         }
 
-        .action-box.small {
-            background: rgba(255, 217, 61, 0.1);
-            border: 2px solid var(--accent-yellow);
-            color: var(--accent-yellow);
+        .perf-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
         }
 
-        .action-box.late {
-            background: rgba(255, 51, 102, 0.1);
-            border: 2px solid var(--accent-red);
-            color: var(--accent-red);
+        .perf-value.positive { color: var(--accent-green); }
+        .perf-value.negative { color: var(--accent-red); }
+
+        .perf-warnings {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
         }
 
-        .action-box.watch {
-            background: rgba(255, 217, 61, 0.1);
-            border: 2px solid var(--accent-yellow);
-            color: var(--accent-yellow);
+        .perf-warning-item {
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            background: rgba(255, 217, 61, 0.15);
+            border-left: 3px solid var(--accent-yellow);
+            border-radius: 4px;
+            color: var(--text-primary);
         }
 
-        .action-box.avoid {
-            background: rgba(255, 51, 102, 0.1);
-            border: 2px solid var(--accent-red);
-            color: var(--accent-red);
+        .perf-warning-item.danger {
+            background: rgba(255, 51, 102, 0.15);
+            border-left-color: var(--accent-red);
+        }
+
+        .position-suggestion {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(108, 92, 231, 0.15);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .position-suggestion strong {
+            color: var(--accent-blue);
         }
 
         /* Summary */
@@ -563,35 +581,33 @@
             background: var(--bg-card);
             border: 2px solid var(--border);
             border-radius: 12px;
-            padding: 2rem;
-            margin-top: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .summary h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 1rem;
             color: var(--accent-blue);
         }
 
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .summary-section {
             background: var(--bg-secondary);
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: 8px;
         }
 
         .summary-section h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 1rem;
         }
 
         .summary-section ul {
@@ -600,22 +616,19 @@
         }
 
         .summary-section li {
-            padding: 0.5rem 0;
+            padding: 0.25rem 0;
             color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .summary-section li:last-child {
-            border-bottom: none;
         }
 
         /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -630,75 +643,70 @@
             }
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
-
-        /* Responsive */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
             }
-            
+
             .threshold-table {
                 grid-template-columns: 1fr;
             }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr 1fr;
+
+            .ticker-grid {
+                grid-template-columns: 1fr;
             }
+
+            .regime-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 2px solid var(--border);
+            margin-top: 3rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚡ REGIME-AWARE MOMENTUM TRACKER</h1>
-            <p>Deploy capital systematically based on technical strength, regime, and momentum</p>
+            <h1>⚡ REGIME-AWARE MOMENTUM DASHBOARD</h1>
+            <p>Adaptive scoring based on market regime and asset classification</p>
         </div>
 
-        <div class="regime-status">
+        <div class="regime-status" id="regimeStatus">
             <div class="regime-header">
-                <div id="regimeMode" class="regime-mode risk">
-                    <span id="regimeIcon">📈</span>
-                    <span id="regimeText">RISK MODE</span>
+                <div class="regime-mode risk" id="regimeMode">
+                    <span id="regimeIcon">📊</span>
+                    <span id="regimeText">LOADING...</span>
                 </div>
-                <div id="vooStatus" class="voo-status">VOO: Calculating...</div>
+                <div class="voo-status" id="vooStatus">Checking VOO vs 200-DMA...</div>
             </div>
-            
+
             <div class="threshold-table">
                 <div class="threshold-col">
-                    <h3>🟢 RISK MODE (VOO > 200-DMA)</h3>
+                    <h3>MODE A - STRICT (Risk Mode)</h3>
                     <ul>
-                        <li>✓ RSI 40-70</li>
-                        <li>✓ Above 20 & 50-DMA</li>
-                        <li>✓ Volume ≥ 0.8x avg</li>
-                        <li>✓ RS > SPY (3-mo)</li>
+                        <li>✓ RSI ≥ 55</li>
+                        <li>✓ Above BOTH 20-DMA & 50-DMA</li>
+                        <li>✓ Volume ≥ 1.2× average</li>
+                        <li>✓ Positive vs SPY</li>
                     </ul>
                 </div>
                 <div class="threshold-col defensive">
-                    <h3>🛡️ DEFENSIVE MODE (VOO < 200-DMA)</h3>
+                    <h3>MODE B - FLEXIBLE (Defensive Mode)</h3>
                     <ul>
-                        <li>✓ RSI 30-70 (wider range)</li>
-                        <li>✓ Above 50-DMA only</li>
-                        <li>✓ Volume ≥ 1.0x avg (stricter)</li>
-                        <li>✓ RS > SPY (3-mo)</li>
+                        <li>✓ RSI ≥ 45 & rising</li>
+                        <li>✓ Above 20-DMA or repairing</li>
+                        <li>✓ Volume ≥ 1.0× average</li>
+                        <li>✓ Positive vs SPY</li>
                     </ul>
                 </div>
             </div>
@@ -708,8 +716,7 @@
             <div class="input-group">
                 <label for="apiKeyInput">Twelve Data API Key:</label>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <input type="password" id="apiKeyInput" placeholder="Enter your API key (saved in browser)" 
-                        style="flex: 1;">
+                    <input type="password" id="apiKeyInput" placeholder="Enter your API key (saved in browser)" style="flex: 1;">
                     <button onclick="saveApiKey()" style="padding: 0.75rem 1.5rem; white-space: nowrap;">💾 Save Key</button>
                     <button onclick="clearApiKey()" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));">🗑️</button>
                 </div>
@@ -718,64 +725,69 @@
 
             <div class="input-group">
                 <label for="tickerInput">Enter Tickers (comma-separated):</label>
-                <input type="text" id="tickerInput" placeholder="e.g., AAPL, MSFT, GOOGL, NVDA" 
-                    value="AAPL, MSFT, GOOGL, NVDA, TSLA, AMD, META, AMZN">
+                <input type="text" id="tickerInput" placeholder="NVDA, MSFT, AVGO, VOO, VXUS" value="NVDA, MSFT, AVGO, GOOG, VOO, VXUS, TSM, AMD">
             </div>
 
             <div class="input-group">
-                <label for="assetTypeInput">Asset Types (optional - ticker:type pairs):</label>
-                <input type="text" id="assetTypeInput" placeholder="e.g., GLD:DEFENSIVE, TLT:DEFENSIVE">
+                <label for="assetTypes">Asset Classification (Format: TICKER:TYPE)</label>
+                <input type="text" id="assetTypes" placeholder="NVDA:RISK, VXUS:DEFENSIVE" 
+                       value="NVDA:RISK, MSFT:RISK, AVGO:RISK, GOOG:RISK, VOO:RISK, VXUS:DEFENSIVE, VEA:DEFENSIVE, VGSH:DEFENSIVE, IAUM:DEFENSIVE, TSM:RISK, AMD:RISK, MU:RISK, LRCX:RISK, ASML:RISK, KLAC:RISK, BWXT:RISK, XOM:RISK, ITA:RISK, LHX:RISK, GD:RISK, VUG:RISK">
             </div>
 
             <!-- Mode Toggle -->
-            <div class="mode-toggle">
-                <label>Scan Mode:</label>
-                <div id="modeToggle" class="toggle-switch" onclick="toggleMode()">
-                    <div class="toggle-slider"></div>
+            <div class="mode-toggle" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary);">Scan Mode:</label>
+                <div id="modeToggle" class="toggle-switch" onclick="toggleMode()" style="position: relative; width: 60px; height: 30px; background: var(--border); border-radius: 15px; cursor: pointer; transition: background 0.3s;">
+                    <div class="toggle-slider" style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s;"></div>
                 </div>
-                <span id="modeLabel" class="mode-label">MANUAL</span>
+                <span id="modeLabel" style="font-weight: 700; color: var(--text-secondary);">MANUAL</span>
             </div>
 
-            <div class="auto-status" id="autoStatus">
-                <p><strong>🤖 AUTO MODE ENABLED</strong></p>
-                <p>• System will automatically process all batches with 60-second delays</p>
-                <p>• You can pause at any time using the pause button</p>
-                <p>• Each batch processes 4 positions to respect API rate limits</p>
+            <div class="auto-status" id="autoStatus" style="display: none; padding: 1rem; background: var(--bg-secondary); border-left: 4px solid var(--accent-green); border-radius: 8px; margin-top: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>🤖 AUTO MODE ENABLED</strong></p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• System will automatically process all batches with 60-second delays</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• You can pause at any time using the pause button</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">• Each batch processes 4 positions to respect API rate limits</p>
             </div>
 
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button onclick="runAnalysis()" id="runButton">▶ RUN ANALYSIS</button>
-                <button onclick="pauseAuto()" id="pauseButton" class="pause-button" style="display: none;">⏸ PAUSE AUTO</button>
+                <button onclick="runAnalysis()">🚀 ANALYZE MOMENTUM</button>
+                <button onclick="pauseAuto()" id="pauseButton" style="display: none; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));">⏸ PAUSE AUTO</button>
             </div>
-        </div>
 
-        <!-- Countdown Timer -->
-        <div class="countdown-timer" id="countdownTimer">
-            <div class="countdown-display" id="countdownDisplay">120</div>
-            <div class="countdown-text">Seconds until next analysis available</div>
-        </div>
+            <div class="countdown-timer" id="countdownTimer">
+                <div class="timer-display" id="timerDisplay">Ready</div>
+                <div class="timer-message" id="timerMessage">Click above to start analysis</div>
+            </div>
 
-        <!-- Progress Container -->
-        <div class="progress-container" id="progressContainer">
             <div class="batch-info" id="batchInfo">
-                <span id="batchProgress">Batch 0 of 0</span>
+                <div class="batch-status" id="batchStatus">Processing in batches of 4 tickers...</div>
+                <div class="batch-progress" id="batchProgress">Batch 1 of 3</div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+
+            <div class="pause-notice" id="pauseNotice">
+                <h3>⏸️ BATCH COMPLETE - WAITING FOR RATE LIMIT</h3>
+                <p>Processed 4 tickers. Ready for next batch in <span id="pauseCountdown">60</span> seconds...</p>
+                <div class="countdown-display" id="autoCountdown" style="display: none; font-size: 4rem; color: var(--accent-yellow); margin: 1rem 0;">60</div>
+                <button class="continue-button" id="continueButton" onclick="continueAnalysis()" disabled>
+                    ⏳ Continue Next Batch (60s)
+                </button>
             </div>
-            <div class="progress-text" id="progressText">Starting analysis...</div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="progress-text" id="progressText">Initializing...</div>
+            </div>
         </div>
 
-        <!-- Pause Notice -->
-        <div class="pause-notice" id="pauseNotice">
-            <h3>⏸️ BATCH COMPLETE</h3>
-            <p id="pauseText">Batch processing paused. Click Continue to process next batch.</p>
-            <div class="countdown-display" id="autoCountdown" style="display: none;">60</div>
-            <button onclick="continueAnalysis()" id="continueButton">▶ CONTINUE TO NEXT BATCH</button>
-        </div>
+        <div id="results"></div>
 
-        <!-- Results -->
-        <div class="results" id="results"></div>
+        <div class="footer">
+            <p>Built for Peter | Score 3+ = DEPLOY | Score 2 = WATCH | Score 0-1 = AVOID/EXIT</p>
+            <p style="margin-top: 0.5rem;">Data provided by Twelve Data API</p>
+        </div>
     </div>
 
     <script>
@@ -820,36 +832,11 @@
             }
         }
         
-        // Load saved API key on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = getApiKey();
-            if (savedKey) {
-                document.getElementById('apiKeyInput').value = savedKey;
-            }
-            updateApiKeyStatus();
-        });
-        
-        const API_DELAY = 8000; // 8 seconds between API calls
-        
-        let nextAvailableTime = 0;
-        let countdownInterval = null;
+        // Auto mode variables
         let autoMode = false;
         let autoPaused = false;
         let autoCountdownInterval = null;
         
-        let batchState = {
-            allTickers: [],
-            currentBatch: 0,
-            batchSize: 4,
-            results: [],
-            regimeMode: null,
-            spyData: null,
-            vooData: null,
-            isProcessing: false
-        };
-        
-        let assetTypes = {};
-
         // Toggle between manual and auto mode
         function toggleMode() {
             autoMode = !autoMode;
@@ -858,18 +845,20 @@
             const autoStatus = document.getElementById('autoStatus');
             
             if (autoMode) {
-                toggle.classList.add('active');
+                toggle.style.background = 'var(--accent-green)';
+                toggle.querySelector('.toggle-slider').style.transform = 'translateX(30px)';
                 label.textContent = 'AUTO';
                 label.style.color = 'var(--accent-green)';
-                autoStatus.classList.add('active');
+                autoStatus.style.display = 'block';
             } else {
-                toggle.classList.remove('active');
+                toggle.style.background = 'var(--border)';
+                toggle.querySelector('.toggle-slider').style.transform = 'translateX(0)';
                 label.textContent = 'MANUAL';
                 label.style.color = 'var(--text-secondary)';
-                autoStatus.classList.remove('active');
+                autoStatus.style.display = 'none';
             }
         }
-
+        
         // Pause auto mode
         function pauseAuto() {
             autoPaused = true;
@@ -879,46 +868,7 @@
                 autoCountdownInterval = null;
             }
         }
-
-        // Parse asset types
-        function parseAssetTypes() {
-            const input = document.getElementById('assetTypeInput').value;
-            assetTypes = {};
-            
-            if (input.trim()) {
-                const pairs = input.split(',').map(p => p.trim());
-                pairs.forEach(pair => {
-                    const [ticker, type] = pair.split(':').map(s => s.trim().toUpperCase());
-                    if (ticker && type) {
-                        assetTypes[ticker] = type;
-                    }
-                });
-            }
-        }
-
-        // Countdown timer
-        function startCountdownTimer(seconds) {
-            nextAvailableTime = Date.now() + (seconds * 1000);
-            const timerEl = document.getElementById('countdownTimer');
-            const displayEl = document.getElementById('countdownDisplay');
-            
-            timerEl.classList.add('active');
-            
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
-            }
-            
-            countdownInterval = setInterval(() => {
-                const remaining = Math.max(0, Math.ceil((nextAvailableTime - Date.now()) / 1000));
-                displayEl.textContent = remaining;
-                
-                if (remaining === 0) {
-                    clearInterval(countdownInterval);
-                    timerEl.classList.remove('active');
-                }
-            }, 1000);
-        }
-
+        
         // Auto countdown between batches
         function startAutoCountdown(seconds, callback) {
             const displayEl = document.getElementById('autoCountdown');
@@ -944,49 +894,322 @@
                 }
             }, 1000);
         }
+        
+        // Load saved API key on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = getApiKey();
+            if (savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+            updateApiKeyStatus();
+        });
+        
+        // Twelve Data API Configuration
+        const TWELVE_DATA_API_KEY = getApiKey(); // Dynamically retrieved from localStorage
+        
+        // Batch processing state
+        let batchState = {
+            allTickers: [],
+            currentBatch: 0,
+            batchSize: 4,
+            results: [],
+            regimeMode: null,
+            spyData: null,
+            vooData: null,
+            isProcessing: false
+        };
 
-        // Update progress
-        function updateProgress(current, total, text) {
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const progressContainer = document.getElementById('progressContainer');
+        // Timer state
+        let countdownInterval = null;
+        let nextAvailableTime = Date.now();
+        
+        // Asset configuration
+        let assetTypes = {};
+
+        // Parse asset types from input
+        function parseAssetTypes() {
+            const input = document.getElementById('assetTypes').value;
+            assetTypes = {};
             
-            progressContainer.classList.add('active');
-            
-            const percentage = (current / total) * 100;
-            progressFill.style.width = `${percentage}%`;
-            progressText.textContent = text;
+            input.split(',').forEach(item => {
+                const [ticker, type] = item.trim().split(':');
+                if (ticker && type) {
+                    assetTypes[ticker.toUpperCase()] = type.toUpperCase();
+                }
+            });
         }
 
-        // Show pause notice
-        function showPauseNotice(currentBatch, totalBatches, remainingTickers) {
+        // Countdown timer
+        function startCountdownTimer(seconds) {
+            nextAvailableTime = Date.now() + (seconds * 1000);
+            
+            const timerEl = document.getElementById('countdownTimer');
+            const displayEl = document.getElementById('timerDisplay');
+            const messageEl = document.getElementById('timerMessage');
+            
+            timerEl.classList.add('active', 'waiting');
+            timerEl.classList.remove('ready');
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((nextAvailableTime - Date.now()) / 1000));
+                
+                if (remaining > 0) {
+                    const minutes = Math.floor(remaining / 60);
+                    const seconds = remaining % 60;
+                    displayEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    displayEl.classList.add('waiting');
+                    messageEl.textContent = 'Waiting for rate limit cooldown...';
+                } else {
+                    displayEl.textContent = '✅ Ready';
+                    displayEl.classList.remove('waiting');
+                    messageEl.textContent = 'Safe to run next analysis';
+                    timerEl.classList.remove('waiting');
+                    timerEl.classList.add('ready');
+                    clearInterval(countdownInterval);
+                }
+            }, 100);
+        }
+
+        // Update progress bar
+        function updateProgress(current, total, message) {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            const percentage = Math.round((current / total) * 100);
+            
+            progressContainer.classList.add('active');
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '%';
+            progressText.textContent = message;
+        }
+
+        // Show batch pause notice
+        function showPauseNotice(batchNum, totalBatches, remainingTickers) {
             const pauseNotice = document.getElementById('pauseNotice');
-            const pauseText = document.getElementById('pauseText');
+            const pauseCountdown = document.getElementById('pauseCountdown');
             const continueButton = document.getElementById('continueButton');
             const autoCountdown = document.getElementById('autoCountdown');
             
-            pauseText.textContent = `Batch ${currentBatch} of ${totalBatches} complete. ${remainingTickers} tickers remaining.`;
             pauseNotice.classList.add('active');
-            continueButton.disabled = false;
+            continueButton.disabled = true;
+            
+            let countdown = 60;
+            pauseCountdown.textContent = countdown;
+            continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
             
             if (autoMode && !autoPaused) {
-                // Auto mode: start 60-second countdown
+                // Auto mode: start 60-second countdown and auto-continue
                 document.getElementById('pauseButton').style.display = 'block';
                 continueButton.style.display = 'none';
                 
                 startAutoCountdown(60, () => {
                     pauseNotice.classList.remove('active');
                     document.getElementById('pauseButton').style.display = 'none';
+                    autoPaused = false; // Reset pause flag
                     processBatch();
                 });
             } else {
-                // Manual mode or paused: wait for user
+                // Manual mode or paused: show button and manual countdown
                 continueButton.style.display = 'block';
                 autoCountdown.style.display = 'none';
+                
+                const countdownTimer = setInterval(() => {
+                    countdown--;
+                    pauseCountdown.textContent = countdown;
+                    continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownTimer);
+                        continueButton.disabled = false;
+                        continueButton.textContent = `✅ Continue with ${remainingTickers} tickers`;
+                        pauseCountdown.textContent = '0';
+                    }
+                }, 1000);
             }
         }
+        
+        async function continueAnalysis() {
+            autoPaused = false; // Reset pause flag
+            document.getElementById('pauseNotice').classList.remove('active');
+            document.getElementById('continueButton').disabled = true;
+            await processBatch();
+        }
+        
+        // Finish analysis
+        function finishAnalysis() {
+            document.getElementById('progressContainer').classList.remove('active');
+            document.getElementById('batchInfo').classList.remove('active');
+            document.getElementById('pauseNotice').classList.remove('active');
+            document.getElementById('pauseButton').style.display = 'none';
+            batchState.isProcessing = false;
+            autoPaused = false;
+            
+            // Start cooldown timer (2 minutes)
+            startCountdownTimer(120);
+        }
+        function calculateRSI(prices, period = 14) {
+            if (prices.length < period + 1) return 50;
+            
+            const changes = [];
+            for (let i = 1; i < prices.length; i++) {
+                changes.push(prices[i] - prices[i - 1]);
+            }
+            
+            const gains = changes.slice(-period).filter(x => x > 0);
+            const losses = changes.slice(-period).filter(x => x < 0).map(Math.abs);
+            
+            const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / period : 0;
+            const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / period : 0;
+            
+            if (avgLoss === 0) return 100;
+            
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
 
-        // Fetch stock data
+        function calculateMA(prices, period) {
+            if (prices.length < period) return prices[prices.length - 1];
+            const slice = prices.slice(-period);
+            return slice.reduce((a, b) => a + b, 0) / period;
+        }
+
+        function calculateVolRatio(volumes, period = 20) {
+            if (volumes.length < period) return 1.0;
+            
+            // Check if market is open (rough estimate)
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+            
+            // If it's a weekday (1-5) and between 9 AM - 4 PM, use YESTERDAY's volume
+            // This avoids incomplete intraday volume from the API
+            const isMarketHours = (day >= 1 && day <= 5) && (hour >= 9 && hour < 16);
+            
+            let currentVol;
+            if (isMarketHours && volumes.length >= 2) {
+                // Use previous day's volume (more reliable during market hours)
+                currentVol = volumes[volumes.length - 2];
+            } else {
+                // Use today's volume (after hours or weekend)
+                currentVol = volumes[volumes.length - 1];
+            }
+            
+            const avgVol = calculateMA(volumes.slice(0, -1), period); // Average of historical, not including today
+            
+            // Handle missing or zero volume data
+            if (!currentVol || currentVol === 0 || !avgVol || avgVol === 0) {
+                return 1.0; // Return neutral if data is missing
+            }
+            
+            // Simple calculation - just return the ratio
+            return currentVol / avgVol;
+        }
+
+        // Calculate recent performance metrics
+        function calculatePerformanceMetrics(prices) {
+            const metrics = {
+                change1Day: 0,
+                change5Day: 0,
+                change10Day: 0
+            };
+
+            if (prices.length < 2) return metrics;
+
+            const currentPrice = prices[prices.length - 1];
+
+            // 1-day change
+            if (prices.length >= 2) {
+                const price1DayAgo = prices[prices.length - 2];
+                metrics.change1Day = ((currentPrice / price1DayAgo) - 1) * 100;
+            }
+
+            // 5-day change
+            if (prices.length >= 6) {
+                const price5DaysAgo = prices[prices.length - 6];
+                metrics.change5Day = ((currentPrice / price5DaysAgo) - 1) * 100;
+            }
+
+            // 10-day change
+            if (prices.length >= 11) {
+                const price10DaysAgo = prices[prices.length - 11];
+                metrics.change10Day = ((currentPrice / price10DaysAgo) - 1) * 100;
+            }
+
+            return metrics;
+        }
+
+        // Generate warnings based on performance
+        function generatePerformanceWarnings(perf, rsi, score) {
+            const warnings = [];
+            let severity = 'normal'; // normal, warning, danger
+            let positionSize = '1%'; // Suggested position size
+
+            // Check for extended moves
+            if (perf.change5Day > 10) {
+                warnings.push({
+                    text: `🔥 Up ${perf.change5Day.toFixed(1)}% in 5 days - parabolic move, very high risk`,
+                    level: 'danger'
+                });
+                severity = 'danger';
+                positionSize = '0.25-0.5%';
+            } else if (perf.change5Day > 7) {
+                warnings.push({
+                    text: `📈 Up ${perf.change5Day.toFixed(1)}% in 5 days - extended, consider smaller size`,
+                    level: 'warning'
+                });
+                severity = 'warning';
+                positionSize = '0.5-0.75%';
+            } else if (perf.change5Day > 5) {
+                warnings.push({
+                    text: `📊 Up ${perf.change5Day.toFixed(1)}% in 5 days - some extension, watch for pullback`,
+                    level: 'warning'
+                });
+                if (severity === 'normal') severity = 'warning';
+                positionSize = '0.75%';
+            }
+
+            // Check for overbought + extended
+            if (rsi > 75 && perf.change5Day > 5) {
+                warnings.push({
+                    text: `⚠️ Overbought (RSI ${rsi.toFixed(0)}) + extended move - high reversal risk`,
+                    level: 'danger'
+                });
+                severity = 'danger';
+                positionSize = '0.25-0.5%';
+            } else if (rsi > 70 && perf.change5Day > 7) {
+                warnings.push({
+                    text: `⚠️ Elevated RSI + strong move - wait for pullback to 20-DMA`,
+                    level: 'warning'
+                });
+                if (severity !== 'danger') severity = 'warning';
+            }
+
+            // Check for climax volume scenario
+            // (would need volume data comparison - placeholder for now)
+
+            // Fresh setup (good entry)
+            if (perf.change5Day < 3 && perf.change5Day > -2 && score >= 3) {
+                warnings.push({
+                    text: `✅ Fresh setup - minimal extension, good entry timing`,
+                    level: 'normal'
+                });
+            }
+
+            // Strong momentum continuation
+            if (perf.change10Day > 15 && perf.change5Day > 5) {
+                warnings.push({
+                    text: `🚀 Strong 10-day trend (+${perf.change10Day.toFixed(1)}%) - momentum established but late entry`,
+                    level: 'warning'
+                });
+            }
+
+            return { warnings, severity, positionSize };
+        }
+
+        // Fetch stock data from Twelve Data API
         async function fetchStockData(ticker) {
             const apiKey = getApiKey();
             
@@ -995,25 +1218,20 @@
                 throw new Error('No API key available');
             }
             
+            const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=180&apikey=${apiKey}`;
+            
             try {
-                const response = await fetch(
-                    `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=300&apikey=${apiKey}`
-                );
-                
-                if (!response.ok) {
-                    console.error(`Failed to fetch ${ticker}`);
-                    return null;
-                }
-                
+                const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.status === 'error' || !data.values) {
-                    console.error(`Error for ${ticker}:`, data.message);
-                    return null;
+                    console.error(`Error for ${ticker}:`, data.message || 'Invalid data');
+                    throw new Error(data.message || 'Invalid data');
                 }
                 
-                const prices = data.values.map(v => parseFloat(v.close)).reverse();
-                const volumes = data.values.map(v => parseFloat(v.volume)).reverse();
+                const values = data.values.reverse();
+                const prices = values.map(v => parseFloat(v.close));
+                const volumes = values.map(v => parseFloat(v.volume));
                 
                 return { prices, volumes };
             } catch (error) {
@@ -1022,253 +1240,277 @@
             }
         }
 
-        // Calculate moving average
-        function calculateMA(prices, period) {
-            if (prices.length < period) return null;
-            const slice = prices.slice(-period);
-            return slice.reduce((a, b) => a + b, 0) / period;
-        }
-
-        // Calculate RSI
-        function calculateRSI(prices, period = 14) {
-            if (prices.length < period + 1) return null;
-            
-            let gains = 0;
-            let losses = 0;
-            
-            for (let i = prices.length - period; i < prices.length; i++) {
-                const change = prices[i] - prices[i - 1];
-                if (change > 0) gains += change;
-                else losses -= change;
-            }
-            
-            const avgGain = gains / period;
-            const avgLoss = losses / period;
-            
-            if (avgLoss === 0) return 100;
-            
-            const rs = avgGain / avgLoss;
-            return 100 - (100 / (1 + rs));
-        }
-
-        // Get regime mode
+        // Determine regime mode
         function getRegimeMode(vooPrices) {
+            if (vooPrices.length < 200) return 'RISK';
+            
             const currentPrice = vooPrices[vooPrices.length - 1];
             const dma200 = calculateMA(vooPrices, 200);
+            
             return currentPrice > dma200 ? 'RISK' : 'DEFENSIVE';
         }
 
-        // Get active mode for ticker
+        // Determine active mode for ticker
         function getActiveMode(ticker, regimeMode) {
             const assetType = assetTypes[ticker] || 'RISK';
             
-            if (assetType === 'DEFENSIVE') {
-                return regimeMode === 'DEFENSIVE' ? 'DEFENSIVE' : 'OFF';
+            if (regimeMode === 'DEFENSIVE' || assetType === 'DEFENSIVE') {
+                return 'MODE B';
             }
-            
-            return regimeMode;
+            return 'MODE A';
         }
 
-        // Calculate score
+        // Calculate regime-aware score
         function calculateScore(ticker, data, spyData, mode) {
-            if (mode === 'OFF') {
-                return {
-                    score: 0,
-                    breakdown: { rsi: false, dma20: false, dma50: false, volume: false, rs: false },
-                    perf: { change5d: 0, change1mo: 0 },
-                    perfAnalysis: 'Asset type OFF in current regime'
+            let score = 0;
+            const breakdown = [];
+            
+            const prices = data.prices;
+            const volumes = data.volumes;
+            
+            const currentPrice = prices[prices.length - 1];
+            const prevPrice = prices[prices.length - 2] || currentPrice;
+            const dma20 = calculateMA(prices, 20);
+            const dma50 = calculateMA(prices, 50);
+            const rsi = calculateRSI(prices);
+            const prevRSI = calculateRSI(prices.slice(0, -1));
+            const volRatio = calculateVolRatio(volumes); // Simple number
+            
+            // Calculate performance metrics
+            const perf = calculatePerformanceMetrics(prices);
+            
+            let vsspy = 0;
+            if (spyData && prices.length >= 20 && spyData.prices.length >= 20) {
+                const tickerReturn = ((currentPrice / prices[prices.length - 20]) - 1) * 100;
+                const spyReturn = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
+                vsspy = tickerReturn - spyReturn;
+            }
+            
+            if (mode === 'MODE A') {
+                if (rsi >= 55) {
+                    score++;
+                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥55)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥55)`, pass: false });
+                }
+                
+                if (currentPrice > dma20 && currentPrice > dma50) {
+                    score++;
+                    breakdown.push({ text: '✅ Above both DMAs', pass: true });
+                } else {
+                    breakdown.push({ text: '❌ Below DMA(s)', pass: false });
+                }
+                
+                // Volume check (simple)
+                if (volRatio >= 1.2) {
+                    score++;
+                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.2x)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.2x)`, pass: false });
+                }
+                
+                if (vsspy > 0) {
+                    score++;
+                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
+                }
+            } else {
+                const rsiRising = rsi > prevRSI;
+                
+                if (rsi >= 45 && rsiRising) {
+                    score++;
+                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & rising)`, pass: true });
+                } else if (rsi >= 45) {
+                    breakdown.push({ text: `⚠️ RSI ${rsi.toFixed(1)} (≥45 but not rising)`, pass: false });
+                } else {
+                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & rising)`, pass: false });
+                }
+                
+                const repairing = currentPrice > dma20 && prevPrice < dma20;
+                if (currentPrice > dma20) {
+                    score++;
+                    const tag = repairing ? ' (🔧 REPAIR)' : '';
+                    breakdown.push({ text: `✅ Above 20-DMA${tag}`, pass: true });
+                } else {
+                    breakdown.push({ text: '❌ Below 20-DMA', pass: false });
+                }
+                
+                // Volume check (MODE B uses lower threshold)
+                if (volRatio >= 1.0) {
+                    score++;
+                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.0x)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.0x)`, pass: false });
+                }
+                
+                if (vsspy > 0) {
+                    score++;
+                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
+                }
+            }
+            
+            // Generate performance warnings
+            const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
+            
+            return { score, breakdown, perf, perfAnalysis };
+        }
+
+        function getSignal(score, perf) {
+            if (score >= 3) {
+                // TIMING GATE: Check 5-day performance
+                if (perf.change5Day > 10) {
+                    return { 
+                        text: '🔴 TOO LATE', 
+                        subtext: 'Parabolic move - very high risk',
+                        class: 'exit',
+                        size: '0.25% max'
+                    };
+                } else if (perf.change5Day > 5) {
+                    return { 
+                        text: '🟡 DEPLOY SMALL', 
+                        subtext: 'Extended - reduced size or wait for pullback',
+                        class: 'watch',
+                        size: '0.5-0.75%'
+                    };
+                } else {
+                    return { 
+                        text: '🟢 DEPLOY NOW', 
+                        subtext: 'Fresh setup - good timing',
+                        class: 'deploy',
+                        size: '1%'
+                    };
+                }
+            }
+            
+            if (score === 2) {
+                return { 
+                    text: '⚠️ WATCH', 
+                    subtext: 'Don\'t enter new - hold if owned',
+                    class: 'watch',
+                    size: '0%'
                 };
             }
             
-            const { prices, volumes } = data;
-            const currentPrice = prices[prices.length - 1];
-            
-            // RSI
-            const rsi = calculateRSI(prices);
-            const rsiPass = mode === 'RISK' 
-                ? (rsi >= 40 && rsi <= 70)
-                : (rsi >= 30 && rsi <= 70);
-            
-            // Moving averages
-            const dma20 = calculateMA(prices, 20);
-            const dma50 = calculateMA(prices, 50);
-            const dma20Pass = currentPrice > dma20;
-            const dma50Pass = currentPrice > dma50;
-            
-            // Volume
-            const avgVolume = volumes.slice(-20).reduce((a, b) => a + b, 0) / 20;
-            const currentVolume = volumes[volumes.length - 1];
-            const volumeThreshold = mode === 'RISK' ? 0.8 : 1.0;
-            const volumePass = currentVolume >= (avgVolume * volumeThreshold);
-            
-            // Relative strength vs SPY
-            const spy3moReturn = spyData ? (spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 63] - 1) : 0;
-            const ticker3moReturn = prices[prices.length - 1] / prices[prices.length - 63] - 1;
-            const rsPass = ticker3moReturn > spy3moReturn;
-            
-            // Score calculation
-            let score = 0;
-            if (rsiPass) score++;
-            if (mode === 'RISK' && dma20Pass) score++;
-            if (dma50Pass) score++;
-            if (volumePass) score++;
-            if (rsPass) score++;
-            
-            // Performance metrics
-            const change5d = ((prices[prices.length - 1] / prices[prices.length - 6] - 1) * 100);
-            const change1mo = ((prices[prices.length - 1] / prices[prices.length - 21] - 1) * 100);
-            
-            // Performance analysis
-            let perfAnalysis = '';
-            if (score >= 3) {
-                if (change5d <= 5) perfAnalysis = '🟢 DEPLOY NOW (1%)';
-                else if (change5d <= 10) perfAnalysis = '🟡 DEPLOY SMALL (0.5-0.75%)';
-                else perfAnalysis = '🔴 TOO LATE (0.25% or WAIT)';
-            } else if (score === 2) {
-                perfAnalysis = '⚠️ WATCH (Hold if owned, don\'t enter)';
-            } else {
-                perfAnalysis = '🔴 AVOID/EXIT';
+            if (score === 1) {
+                return { 
+                    text: '🔴 HOLD', 
+                    subtext: 'Weakening - prepare to exit',
+                    class: 'hold',
+                    size: '0%'
+                };
             }
             
-            return {
-                score,
-                breakdown: {
-                    rsi: rsiPass,
-                    dma20: dma20Pass,
-                    dma50: dma50Pass,
-                    volume: volumePass,
-                    rs: rsPass,
-                    rsiValue: rsi,
-                    dma20Value: dma20,
-                    dma50Value: dma50,
-                    volumeRatio: currentVolume / avgVolume
-                },
-                perf: { change5d, change1mo },
-                perfAnalysis
+            return { 
+                text: '🔴 EXIT', 
+                subtext: 'Trend broken - sell',
+                class: 'exit',
+                size: '0%'
             };
         }
 
-        // Render results
         function renderResults(results, regimeMode) {
-            console.log(`📊 renderResults called with ${results.length} results`);
             const resultsDiv = document.getElementById('results');
             
-            if (!resultsDiv) {
-                console.error('❌ Results div not found!');
-                return;
-            }
+            let cardsHTML = '<div class="ticker-grid">';
             
-            console.log(`✓ Results div found, rendering...`);
-            
-            // Sort by score descending
-            const sorted = [...results].sort((a, b) => b.score - a.score);
-            
-            // Generate cards
-            const cardsHTML = sorted.map(result => {
-                const { ticker, assetType, mode, score, breakdown, perf, perfAnalysis } = result;
+            results.forEach(result => {
+                const signal = getSignal(result.score, result.perf);
+                const modeClass = result.mode === 'MODE A' ? 'mode-a' : 'mode-b';
+                const scoreClass = `score-${result.score}`;
                 
-                let cardClass = 'result-card';
-                if (perfAnalysis.includes('DEPLOY NOW')) cardClass += ' deploy';
-                else if (perfAnalysis.includes('DEPLOY SMALL')) cardClass += ' small';
-                else if (perfAnalysis.includes('TOO LATE')) cardClass += ' late';
+                // Performance metrics display
+                const perfClass = result.perfAnalysis.severity === 'danger' ? 'danger' : 
+                                 result.perfAnalysis.severity === 'warning' ? 'warning' : '';
                 
-                let actionClass = 'action-box';
-                if (perfAnalysis.includes('DEPLOY NOW')) actionClass += ' deploy';
-                else if (perfAnalysis.includes('DEPLOY SMALL')) actionClass += ' small';
-                else if (perfAnalysis.includes('TOO LATE')) actionClass += ' late';
-                else if (perfAnalysis.includes('WATCH')) actionClass += ' watch';
-                else actionClass += ' avoid';
-                
-                return `
-                    <div class="${cardClass}">
-                        <div class="card-header">
-                            <div class="ticker-info">
-                                <div class="ticker-name">${ticker}</div>
-                                <div class="asset-badge">${assetType}</div>
-                                <div class="asset-badge">${mode}</div>
+                const perfHTML = `
+                    <div class="performance-metrics ${perfClass}">
+                        <div class="perf-title">📊 Recent Performance</div>
+                        <div class="perf-stats">
+                            <div class="perf-stat">
+                                <span class="perf-label">1-Day</span>
+                                <span class="perf-value ${result.perf.change1Day >= 0 ? 'positive' : 'negative'}">
+                                    ${result.perf.change1Day >= 0 ? '+' : ''}${result.perf.change1Day.toFixed(2)}%
+                                </span>
                             </div>
-                            <div class="score-display score-${score}">${score}/4</div>
-                        </div>
-                        
-                        <div class="metrics-grid">
-                            <div class="metric">
-                                <div class="metric-label">5-Day</div>
-                                <div class="metric-value ${perf.change5d >= 0 ? 'positive' : 'negative'}">
-                                    ${perf.change5d >= 0 ? '+' : ''}${perf.change5d.toFixed(2)}%
-                                </div>
+                            <div class="perf-stat">
+                                <span class="perf-label">5-Day</span>
+                                <span class="perf-value ${result.perf.change5Day >= 0 ? 'positive' : 'negative'}">
+                                    ${result.perf.change5Day >= 0 ? '+' : ''}${result.perf.change5Day.toFixed(2)}%
+                                </span>
                             </div>
-                            <div class="metric">
-                                <div class="metric-label">1-Month</div>
-                                <div class="metric-value ${perf.change1mo >= 0 ? 'positive' : 'negative'}">
-                                    ${perf.change1mo >= 0 ? '+' : ''}${perf.change1mo.toFixed(2)}%
-                                </div>
+                            <div class="perf-stat">
+                                <span class="perf-label">10-Day</span>
+                                <span class="perf-value ${result.perf.change10Day >= 0 ? 'positive' : 'negative'}">
+                                    ${result.perf.change10Day >= 0 ? '+' : ''}${result.perf.change10Day.toFixed(2)}%
+                                </span>
                             </div>
-                            <div class="metric">
-                                <div class="metric-label">RSI (14)</div>
-                                <div class="metric-value">${breakdown.rsiValue?.toFixed(1) || 'N/A'}</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-label">Vol Ratio</div>
-                                <div class="metric-value">${breakdown.volumeRatio?.toFixed(2) || 'N/A'}x</div>
-                            </div>
-                        </div>
-                        
-                        <div class="breakdown">
-                            <div class="breakdown-item ${breakdown.rsi ? 'pass' : 'fail'}">
-                                ${breakdown.rsi ? '✓' : '✗'} RSI
-                            </div>
-                            ${mode === 'RISK' ? `
-                                <div class="breakdown-item ${breakdown.dma20 ? 'pass' : 'fail'}">
-                                    ${breakdown.dma20 ? '✓' : '✗'} 20-DMA
-                                </div>
-                            ` : ''}
-                            <div class="breakdown-item ${breakdown.dma50 ? 'pass' : 'fail'}">
-                                ${breakdown.dma50 ? '✓' : '✗'} 50-DMA
-                            </div>
-                            <div class="breakdown-item ${breakdown.volume ? 'pass' : 'fail'}">
-                                ${breakdown.volume ? '✓' : '✗'} Volume
-                            </div>
-                            <div class="breakdown-item ${breakdown.rs ? 'pass' : 'fail'}">
-                                ${breakdown.rs ? '✓' : '✗'} RS > SPY
-                            </div>
-                        </div>
-                        
-                        <div class="${actionClass}">
-                            ${perfAnalysis}
                         </div>
                     </div>
                 `;
-            }).join('');
+                
+                cardsHTML += `
+                    <div class="ticker-card">
+                        <div class="ticker-header">
+                            <div class="ticker-symbol">${result.ticker}</div>
+                            <div class="ticker-meta">
+                                <div class="asset-type">${result.assetType} Asset</div>
+                                <div class="active-mode ${modeClass}">${result.mode}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-number ${scoreClass}">${result.score}<span style="font-size:1rem; color: var(--text-secondary);">/4</span></div>
+                            <div class="score-info">
+                                <div class="signal ${signal.class}">${signal.text}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${signal.subtext}</div>
+                                ${signal.size ? `<div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); margin-top: 0.5rem;">Position: ${signal.size}</div>` : ''}
+                            </div>
+                        </div>
+                        
+                        ${perfHTML}
+                        
+                        <ul class="breakdown">
+                            ${result.breakdown.map(item => `
+                                <li class="${item.pass ? 'pass' : 'fail'}">${item.text}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
             
-            // Generate summary
-            const deploy = sorted.filter(r => r.perfAnalysis.includes('DEPLOY NOW'));
-            const small = sorted.filter(r => r.perfAnalysis.includes('DEPLOY SMALL'));
-            const late = sorted.filter(r => r.perfAnalysis.includes('TOO LATE'));
-            const watch = sorted.filter(r => r.perfAnalysis.includes('WATCH'));
-            const avoid = sorted.filter(r => r.perfAnalysis.includes('AVOID') || r.perfAnalysis.includes('EXIT'));
+            cardsHTML += '</div>';
+            
+            const deploy = results.filter(r => r.score >= 3 && r.perf.change5Day <= 5);
+            const deploySmall = results.filter(r => r.score >= 3 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
+            const tooLate = results.filter(r => r.score >= 3 && r.perf.change5Day > 10);
+            const watch = results.filter(r => r.score === 2);
+            const avoid = results.filter(r => r.score <= 1);
             
             const summaryHTML = `
                 <div class="summary">
-                    <h2>📊 DEPLOYMENT SUMMARY</h2>
+                    <h2>📋 DEPLOYMENT RECOMMENDATIONS</h2>
                     <div class="summary-grid">
                         <div class="summary-section">
                             <h3><span>🟢</span> DEPLOY NOW (${deploy.length})</h3>
                             <ul>
-                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} (${r.mode}) - ${r.score}/4 - Fresh setup</li>`).join('') : '<li>None</li>'}
+                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} - 1% position (${r.mode}) ${r.score}/4</li>`).join('') : '<li>None - Fresh Score 3-4 setups only</li>'}
                             </ul>
                         </div>
                         
                         <div class="summary-section">
-                            <h3><span>🟡</span> DEPLOY SMALL (${small.length})</h3>
+                            <h3><span>🟡</span> DEPLOY SMALL (${deploySmall.length})</h3>
                             <ul>
-                                ${small.length ? small.map(r => `<li>• ${r.ticker} (${r.mode}) - ${r.score}/4 - Starter size</li>`).join('') : '<li>None</li>'}
+                                ${deploySmall.length ? deploySmall.map(r => `<li>• ${r.ticker} - 0.5-0.75% (extended +${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}
                             </ul>
                         </div>
                         
                         <div class="summary-section">
-                            <h3><span>🔴</span> TOO LATE (${late.length})</h3>
+                            <h3><span>🔴</span> TOO LATE (${tooLate.length})</h3>
                             <ul>
-                                ${late.length ? late.map(r => `<li>• ${r.ticker} (${r.mode}) - Extended move</li>`).join('') : '<li>None</li>'}
+                                ${tooLate.length ? tooLate.map(r => `<li>• ${r.ticker} - Wait for pullback (parabolic +${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}
                             </ul>
                         </div>
                         
@@ -1316,7 +1558,6 @@
             `;
             
             resultsDiv.innerHTML = cardsHTML + summaryHTML;
-            console.log(`✅ Results rendered successfully! Check page for ${results.length} position cards.`);
         }
 
         // Process a single batch
@@ -1325,7 +1566,7 @@
                 // First batch - fetch VOO and SPY
                 updateProgress(0, 2, 'Fetching VOO for regime detection...');
                 batchState.vooData = await fetchStockData('VOO');
-                await new Promise(resolve => setTimeout(resolve, API_DELAY));
+                await new Promise(resolve => setTimeout(resolve, 8000));
                 
                 batchState.regimeMode = batchState.vooData ? getRegimeMode(batchState.vooData.prices) : 'RISK';
                 
@@ -1348,7 +1589,7 @@
                 
                 updateProgress(1, 2, 'Fetching SPY for relative strength...');
                 batchState.spyData = await fetchStockData('SPY');
-                await new Promise(resolve => setTimeout(resolve, API_DELAY));
+                await new Promise(resolve => setTimeout(resolve, 8000));
             }
             
             // Process current batch of tickers
@@ -1388,15 +1629,11 @@
                     });
                     
                     // Render incrementally
-                    console.log(`✓ ${ticker} processed - Score: ${score}/4 - ${perfAnalysis}`);
-                    console.log(`Total results so far: ${batchState.results.length}`);
                     renderResults(batchState.results, batchState.regimeMode);
-                } else {
-                    console.warn(`⚠ Failed to fetch data for ${ticker}`);
                 }
                 
                 if (i < batchTickers.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, API_DELAY));
+                    await new Promise(resolve => setTimeout(resolve, 8000));
                 }
             }
             
@@ -1414,27 +1651,7 @@
         }
 
         // Continue to next batch
-        async function continueAnalysis() {
-            autoPaused = false; // Reset pause flag
-            document.getElementById('pauseNotice').classList.remove('active');
-            document.getElementById('continueButton').disabled = true;
-            await processBatch();
-        }
-
-        // Finish analysis
-        function finishAnalysis() {
-            document.getElementById('progressContainer').classList.remove('active');
-            document.getElementById('batchInfo').classList.remove('active');
-            document.getElementById('pauseNotice').classList.remove('active');
-            document.getElementById('pauseButton').style.display = 'none';
-            batchState.isProcessing = false;
-            autoPaused = false;
-            
-            // Start cooldown timer (2 minutes)
-            startCountdownTimer(120);
-        }
-
-        // Main analysis function
+        // Technical indicators
         async function runAnalysis() {
             // Check if still in cooldown
             if (Date.now() < nextAvailableTime) {
@@ -1470,10 +1687,8 @@
                 isProcessing: true
             };
             
-            autoPaused = false;
             document.getElementById('results').innerHTML = '';
             document.getElementById('pauseNotice').classList.remove('active');
-            document.getElementById('pauseButton').style.display = 'none';
             
             try {
                 await processBatch();
