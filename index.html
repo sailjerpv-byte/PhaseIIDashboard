@@ -1077,36 +1077,43 @@
         }
 
         function calculateVolRatio(volumes, period = 20) {
-            if (volumes.length < period) return 1.0;
-            
-            // Check if market is open (rough estimate)
-            const now = new Date();
-            const hour = now.getHours();
-            const day = now.getDay();
-            
-            // If it's a weekday (1-5) and between 9 AM - 4 PM, use YESTERDAY's volume
-            // This avoids incomplete intraday volume from the API
-            const isMarketHours = (day >= 1 && day <= 5) && (hour >= 9 && hour < 16);
-            
-            let currentVol;
-            if (isMarketHours && volumes.length >= 2) {
-                // Use previous day's volume (more reliable during market hours)
-                currentVol = volumes[volumes.length - 2];
-            } else {
-                // Use today's volume (after hours or weekend)
-                currentVol = volumes[volumes.length - 1];
-            }
-            
-            const avgVol = calculateMA(volumes.slice(0, -1), period); // Average of historical, not including today
-            
-            // Handle missing or zero volume data
-            if (!currentVol || currentVol === 0 || !avgVol || avgVol === 0) {
-                return 1.0; // Return neutral if data is missing
-            }
-            
-            // Simple calculation - just return the ratio
-            return currentVol / avgVol;
-        }
+    if (volumes.length < period + 1) return 1.0;
+    
+    // Check if market is open (rough estimate)
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay();
+    
+    // If it's a weekday (1-5) and between 9 AM - 4 PM, use YESTERDAY's volume
+    // This avoids incomplete intraday volume from the API
+    const isMarketHours = (day >= 1 && day <= 5) && (hour >= 9 && hour < 16);
+    
+    let currentVol;
+    let volumesForAvg;
+    
+    if (isMarketHours && volumes.length >= 2) {
+        // Use yesterday's volume (more reliable during market hours)
+        currentVol = volumes[volumes.length - 2];
+        // Average the 'period' days BEFORE yesterday
+        volumesForAvg = volumes.slice(volumes.length - period - 2, volumes.length - 2);
+    } else {
+        // Use today's volume (after hours or weekend)
+        currentVol = volumes[volumes.length - 1];
+        // Average the 'period' days BEFORE today
+        volumesForAvg = volumes.slice(volumes.length - period - 1, volumes.length - 1);
+    }
+    
+    // Calculate average manually
+    const avgVol = volumesForAvg.reduce((sum, v) => sum + v, 0) / volumesForAvg.length;
+    
+    // Handle missing or zero volume data
+    if (!currentVol || currentVol === 0 || !avgVol || avgVol === 0) {
+        return 1.0; // Return neutral if data is missing
+    }
+    
+    // Return the ratio
+    return currentVol / avgVol;
+}
 
         // Calculate recent performance metrics
         function calculatePerformanceMetrics(prices) {
