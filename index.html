@@ -1375,6 +1375,7 @@
                 const tickerReturn = ((currentPrice / prices[prices.length - 20]) - 1) * 100;
                 const spyReturn = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
                 vsspy = tickerReturn - spyReturn;
+                breakdown.vsspyValue = vsspy;
             }
             
             if (mode === 'MODE A') {
@@ -1591,12 +1592,12 @@
                     breakdownHTML.push(`<li class="${result.breakdown.rsi ? 'pass' : 'fail'}">${result.breakdown.rsi ? '✅' : '❌'} RSI ${result.breakdown.rsiValue.toFixed(1)} (≥55)</li>`);
                     breakdownHTML.push(`<li class="${result.breakdown.dma20 && result.breakdown.dma50 ? 'pass' : 'fail'}">${result.breakdown.dma20 && result.breakdown.dma50 ? '✅' : '❌'} Above both DMAs</li>`);
                     breakdownHTML.push(`<li class="${result.breakdown.volume ? 'pass' : 'fail'}">${result.breakdown.volume ? '✅' : '❌'} Vol ${result.breakdown.volumeRatio.toFixed(2)}x (≥1.2x)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} Positive vs SPY</li>`);
+                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} ${result.breakdown.vsspyValue !== undefined ? (result.breakdown.vsspyValue >= 0 ? '+' : '') + result.breakdown.vsspyValue.toFixed(2) + '%' : ''} vs SPY</li>`);
                 } else {
                     breakdownHTML.push(`<li class="${result.breakdown.rsi ? 'pass' : 'fail'}">${result.breakdown.rsi ? '✅' : '❌'} RSI ${result.breakdown.rsiValue.toFixed(1)} (≥45 & rising)</li>`);
                     breakdownHTML.push(`<li class="${result.breakdown.dma20 ? 'pass' : 'fail'}">${result.breakdown.dma20 ? '✅' : '❌'} Above 20-DMA</li>`);
                     breakdownHTML.push(`<li class="${result.breakdown.volume ? 'pass' : 'fail'}">${result.breakdown.volume ? '✅' : '❌'} Vol ${result.breakdown.volumeRatio.toFixed(2)}x (≥1.0x)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} Positive vs SPY</li>`);
+                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} ${result.breakdown.vsspyValue !== undefined ? (result.breakdown.vsspyValue >= 0 ? '+' : '') + result.breakdown.vsspyValue.toFixed(2) + '%' : ''} vs SPY</li>`);
                 }
                 
                 cardsHTML += `
