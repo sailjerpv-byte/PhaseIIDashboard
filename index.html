@@ -663,6 +663,79 @@
             }
         }
 
+        /* Deterioration Alert */
+        .deterioration-section {
+            background: rgba(255, 51, 102, 0.08);
+            border: 2px solid var(--accent-red);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .deterioration-section h2 {
+            color: var(--accent-red);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .deterioration-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .deterioration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .deterioration-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .deterioration-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .deterioration-ticker {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .deterioration-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .deterioration-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .deterioration-message {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .deterioration-action {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -729,9 +802,9 @@
             </div>
 
             <div class="input-group">
-                <label for="assetTypes">Asset Classification (Format: TICKER:TYPE)</label>
-                <input type="text" id="assetTypes" placeholder="NVDA:RISK, VXUS:DEFENSIVE" 
-                       value="NVDA:RISK, MSFT:RISK, AVGO:RISK, GOOG:RISK, VOO:RISK, VXUS:DEFENSIVE, VEA:DEFENSIVE, VGSH:DEFENSIVE, IAUM:DEFENSIVE, TSM:RISK, AMD:RISK, MU:RISK, LRCX:RISK, ASML:RISK, KLAC:RISK, BWXT:RISK, XOM:RISK, ITA:RISK, LHX:RISK, GD:RISK, VUG:RISK">
+                <label for="assetTypes">Asset Classification - DEFENSIVE assets only (beta auto-classifies all others):</label>
+                <input type="text" id="assetTypes" placeholder="IAUM:DEFENSIVE, GLD:DEFENSIVE, VGSH:DEFENSIVE" 
+                       value="IAUM:DEFENSIVE, GLD:DEFENSIVE, VGSH:DEFENSIVE">
             </div>
 
             <!-- Mode Toggle -->
@@ -785,7 +858,7 @@
         <div id="results"></div>
 
         <div class="footer">
-            <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0-1 = EXIT</p>
+            <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0-1 = EXIT | Beta Auto-Classification Active</p>
             <p style="margin-top: 0.5rem;">Data provided by Twelve Data API</p>
         </div>
     </div>
@@ -1014,6 +1087,90 @@
                     consecutiveDays: todayTracking[r.ticker].consecutiveDays,
                     firstSeen: todayTracking[r.ticker].firstSeen
                 }));
+        }
+
+        // Deterioration Alert Tracking
+        function getDeteriorationHistory() {
+            const history = localStorage.getItem('deteriorationHistory');
+            return history ? JSON.parse(history) : {};
+        }
+
+        function saveDeteriorationHistory(history) {
+            localStorage.setItem('deteriorationHistory', JSON.stringify(history));
+        }
+
+        function updateDeteriorationTracking(results) {
+            const history = getDeteriorationHistory();
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+            if (!history[today]) history[today] = {};
+
+            results.forEach(result => {
+                const { ticker, score, assetClass } = result;
+                if (assetClass === 'DEFENSIVE') return; // Defensives use standard rules
+
+                const prevData = history[yesterday]?.[ticker];
+                const prevScore = prevData?.score;
+
+                history[today][ticker] = {
+                    score,
+                    assetClass,
+                    prevScore: prevScore || null,
+                    consecutiveLowDays: (score <= 2 && prevData?.score <= 2) 
+                        ? (prevData?.consecutiveLowDays || 0) + 1 
+                        : (score <= 2 ? 1 : 0)
+                };
+            });
+
+            // Clean up old history (keep 30 days)
+            const thirtyDaysAgo = Date.now() - (30 * 86400000);
+            Object.keys(history).forEach(date => {
+                if (new Date(date).getTime() < thirtyDaysAgo) delete history[date];
+            });
+
+            saveDeteriorationHistory(history);
+            return history[today];
+        }
+
+        function getDeteriorationAlerts(results) {
+            const today = new Date().toDateString();
+            const history = getDeteriorationHistory();
+            const todayData = history[today] || {};
+            const alerts = [];
+
+            results.forEach(result => {
+                const { ticker, score, assetClass } = result;
+                if (assetClass === 'DEFENSIVE') return;
+
+                const tracking = todayData[ticker];
+                if (!tracking) return;
+
+                const prevScore = tracking.prevScore;
+                const consecutiveLowDays = tracking.consecutiveLowDays || 0;
+
+                if (assetClass === 'HIGHBETA') {
+                    if (score === 3 && prevScore === 4) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'WATCH', message: 'Score dropped 4→3. Monitor closely.' });
+                    } else if (score === 2 && consecutiveLowDays === 1) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'CUT 50%', message: 'First close at 2/4. Cut position 50% today.' });
+                    } else if (score === 2 && consecutiveLowDays >= 2) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'FULL EXIT', message: 'Second consecutive close at 2/4. Exit full position next morning.' });
+                    } else if (score === 1) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'EMERGENCY EXIT', message: 'Score at 1/4. Exit immediately.' });
+                    }
+                } else { // RISK (low beta)
+                    if (score === 3 && prevScore === 4) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'WATCH', message: 'Score dropped 4→3. Monitor closely.' });
+                    } else if (score === 2) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'TRIM 20-30%', message: 'Score at 2/4. Trim position 20-30%.' });
+                    } else if (score === 1) {
+                        alerts.push({ ticker, score, assetClass, prevScore, action: 'FULL EXIT', message: 'Score at 1/4. Exit full position next morning.' });
+                    }
+                }
+            });
+
+            return alerts;
         }
 
         function getMissingSignal(breakdown, mode) {
@@ -1317,6 +1474,95 @@
             }
         }
 
+        // Fetch beta from Twelve Data API
+        // Calculate 6-month rolling beta from price data (no extra API call needed)
+        function calculateRollingBeta(tickerPrices, spyPrices) {
+            // Use ~126 trading days = 6 months
+            const period = 126;
+            if (tickerPrices.length < period + 1 || spyPrices.length < period + 1) return null;
+
+            const tPrices = tickerPrices.slice(-period - 1);
+            const sPrices = spyPrices.slice(-period - 1);
+
+            // Weekly returns (every 5 days) for ~25 data points — reduces noise vs daily
+            const tickerReturns = [];
+            const spyReturns = [];
+            for (let i = 5; i < tPrices.length; i += 5) {
+                tickerReturns.push((tPrices[i] - tPrices[i - 5]) / tPrices[i - 5]);
+                spyReturns.push((sPrices[i] - sPrices[i - 5]) / sPrices[i - 5]);
+            }
+
+            if (tickerReturns.length < 5) return null;
+
+            const n = tickerReturns.length;
+            const meanT = tickerReturns.reduce((a, b) => a + b, 0) / n;
+            const meanS = spyReturns.reduce((a, b) => a + b, 0) / n;
+
+            let covariance = 0;
+            let varianceSpy = 0;
+            for (let i = 0; i < n; i++) {
+                covariance += (tickerReturns[i] - meanT) * (spyReturns[i] - meanS);
+                varianceSpy += (spyReturns[i] - meanS) ** 2;
+            }
+
+            if (varianceSpy === 0) return null;
+            return covariance / varianceSpy;
+        }
+
+        // Beta classification freeze — 30-day lock
+        function getBetaCache() {
+            const cache = localStorage.getItem('betaClassCache');
+            return cache ? JSON.parse(cache) : {};
+        }
+
+        function saveBetaCache(cache) {
+            localStorage.setItem('betaClassCache', JSON.stringify(cache));
+        }
+
+        function getOrSetBetaClass(ticker, computedBeta) {
+            const cache = getBetaCache();
+            const now = Date.now();
+            const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+
+            if (cache[ticker] && (now - cache[ticker].timestamp) < thirtyDays) {
+                const cached = cache[ticker];
+
+                // Threshold override: force reclassification if beta breaches extremes
+                // even within the 30-day freeze window
+                const forceReclassify = (
+                    computedBeta !== null &&
+                    cached.betaClass === 'HIGHBETA' && (
+                        computedBeta >= 1.7 ||   // Spiking higher — more aggressive
+                        computedBeta < 1.2        // Cooling significantly — no longer HIGHBETA behavior
+                    )
+                );
+
+                if (!forceReclassify) {
+                    return { betaClass: cached.betaClass, beta: cached.beta, frozen: true, reclassified: false };
+                }
+
+                // Force reclassify — reset 30-day clock from today
+                const betaClass = classifyByBeta(computedBeta);
+                cache[ticker] = { betaClass, beta: computedBeta, timestamp: now, reclassifiedAt: now };
+                saveBetaCache(cache);
+                return { betaClass, beta: computedBeta, frozen: false, reclassified: true };
+            }
+
+            // Normal expiry — compute fresh classification
+            const betaClass = classifyByBeta(computedBeta);
+            cache[ticker] = { betaClass, beta: computedBeta, timestamp: now };
+            saveBetaCache(cache);
+            return { betaClass, beta: computedBeta, frozen: false, reclassified: false };
+        }
+
+        // Classify asset type based on beta
+        function classifyByBeta(beta) {
+            if (beta === null || beta === undefined) return 'RISK'; // default if unavailable
+            if (beta >= 1.5) return 'HIGHBETA';
+            if (beta >= 0.8) return 'RISK';
+            return 'LOWBETA';
+        }
+
         // Determine regime mode
         function getRegimeMode(vooPrices) {
             if (vooPrices.length < 200) return 'RISK';
@@ -1328,13 +1574,17 @@
         }
 
         // Determine active mode for ticker
-        function getActiveMode(ticker, regimeMode) {
-            const assetType = assetTypes[ticker] || 'RISK';
-            
+        function getActiveMode(ticker, regimeMode, betaClass) {
+            const assetType = assetTypes[ticker] || betaClass || 'RISK';
             if (regimeMode === 'DEFENSIVE' || assetType === 'DEFENSIVE') {
                 return 'MODE B';
             }
             return 'MODE A';
+        }
+
+        function getAssetClass(ticker, beta) {
+            if (assetTypes[ticker] === 'DEFENSIVE') return 'DEFENSIVE';
+            return classifyByBeta(beta);
         }
 
         // Calculate regime-aware score
@@ -1499,6 +1749,49 @@
             // Update stealth tracking
             updateStealthTracking(results);
             const stealthList = getStealthWatchList(results);
+
+            // Update deterioration tracking
+            updateDeteriorationTracking(results);
+            const deteriorationAlerts = getDeteriorationAlerts(results);
+
+            // Render Deterioration Alert section
+            let deteriorationHTML = '';
+            if (deteriorationAlerts.length > 0) {
+                const actionColors = {
+                    'WATCH': '#ffd93d',
+                    'CUT 50%': '#ff9800',
+                    'TRIM 20-30%': '#ff9800',
+                    'FULL EXIT': '#ff3366',
+                    'EMERGENCY EXIT': '#ff0000'
+                };
+                const deteriorationCards = deteriorationAlerts.map(a => {
+                    const color = actionColors[a.action] || '#ffd93d';
+                    const betaLabel = a.assetClass === 'HIGHBETA' ? '⚡ HIGH BETA' : '📊 LOW BETA';
+                    return `
+                        <div class="deterioration-card" style="border-left: 4px solid ${color};">
+                            <div class="deterioration-header">
+                                <div class="deterioration-ticker">${a.ticker}</div>
+                                <div class="deterioration-badge" style="color: ${color};">${betaLabel}</div>
+                            </div>
+                            <div class="deterioration-score">${a.prevScore ? a.prevScore + '/4 → ' : ''}${a.score}/4</div>
+                            <div class="deterioration-message">${a.message}</div>
+                            <div class="deterioration-action" style="color: ${color};">⚠️ ${a.action}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                deteriorationHTML = `
+                    <div class="deterioration-section">
+                        <h2>🚨 DETERIORATION ALERT</h2>
+                        <div class="deterioration-subtitle">
+                            Positions showing score deterioration. Take action per asset class rules.
+                        </div>
+                        <div class="deterioration-grid">
+                            ${deteriorationCards}
+                        </div>
+                    </div>
+                `;
+            }
             
             // Render Stealth Watch section
             let stealthHTML = '';
@@ -1605,7 +1898,7 @@
                         <div class="ticker-header">
                             <div class="ticker-symbol">${result.ticker}</div>
                             <div class="ticker-meta">
-                                <div class="asset-type">${result.assetType} Asset</div>
+                                <div class="asset-type">${result.assetClass || result.assetType}${result.beta !== null && result.beta !== undefined ? ' (β' + result.beta.toFixed(2) + (result.betaFrozen ? ' 🔒' : result.betaReclassified ? ' ⚡' : ' ✨') + ')' : ''}</div>
                                 <div class="active-mode ${modeClass}">${result.mode}</div>
                             </div>
                         </div>
@@ -1704,7 +1997,7 @@
                 </div>
             `;
             
-            resultsDiv.innerHTML = stealthHTML + cardsHTML + summaryHTML;
+            resultsDiv.innerHTML = deteriorationHTML + stealthHTML + cardsHTML + summaryHTML;
         }
 
         // Process a single batch
@@ -1758,13 +2051,25 @@
                 const data = await fetchStockData(ticker);
                 
                 if (data) {
-                    const assetType = assetTypes[ticker] || 'RISK';
-                    const mode = getActiveMode(ticker, batchState.regimeMode);
+                    // Calculate 6-month rolling beta from price data (no extra API call)
+                    const computedBeta = batchState.spyData 
+                        ? calculateRollingBeta(data.prices, batchState.spyData.prices)
+                        : null;
+                    
+                    // Apply 30-day freeze on beta classification
+                    const { betaClass, beta, frozen, reclassified } = getOrSetBetaClass(ticker, computedBeta);
+                    const assetClass = getAssetClass(ticker, beta);
+                    const assetType = assetTypes[ticker] || assetClass;
+                    const mode = getActiveMode(ticker, batchState.regimeMode, assetClass);
                     const { score, breakdown, perf, perfAnalysis } = calculateScore(ticker, data, batchState.spyData, mode);
                     
                     batchState.results.push({
                         ticker,
                         assetType,
+                        assetClass,
+                        beta,
+                        betaFrozen: frozen,
+                        betaReclassified: reclassified,
                         mode,
                         score,
                         breakdown,
