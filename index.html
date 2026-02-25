@@ -160,7 +160,7 @@
             color: var(--text-secondary);
         }
 
-        input[type="text"], input[type="password"], select {
+        input[type="text"], select {
             width: 100%;
             padding: 0.75rem;
             background: var(--bg-secondary);
@@ -171,7 +171,7 @@
             font-size: 0.9rem;
         }
 
-        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+        input[type="text"]:focus, select:focus {
             outline: none;
             border-color: var(--accent-blue);
         }
@@ -663,79 +663,6 @@
             }
         }
 
-        /* Deterioration Alert */
-        .deterioration-section {
-            background: rgba(255, 51, 102, 0.08);
-            border: 2px solid var(--accent-red);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .deterioration-section h2 {
-            color: var(--accent-red);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .deterioration-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .deterioration-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .deterioration-card {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 1rem;
-            border-left: 4px solid var(--accent-red);
-        }
-
-        .deterioration-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .deterioration-ticker {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .deterioration-badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .deterioration-score {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            color: var(--accent-red);
-            margin-bottom: 0.5rem;
-        }
-
-        .deterioration-message {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .deterioration-action {
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
-        }
-
         /* Footer */
         .footer {
             text-align: center;
@@ -787,46 +714,17 @@
 
         <div class="controls">
             <div class="input-group">
-                <label for="apiKeyInput">Twelve Data API Key:</label>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <input type="password" id="apiKeyInput" placeholder="Enter your API key (saved in browser)" style="flex: 1;">
-                    <button onclick="saveApiKey()" style="padding: 0.75rem 1.5rem; white-space: nowrap;">💾 Save Key</button>
-                    <button onclick="clearApiKey()" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));">🗑️</button>
-                </div>
-                <div id="apiKeyStatus" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);"></div>
-            </div>
-
-            <div class="input-group">
                 <label for="tickerInput">Enter Tickers (comma-separated):</label>
                 <input type="text" id="tickerInput" placeholder="NVDA, MSFT, AVGO, VOO, VXUS" value="NVDA, MSFT, AVGO, GOOG, VOO, VXUS, TSM, AMD">
             </div>
 
             <div class="input-group">
-                <label for="assetTypes">Asset Classification - DEFENSIVE assets only (beta auto-classifies all others):</label>
-                <input type="text" id="assetTypes" placeholder="IAUM:DEFENSIVE, GLD:DEFENSIVE, VGSH:DEFENSIVE" 
-                       value="IAUM:DEFENSIVE, GLD:DEFENSIVE, VGSH:DEFENSIVE">
+                <label for="assetTypes">Asset Classification (Format: TICKER:TYPE)</label>
+                <input type="text" id="assetTypes" placeholder="NVDA:RISK, VXUS:DEFENSIVE" 
+                       value="NVDA:RISK, MSFT:RISK, AVGO:RISK, GOOG:RISK, VOO:RISK, VXUS:DEFENSIVE, VEA:DEFENSIVE, VGSH:DEFENSIVE, IAUM:DEFENSIVE, TSM:RISK, AMD:RISK, MU:RISK, LRCX:RISK, ASML:RISK, KLAC:RISK, BWXT:RISK, XOM:RISK, ITA:RISK, LHX:RISK, GD:RISK, VUG:RISK">
             </div>
 
-            <!-- Mode Toggle -->
-            <div class="mode-toggle" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary);">Scan Mode:</label>
-                <div id="modeToggle" class="toggle-switch" onclick="toggleMode()" style="position: relative; width: 60px; height: 30px; background: var(--border); border-radius: 15px; cursor: pointer; transition: background 0.3s;">
-                    <div class="toggle-slider" style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s;"></div>
-                </div>
-                <span id="modeLabel" style="font-weight: 700; color: var(--text-secondary);">MANUAL</span>
-            </div>
-
-            <div class="auto-status" id="autoStatus" style="display: none; padding: 1rem; background: var(--bg-secondary); border-left: 4px solid var(--accent-green); border-radius: 8px; margin-top: 1rem;">
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>🤖 AUTO MODE ENABLED</strong></p>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• System will automatically process all batches with 60-second delays</p>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• You can pause at any time using the pause button</p>
-                <p style="font-size: 0.85rem; color: var(--text-secondary);">• Each batch processes 4 positions to respect API rate limits</p>
-            </div>
-
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button onclick="runAnalysis()">🚀 ANALYZE MOMENTUM</button>
-                <button onclick="pauseAuto()" id="pauseButton" style="display: none; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));">⏸ PAUSE AUTO</button>
-            </div>
+            <button onclick="runAnalysis()">🚀 ANALYZE MOMENTUM</button>
 
             <div class="countdown-timer" id="countdownTimer">
                 <div class="timer-display" id="timerDisplay">Ready</div>
@@ -841,7 +739,6 @@
             <div class="pause-notice" id="pauseNotice">
                 <h3>⏸️ BATCH COMPLETE - WAITING FOR RATE LIMIT</h3>
                 <p>Processed 4 tickers. Ready for next batch in <span id="pauseCountdown">60</span> seconds...</p>
-                <div class="countdown-display" id="autoCountdown" style="display: none; font-size: 4rem; color: var(--accent-yellow); margin: 1rem 0;">60</div>
                 <button class="continue-button" id="continueButton" onclick="continueAnalysis()" disabled>
                     ⏳ Continue Next Batch (60s)
                 </button>
@@ -858,123 +755,47 @@
         <div id="results"></div>
 
         <div class="footer">
-            <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0-1 = EXIT | Beta Auto-Classification Active</p>
+            <p>Built for Peter | Score 3+ = DEPLOY | Score 2 = WATCH | Score 0-1 = AVOID/EXIT</p>
             <p style="margin-top: 0.5rem;">Data provided by Twelve Data API</p>
         </div>
     </div>
 
     <script>
-        // API key management
-        function getApiKey() {
-            return localStorage.getItem('twelveDataApiKey') || '';
+        // Twelve Data API Configuration
+        const TWELVE_DATA_API_KEY = 'e58789837020410bb3a50420942ac926';
+        
+        // Save inputs to localStorage
+        function saveInputs() {
+            const tickers = document.getElementById('tickerInput').value;
+            const assetTypes = document.getElementById('assetTypes').value;
+            
+            localStorage.setItem('savedTickers', tickers);
+            localStorage.setItem('savedAssetTypes', assetTypes);
         }
         
-        function saveApiKey() {
-            const apiKeyInput = document.getElementById('apiKeyInput');
-            const apiKey = apiKeyInput.value.trim();
+        // Load inputs from localStorage
+        function loadSavedInputs() {
+            const savedTickers = localStorage.getItem('savedTickers');
+            const savedAssetTypes = localStorage.getItem('savedAssetTypes');
             
-            if (!apiKey) {
-                alert('Please enter an API key');
-                return;
+            if (savedTickers) {
+                document.getElementById('tickerInput').value = savedTickers;
             }
-            
-            localStorage.setItem('twelveDataApiKey', apiKey);
-            updateApiKeyStatus();
-            alert('API key saved successfully! It will be used for all future scans.');
-        }
-        
-        function clearApiKey() {
-            if (confirm('Are you sure you want to remove your saved API key?')) {
-                localStorage.removeItem('twelveDataApiKey');
-                document.getElementById('apiKeyInput').value = '';
-                updateApiKeyStatus();
+            if (savedAssetTypes) {
+                document.getElementById('assetTypes').value = savedAssetTypes;
             }
         }
         
-        function updateApiKeyStatus() {
-            const apiKey = getApiKey();
-            const statusEl = document.getElementById('apiKeyStatus');
-            
-            if (apiKey) {
-                const masked = '•'.repeat(Math.min(apiKey.length, 20));
-                statusEl.innerHTML = `✅ API Key saved: <span style="color: var(--accent-green); font-family: monospace;">${masked}</span> <span style="color: var(--text-secondary);">(${apiKey.length} characters)</span>`;
-                statusEl.style.color = 'var(--accent-green)';
-            } else {
-                statusEl.innerHTML = '⚠️ No API key saved. Please enter and save your Twelve Data API key.';
-                statusEl.style.color = 'var(--accent-yellow)';
-            }
+        // Auto-save inputs when they change
+        function setupAutoSave() {
+            document.getElementById('tickerInput').addEventListener('blur', saveInputs);
+            document.getElementById('assetTypes').addEventListener('blur', saveInputs);
         }
         
-        // Auto mode variables
-        let autoMode = false;
-        let autoPaused = false;
-        let autoCountdownInterval = null;
-        
-        // Toggle between manual and auto mode
-        function toggleMode() {
-            autoMode = !autoMode;
-            const toggle = document.getElementById('modeToggle');
-            const label = document.getElementById('modeLabel');
-            const autoStatus = document.getElementById('autoStatus');
-            
-            if (autoMode) {
-                toggle.style.background = 'var(--accent-green)';
-                toggle.querySelector('.toggle-slider').style.transform = 'translateX(30px)';
-                label.textContent = 'AUTO';
-                label.style.color = 'var(--accent-green)';
-                autoStatus.style.display = 'block';
-            } else {
-                toggle.style.background = 'var(--border)';
-                toggle.querySelector('.toggle-slider').style.transform = 'translateX(0)';
-                label.textContent = 'MANUAL';
-                label.style.color = 'var(--text-secondary)';
-                autoStatus.style.display = 'none';
-            }
-        }
-        
-        // Pause auto mode
-        function pauseAuto() {
-            autoPaused = true;
-            document.getElementById('pauseButton').style.display = 'none';
-            if (autoCountdownInterval) {
-                clearInterval(autoCountdownInterval);
-                autoCountdownInterval = null;
-            }
-        }
-        
-        // Auto countdown between batches
-        function startAutoCountdown(seconds, callback) {
-            const displayEl = document.getElementById('autoCountdown');
-            displayEl.style.display = 'block';
-            displayEl.textContent = seconds;
-            
-            let remaining = seconds;
-            
-            autoCountdownInterval = setInterval(() => {
-                if (autoPaused) {
-                    clearInterval(autoCountdownInterval);
-                    displayEl.style.display = 'none';
-                    return;
-                }
-                
-                remaining--;
-                displayEl.textContent = remaining;
-                
-                if (remaining === 0) {
-                    clearInterval(autoCountdownInterval);
-                    displayEl.style.display = 'none';
-                    callback();
-                }
-            }, 1000);
-        }
-        
-        // Load saved API key on page load
+        // Load saved inputs on page load
         window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = getApiKey();
-            if (savedKey) {
-                document.getElementById('apiKeyInput').value = savedKey;
-            }
-            updateApiKeyStatus();
+            loadSavedInputs();
+            setupAutoSave();
         });
         
         // Batch processing state
@@ -1007,179 +828,6 @@
                     assetTypes[ticker.toUpperCase()] = type.toUpperCase();
                 }
             });
-        }
-
-        // Stealth Watch Tracking
-        function getStealthHistory() {
-            const history = localStorage.getItem('stealthHistory');
-            return history ? JSON.parse(history) : {};
-        }
-
-        function saveStealthHistory(history) {
-            localStorage.setItem('stealthHistory', JSON.stringify(history));
-        }
-
-        function updateStealthTracking(results) {
-            const history = getStealthHistory();
-            const today = new Date().toDateString();
-            
-            // Initialize today's tracking
-            if (!history[today]) {
-                history[today] = {};
-            }
-            
-            // Update tracking for each ticker
-            results.forEach(result => {
-                const { ticker, score } = result;
-                
-                if (score === 3) {
-                    // Track 3/4 tickers
-                    if (!history[today][ticker]) {
-                        // New 3/4 - check if it was 3/4 yesterday
-                        const yesterday = new Date(Date.now() - 86400000).toDateString();
-                        const yesterdayData = history[yesterday]?.[ticker];
-                        
-                        history[today][ticker] = {
-                            score: 3,
-                            consecutiveDays: yesterdayData?.score === 3 ? yesterdayData.consecutiveDays + 1 : 1,
-                            firstSeen: yesterdayData?.firstSeen || today
-                        };
-                    }
-                } else {
-                    // Not 3/4 - reset tracking
-                    delete history[today][ticker];
-                }
-            });
-            
-            // Clean up old history (keep last 30 days)
-            const thirtyDaysAgo = Date.now() - (30 * 86400000);
-            Object.keys(history).forEach(date => {
-                if (new Date(date).getTime() < thirtyDaysAgo) {
-                    delete history[date];
-                }
-            });
-            
-            saveStealthHistory(history);
-            return history[today];
-        }
-
-        function getStealthWatchList(results) {
-            const today = new Date().toDateString();
-            const history = getStealthHistory();
-            const todayTracking = history[today] || {};
-            
-            return results
-                .filter(r => {
-                    const tracking = todayTracking[r.ticker];
-                    if (!tracking) return false;
-                    
-                    // Criteria for Stealth Watch
-                    return (
-                        r.score === 3 &&  // Must be 3/4
-                        tracking.consecutiveDays >= 5 &&  // 5+ consecutive days
-                        r.breakdown.dma20 &&  // Above 20-DMA
-                        r.breakdown.dma50 &&  // Above 50-DMA
-                        r.perf.change5Day <= 10  // Not extended >10%
-                    );
-                })
-                .map(r => ({
-                    ...r,
-                    consecutiveDays: todayTracking[r.ticker].consecutiveDays,
-                    firstSeen: todayTracking[r.ticker].firstSeen
-                }));
-        }
-
-        // Deterioration Alert Tracking
-        function getDeteriorationHistory() {
-            const history = localStorage.getItem('deteriorationHistory');
-            return history ? JSON.parse(history) : {};
-        }
-
-        function saveDeteriorationHistory(history) {
-            localStorage.setItem('deteriorationHistory', JSON.stringify(history));
-        }
-
-        function updateDeteriorationTracking(results) {
-            const history = getDeteriorationHistory();
-            const today = new Date().toDateString();
-            const yesterday = new Date(Date.now() - 86400000).toDateString();
-
-            if (!history[today]) history[today] = {};
-
-            results.forEach(result => {
-                const { ticker, score, assetClass } = result;
-                if (assetClass === 'DEFENSIVE') return; // Defensives use standard rules
-
-                const prevData = history[yesterday]?.[ticker];
-                const prevScore = prevData?.score;
-
-                history[today][ticker] = {
-                    score,
-                    assetClass,
-                    prevScore: prevScore || null,
-                    consecutiveLowDays: (score <= 2 && prevData?.score <= 2) 
-                        ? (prevData?.consecutiveLowDays || 0) + 1 
-                        : (score <= 2 ? 1 : 0)
-                };
-            });
-
-            // Clean up old history (keep 30 days)
-            const thirtyDaysAgo = Date.now() - (30 * 86400000);
-            Object.keys(history).forEach(date => {
-                if (new Date(date).getTime() < thirtyDaysAgo) delete history[date];
-            });
-
-            saveDeteriorationHistory(history);
-            return history[today];
-        }
-
-        function getDeteriorationAlerts(results) {
-            const today = new Date().toDateString();
-            const history = getDeteriorationHistory();
-            const todayData = history[today] || {};
-            const alerts = [];
-
-            results.forEach(result => {
-                const { ticker, score, assetClass } = result;
-                if (assetClass === 'DEFENSIVE') return;
-
-                const tracking = todayData[ticker];
-                if (!tracking) return;
-
-                const prevScore = tracking.prevScore;
-                const consecutiveLowDays = tracking.consecutiveLowDays || 0;
-
-                if (assetClass === 'HIGHBETA') {
-                    if (score === 3 && prevScore === 4) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'WATCH', message: 'Score dropped 4→3. Monitor closely.' });
-                    } else if (score === 2 && consecutiveLowDays === 1) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'CUT 50%', message: 'First close at 2/4. Cut position 50% today.' });
-                    } else if (score === 2 && consecutiveLowDays >= 2) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'FULL EXIT', message: 'Second consecutive close at 2/4. Exit full position next morning.' });
-                    } else if (score === 1) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'EMERGENCY EXIT', message: 'Score at 1/4. Exit immediately.' });
-                    }
-                } else { // RISK (low beta)
-                    if (score === 3 && prevScore === 4) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'WATCH', message: 'Score dropped 4→3. Monitor closely.' });
-                    } else if (score === 2) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'TRIM 20-30%', message: 'Score at 2/4. Trim position 20-30%.' });
-                    } else if (score === 1) {
-                        alerts.push({ ticker, score, assetClass, prevScore, action: 'FULL EXIT', message: 'Score at 1/4. Exit full position next morning.' });
-                    }
-                }
-            });
-
-            return alerts;
-        }
-
-        function getMissingSignal(breakdown, mode) {
-            if (!breakdown.rsi) return 'RSI';
-            if (mode === 'MODE A' && !breakdown.dma20) return '20-DMA';
-            if (!breakdown.dma50) return '50-DMA';
-            if (!breakdown.volume) return 'Volume';
-            if (!breakdown.rs) return 'RS vs SPY';
-            return 'Unknown';
         }
 
         // Countdown timer
@@ -1234,7 +882,6 @@
             const pauseNotice = document.getElementById('pauseNotice');
             const pauseCountdown = document.getElementById('pauseCountdown');
             const continueButton = document.getElementById('continueButton');
-            const autoCountdown = document.getElementById('autoCountdown');
             
             pauseNotice.classList.add('active');
             continueButton.disabled = true;
@@ -1243,57 +890,21 @@
             pauseCountdown.textContent = countdown;
             continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
             
-            if (autoMode && !autoPaused) {
-                // Auto mode: start 60-second countdown and auto-continue
-                document.getElementById('pauseButton').style.display = 'block';
-                continueButton.style.display = 'none';
+            const countdownTimer = setInterval(() => {
+                countdown--;
+                pauseCountdown.textContent = countdown;
+                continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
                 
-                startAutoCountdown(60, () => {
-                    pauseNotice.classList.remove('active');
-                    document.getElementById('pauseButton').style.display = 'none';
-                    autoPaused = false;
-                    processBatch();
-                });
-            } else {
-                // Manual mode or paused: show button and manual countdown
-                continueButton.style.display = 'block';
-                autoCountdown.style.display = 'none';
-                
-                const countdownTimer = setInterval(() => {
-                    countdown--;
-                    pauseCountdown.textContent = countdown;
-                    continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
-                    
-                    if (countdown <= 0) {
-                        clearInterval(countdownTimer);
-                        continueButton.disabled = false;
-                        continueButton.textContent = `✅ Continue with ${remainingTickers} tickers`;
-                        pauseCountdown.textContent = '0';
-                    }
-                }, 1000);
-            }
-        }
-        
-        async function continueAnalysis() {
-            autoPaused = false;
-            document.getElementById('pauseNotice').classList.remove('active');
-            document.getElementById('continueButton').disabled = true;
-            await processBatch();
-        }
-        
-        // Finish analysis
-        function finishAnalysis() {
-            document.getElementById('progressContainer').classList.remove('active');
-            document.getElementById('batchInfo').classList.remove('active');
-            document.getElementById('pauseNotice').classList.remove('active');
-            document.getElementById('pauseButton').style.display = 'none';
-            batchState.isProcessing = false;
-            autoPaused = false;
-            
-            // Start cooldown timer (2 minutes)
-            startCountdownTimer(120);
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    continueButton.disabled = false;
+                    continueButton.textContent = `✅ Continue with ${remainingTickers} tickers`;
+                    pauseCountdown.textContent = '0';
+                }
+            }, 1000);
         }
 
+        // Technical indicators
         function calculateRSI(prices, period = 14) {
             if (prices.length < period + 1) return 50;
             
@@ -1321,31 +932,34 @@
         }
 
         function calculateVolRatio(volumes, period = 20) {
-            if (volumes.length < period + 1) return 1.0;
+            if (volumes.length < period) return 1.0;
             
+            // Check if market is open (rough estimate)
             const now = new Date();
             const hour = now.getHours();
             const day = now.getDay();
             
+            // If it's a weekday (1-5) and between 9 AM - 4 PM, use YESTERDAY's volume
+            // This avoids incomplete intraday volume from the API
             const isMarketHours = (day >= 1 && day <= 5) && (hour >= 9 && hour < 16);
             
             let currentVol;
-            let volumesForAvg;
-            
             if (isMarketHours && volumes.length >= 2) {
+                // Use previous day's volume (more reliable during market hours)
                 currentVol = volumes[volumes.length - 2];
-                volumesForAvg = volumes.slice(volumes.length - period - 2, volumes.length - 2);
             } else {
+                // Use today's volume (after hours or weekend)
                 currentVol = volumes[volumes.length - 1];
-                volumesForAvg = volumes.slice(volumes.length - period - 1, volumes.length - 1);
             }
             
-            const avgVol = volumesForAvg.reduce((sum, v) => sum + v, 0) / volumesForAvg.length;
+            const avgVol = calculateMA(volumes.slice(0, -1), period); // Average of historical, not including today
             
+            // Handle missing or zero volume data
             if (!currentVol || currentVol === 0 || !avgVol || avgVol === 0) {
-                return 1.0;
+                return 1.0; // Return neutral if data is missing
             }
             
+            // Simple calculation - just return the ratio
             return currentVol / avgVol;
         }
 
@@ -1385,9 +999,10 @@
         // Generate warnings based on performance
         function generatePerformanceWarnings(perf, rsi, score) {
             const warnings = [];
-            let severity = 'normal';
-            let positionSize = '1%';
+            let severity = 'normal'; // normal, warning, danger
+            let positionSize = '1%'; // Suggested position size
 
+            // Check for extended moves
             if (perf.change5Day > 10) {
                 warnings.push({
                     text: `🔥 Up ${perf.change5Day.toFixed(1)}% in 5 days - parabolic move, very high risk`,
@@ -1411,6 +1026,7 @@
                 positionSize = '0.75%';
             }
 
+            // Check for overbought + extended
             if (rsi > 75 && perf.change5Day > 5) {
                 warnings.push({
                     text: `⚠️ Overbought (RSI ${rsi.toFixed(0)}) + extended move - high reversal risk`,
@@ -1426,6 +1042,10 @@
                 if (severity !== 'danger') severity = 'warning';
             }
 
+            // Check for climax volume scenario
+            // (would need volume data comparison - placeholder for now)
+
+            // Fresh setup (good entry)
             if (perf.change5Day < 3 && perf.change5Day > -2 && score >= 3) {
                 warnings.push({
                     text: `✅ Fresh setup - minimal extension, good entry timing`,
@@ -1433,6 +1053,7 @@
                 });
             }
 
+            // Strong momentum continuation
             if (perf.change10Day > 15 && perf.change5Day > 5) {
                 warnings.push({
                     text: `🚀 Strong 10-day trend (+${perf.change10Day.toFixed(1)}%) - momentum established but late entry`,
@@ -1445,21 +1066,13 @@
 
         // Fetch stock data from Twelve Data API
         async function fetchStockData(ticker) {
-            const apiKey = getApiKey();
-            
-            if (!apiKey) {
-                alert('Please save your API key before running analysis');
-                throw new Error('No API key available');
-            }
-            
-            const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=180&apikey=${apiKey}`;
+            const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=180&apikey=${TWELVE_DATA_API_KEY}`;
             
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.status === 'error' || !data.values) {
-                    console.error(`Error for ${ticker}:`, data.message || 'Invalid data');
                     throw new Error(data.message || 'Invalid data');
                 }
                 
@@ -1474,95 +1087,6 @@
             }
         }
 
-        // Fetch beta from Twelve Data API
-        // Calculate 6-month rolling beta from price data (no extra API call needed)
-        function calculateRollingBeta(tickerPrices, spyPrices) {
-            // Use ~126 trading days = 6 months
-            const period = 126;
-            if (tickerPrices.length < period + 1 || spyPrices.length < period + 1) return null;
-
-            const tPrices = tickerPrices.slice(-period - 1);
-            const sPrices = spyPrices.slice(-period - 1);
-
-            // Weekly returns (every 5 days) for ~25 data points — reduces noise vs daily
-            const tickerReturns = [];
-            const spyReturns = [];
-            for (let i = 5; i < tPrices.length; i += 5) {
-                tickerReturns.push((tPrices[i] - tPrices[i - 5]) / tPrices[i - 5]);
-                spyReturns.push((sPrices[i] - sPrices[i - 5]) / sPrices[i - 5]);
-            }
-
-            if (tickerReturns.length < 5) return null;
-
-            const n = tickerReturns.length;
-            const meanT = tickerReturns.reduce((a, b) => a + b, 0) / n;
-            const meanS = spyReturns.reduce((a, b) => a + b, 0) / n;
-
-            let covariance = 0;
-            let varianceSpy = 0;
-            for (let i = 0; i < n; i++) {
-                covariance += (tickerReturns[i] - meanT) * (spyReturns[i] - meanS);
-                varianceSpy += (spyReturns[i] - meanS) ** 2;
-            }
-
-            if (varianceSpy === 0) return null;
-            return covariance / varianceSpy;
-        }
-
-        // Beta classification freeze — 30-day lock
-        function getBetaCache() {
-            const cache = localStorage.getItem('betaClassCache');
-            return cache ? JSON.parse(cache) : {};
-        }
-
-        function saveBetaCache(cache) {
-            localStorage.setItem('betaClassCache', JSON.stringify(cache));
-        }
-
-        function getOrSetBetaClass(ticker, computedBeta) {
-            const cache = getBetaCache();
-            const now = Date.now();
-            const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-
-            if (cache[ticker] && (now - cache[ticker].timestamp) < thirtyDays) {
-                const cached = cache[ticker];
-
-                // Threshold override: force reclassification if beta breaches extremes
-                // even within the 30-day freeze window
-                const forceReclassify = (
-                    computedBeta !== null &&
-                    cached.betaClass === 'HIGHBETA' && (
-                        computedBeta >= 1.7 ||   // Spiking higher — more aggressive
-                        computedBeta < 1.2        // Cooling significantly — no longer HIGHBETA behavior
-                    )
-                );
-
-                if (!forceReclassify) {
-                    return { betaClass: cached.betaClass, beta: cached.beta, frozen: true, reclassified: false };
-                }
-
-                // Force reclassify — reset 30-day clock from today
-                const betaClass = classifyByBeta(computedBeta);
-                cache[ticker] = { betaClass, beta: computedBeta, timestamp: now, reclassifiedAt: now };
-                saveBetaCache(cache);
-                return { betaClass, beta: computedBeta, frozen: false, reclassified: true };
-            }
-
-            // Normal expiry — compute fresh classification
-            const betaClass = classifyByBeta(computedBeta);
-            cache[ticker] = { betaClass, beta: computedBeta, timestamp: now };
-            saveBetaCache(cache);
-            return { betaClass, beta: computedBeta, frozen: false, reclassified: false };
-        }
-
-        // Classify asset type based on beta
-        function classifyByBeta(beta) {
-            if (beta === null || beta === undefined) return 'RISK'; // default if unavailable
-            if (beta >= 1.5) return 'HIGHBETA';
-            if (beta >= 0.8) return 'RISK';
-            return 'LOWBETA';
-        }
-
         // Determine regime mode
         function getRegimeMode(vooPrices) {
             if (vooPrices.length < 200) return 'RISK';
@@ -1574,33 +1098,19 @@
         }
 
         // Determine active mode for ticker
-        function getActiveMode(ticker, regimeMode, betaClass) {
-            const assetType = assetTypes[ticker] || betaClass || 'RISK';
+        function getActiveMode(ticker, regimeMode) {
+            const assetType = assetTypes[ticker] || 'RISK';
+            
             if (regimeMode === 'DEFENSIVE' || assetType === 'DEFENSIVE') {
                 return 'MODE B';
             }
             return 'MODE A';
         }
 
-        function getAssetClass(ticker, beta) {
-            if (assetTypes[ticker] === 'DEFENSIVE') return 'DEFENSIVE';
-            return classifyByBeta(beta);
-        }
-
         // Calculate regime-aware score
         function calculateScore(ticker, data, spyData, mode) {
             let score = 0;
-            const breakdown = {
-                rsi: false,
-                dma20: false,
-                dma50: false,
-                volume: false,
-                rs: false,
-                rsiValue: 0,
-                dma20Value: 0,
-                dma50Value: 0,
-                volumeRatio: 0
-            };
+            const breakdown = [];
             
             const prices = data.prices;
             const volumes = data.volumes;
@@ -1611,13 +1121,9 @@
             const dma50 = calculateMA(prices, 50);
             const rsi = calculateRSI(prices);
             const prevRSI = calculateRSI(prices.slice(0, -1));
-            const volRatio = calculateVolRatio(volumes);
+            const volRatio = calculateVolRatio(volumes); // Simple number
             
-            breakdown.rsiValue = rsi;
-            breakdown.dma20Value = dma20;
-            breakdown.dma50Value = dma50;
-            breakdown.volumeRatio = volRatio;
-            
+            // Calculate performance metrics
             const perf = calculatePerformanceMetrics(prices);
             
             let vsspy = 0;
@@ -1625,64 +1131,83 @@
                 const tickerReturn = ((currentPrice / prices[prices.length - 20]) - 1) * 100;
                 const spyReturn = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
                 vsspy = tickerReturn - spyReturn;
-                breakdown.vsspyValue = vsspy;
             }
             
             if (mode === 'MODE A') {
                 if (rsi >= 55) {
                     score++;
-                    breakdown.rsi = true;
+                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥55)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥55)`, pass: false });
                 }
                 
                 if (currentPrice > dma20 && currentPrice > dma50) {
                     score++;
-                    breakdown.dma20 = true;
-                    breakdown.dma50 = true;
-                } else if (currentPrice > dma50) {
-                    breakdown.dma50 = true;
+                    breakdown.push({ text: '✅ Above both DMAs', pass: true });
+                } else {
+                    breakdown.push({ text: '❌ Below DMA(s)', pass: false });
                 }
                 
+                // Volume check (simple)
                 if (volRatio >= 1.2) {
                     score++;
-                    breakdown.volume = true;
+                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.2x)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.2x)`, pass: false });
                 }
                 
                 if (vsspy > 0) {
                     score++;
-                    breakdown.rs = true;
+                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
                 }
             } else {
                 const rsiRising = rsi > prevRSI;
                 
                 if (rsi >= 45 && rsiRising) {
                     score++;
-                    breakdown.rsi = true;
+                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & rising)`, pass: true });
+                } else if (rsi >= 45) {
+                    breakdown.push({ text: `⚠️ RSI ${rsi.toFixed(1)} (≥45 but not rising)`, pass: false });
+                } else {
+                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & rising)`, pass: false });
                 }
                 
+                const repairing = currentPrice > dma20 && prevPrice < dma20;
                 if (currentPrice > dma20) {
                     score++;
-                    breakdown.dma20 = true;
+                    const tag = repairing ? ' (🔧 REPAIR)' : '';
+                    breakdown.push({ text: `✅ Above 20-DMA${tag}`, pass: true });
+                } else {
+                    breakdown.push({ text: '❌ Below 20-DMA', pass: false });
                 }
                 
+                // Volume check (MODE B uses lower threshold)
                 if (volRatio >= 1.0) {
                     score++;
-                    breakdown.volume = true;
+                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.0x)`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.0x)`, pass: false });
                 }
                 
                 if (vsspy > 0) {
                     score++;
-                    breakdown.rs = true;
+                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                } else {
+                    breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
                 }
             }
             
+            // Generate performance warnings
             const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
             
             return { score, breakdown, perf, perfAnalysis };
         }
 
         function getSignal(score, perf) {
-            // FIXED: Only score 4/4 gets deploy recommendations
-            if (score === 4) {
+            if (score >= 3) {
+                // TIMING GATE: Check 5-day performance
                 if (perf.change5Day > 10) {
                     return { 
                         text: '🔴 TOO LATE', 
@@ -1705,16 +1230,6 @@
                         size: '1%'
                     };
                 }
-            }
-            
-            // Score 3/4 always goes to WATCH (will show in Stealth Watch if meets criteria)
-            if (score === 3) {
-                return { 
-                    text: '⚠️ WATCH', 
-                    subtext: 'Score 3/4 - Track in Stealth Watch',
-                    class: 'watch',
-                    size: '0%'
-                };
             }
             
             if (score === 2) {
@@ -1746,103 +1261,6 @@
         function renderResults(results, regimeMode) {
             const resultsDiv = document.getElementById('results');
             
-            // Update stealth tracking
-            updateStealthTracking(results);
-            const stealthList = getStealthWatchList(results);
-
-            // Update deterioration tracking
-            updateDeteriorationTracking(results);
-            const deteriorationAlerts = getDeteriorationAlerts(results);
-
-            // Render Deterioration Alert section
-            let deteriorationHTML = '';
-            if (deteriorationAlerts.length > 0) {
-                const actionColors = {
-                    'WATCH': '#ffd93d',
-                    'CUT 50%': '#ff9800',
-                    'TRIM 20-30%': '#ff9800',
-                    'FULL EXIT': '#ff3366',
-                    'EMERGENCY EXIT': '#ff0000'
-                };
-                const deteriorationCards = deteriorationAlerts.map(a => {
-                    const color = actionColors[a.action] || '#ffd93d';
-                    const betaLabel = a.assetClass === 'HIGHBETA' ? '⚡ HIGH BETA' : '📊 LOW BETA';
-                    return `
-                        <div class="deterioration-card" style="border-left: 4px solid ${color};">
-                            <div class="deterioration-header">
-                                <div class="deterioration-ticker">${a.ticker}</div>
-                                <div class="deterioration-badge" style="color: ${color};">${betaLabel}</div>
-                            </div>
-                            <div class="deterioration-score">${a.prevScore ? a.prevScore + '/4 → ' : ''}${a.score}/4</div>
-                            <div class="deterioration-message">${a.message}</div>
-                            <div class="deterioration-action" style="color: ${color};">⚠️ ${a.action}</div>
-                        </div>
-                    `;
-                }).join('');
-
-                deteriorationHTML = `
-                    <div class="deterioration-section">
-                        <h2>🚨 DETERIORATION ALERT</h2>
-                        <div class="deterioration-subtitle">
-                            Positions showing score deterioration. Take action per asset class rules.
-                        </div>
-                        <div class="deterioration-grid">
-                            ${deteriorationCards}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Render Stealth Watch section
-            let stealthHTML = '';
-            if (stealthList.length > 0) {
-                const stealthCards = stealthList.map(s => {
-                    const missingSignal = getMissingSignal(s.breakdown, s.mode);
-                    const positionSize = s.consecutiveDays >= 10 ? '1%' : '0.5-0.75%';
-                    
-                    return `
-                        <div class="stealth-card">
-                            <div class="stealth-header">
-                                <div class="stealth-ticker">${s.ticker}</div>
-                                <div class="stealth-score">${s.score}/4</div>
-                            </div>
-                            <div class="stealth-days">📅 ${s.consecutiveDays} days at 3/4</div>
-                            <div class="stealth-metrics">
-                                <div class="stealth-metric">
-                                    <div class="stealth-metric-label">5-Day</div>
-                                    <div class="stealth-metric-value ${s.perf.change5d >= 0 ? 'positive' : 'negative'}">
-                                        ${s.perf.change5d >= 0 ? '+' : ''}${s.perf.change5d.toFixed(2)}%
-                                    </div>
-                                </div>
-                                <div class="stealth-metric">
-                                    <div class="stealth-metric-label">Vol Ratio</div>
-                                    <div class="stealth-metric-value">${s.breakdown.volumeRatio?.toFixed(2)}x</div>
-                                </div>
-                            </div>
-                            <div class="stealth-missing">
-                                ⚠️ Missing: ${missingSignal}
-                            </div>
-                            <div class="stealth-action">
-                                🟡 PROBE ${positionSize}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                stealthHTML = `
-                    <div class="stealth-watch">
-                        <h2>🔍 STEALTH WATCH - Building Momentum (Deploy 3/4)</h2>
-                        <div class="subtitle">
-                            These tickers have been at 3/4 for 5+ days while holding above DMAs. 
-                            Consider small probe positions (0.5-1%) ahead of volume breakout.
-                        </div>
-                        <div class="stealth-grid">
-                            ${stealthCards}
-                        </div>
-                    </div>
-                `;
-            }
-            
             let cardsHTML = '<div class="ticker-grid">';
             
             results.forEach(result => {
@@ -1850,6 +1268,7 @@
                 const modeClass = result.mode === 'MODE A' ? 'mode-a' : 'mode-b';
                 const scoreClass = `score-${result.score}`;
                 
+                // Performance metrics display
                 const perfClass = result.perfAnalysis.severity === 'danger' ? 'danger' : 
                                  result.perfAnalysis.severity === 'warning' ? 'warning' : '';
                 
@@ -1879,26 +1298,12 @@
                     </div>
                 `;
                 
-                // Build breakdown list
-                const breakdownHTML = [];
-                if (result.mode === 'MODE A') {
-                    breakdownHTML.push(`<li class="${result.breakdown.rsi ? 'pass' : 'fail'}">${result.breakdown.rsi ? '✅' : '❌'} RSI ${result.breakdown.rsiValue.toFixed(1)} (≥55)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.dma20 && result.breakdown.dma50 ? 'pass' : 'fail'}">${result.breakdown.dma20 && result.breakdown.dma50 ? '✅' : '❌'} Above both DMAs</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.volume ? 'pass' : 'fail'}">${result.breakdown.volume ? '✅' : '❌'} Vol ${result.breakdown.volumeRatio.toFixed(2)}x (≥1.2x)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} ${result.breakdown.vsspyValue !== undefined ? (result.breakdown.vsspyValue >= 0 ? '+' : '') + result.breakdown.vsspyValue.toFixed(2) + '%' : ''} vs SPY</li>`);
-                } else {
-                    breakdownHTML.push(`<li class="${result.breakdown.rsi ? 'pass' : 'fail'}">${result.breakdown.rsi ? '✅' : '❌'} RSI ${result.breakdown.rsiValue.toFixed(1)} (≥45 & rising)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.dma20 ? 'pass' : 'fail'}">${result.breakdown.dma20 ? '✅' : '❌'} Above 20-DMA</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.volume ? 'pass' : 'fail'}">${result.breakdown.volume ? '✅' : '❌'} Vol ${result.breakdown.volumeRatio.toFixed(2)}x (≥1.0x)</li>`);
-                    breakdownHTML.push(`<li class="${result.breakdown.rs ? 'pass' : 'fail'}">${result.breakdown.rs ? '✅' : '❌'} ${result.breakdown.vsspyValue !== undefined ? (result.breakdown.vsspyValue >= 0 ? '+' : '') + result.breakdown.vsspyValue.toFixed(2) + '%' : ''} vs SPY</li>`);
-                }
-                
                 cardsHTML += `
                     <div class="ticker-card">
                         <div class="ticker-header">
                             <div class="ticker-symbol">${result.ticker}</div>
                             <div class="ticker-meta">
-                                <div class="asset-type">${result.assetClass || result.assetType}${result.beta !== null && result.beta !== undefined ? ' (β' + result.beta.toFixed(2) + (result.betaFrozen ? ' 🔒' : result.betaReclassified ? ' ⚡' : ' ✨') + ')' : ''}</div>
+                                <div class="asset-type">${result.assetType} Asset</div>
                                 <div class="active-mode ${modeClass}">${result.mode}</div>
                             </div>
                         </div>
@@ -1908,14 +1313,16 @@
                             <div class="score-info">
                                 <div class="signal ${signal.class}">${signal.text}</div>
                                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${signal.subtext}</div>
-                                ${signal.size !== '0%' ? `<div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); margin-top: 0.5rem;">Position: ${signal.size}</div>` : ''}
+                                ${signal.size ? `<div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-blue); margin-top: 0.5rem;">Position: ${signal.size}</div>` : ''}
                             </div>
                         </div>
                         
                         ${perfHTML}
                         
                         <ul class="breakdown">
-                            ${breakdownHTML.join('')}
+                            ${result.breakdown.map(item => `
+                                <li class="${item.pass ? 'pass' : 'fail'}">${item.text}</li>
+                            `).join('')}
                         </ul>
                     </div>
                 `;
@@ -1923,10 +1330,10 @@
             
             cardsHTML += '</div>';
             
-            const deploy = results.filter(r => r.score === 4 && r.perf.change5Day <= 5);
-            const deploySmall = results.filter(r => r.score === 4 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
-            const tooLate = results.filter(r => r.score === 4 && r.perf.change5Day > 10);
-            const watch = results.filter(r => r.score === 2 || r.score === 3);
+            const deploy = results.filter(r => r.score >= 3 && r.perf.change5Day <= 5);
+            const deploySmall = results.filter(r => r.score >= 3 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
+            const tooLate = results.filter(r => r.score >= 3 && r.perf.change5Day > 10);
+            const watch = results.filter(r => r.score === 2);
             const avoid = results.filter(r => r.score <= 1);
             
             const summaryHTML = `
@@ -1936,7 +1343,7 @@
                         <div class="summary-section">
                             <h3><span>🟢</span> DEPLOY NOW (${deploy.length})</h3>
                             <ul>
-                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} - 1% position (${r.mode}) ${r.score}/4</li>`).join('') : '<li>None - Fresh Score 4/4 setups only</li>'}
+                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} - 1% position (${r.mode}) ${r.score}/4</li>`).join('') : '<li>None - Fresh Score 3-4 setups only</li>'}
                             </ul>
                         </div>
                         
@@ -1957,7 +1364,7 @@
                         <div class="summary-section">
                             <h3><span>⚠️</span> WATCH (${watch.length})</h3>
                             <ul>
-                                ${watch.length ? watch.map(r => `<li>• ${r.ticker} - ${r.score}/4 - Hold if owned, don't enter new</li>`).join('') : '<li>None</li>'}
+                                ${watch.length ? watch.map(r => `<li>• ${r.ticker} - Hold if owned, don't enter new</li>`).join('') : '<li>None</li>'}
                             </ul>
                         </div>
                         
@@ -1974,19 +1381,19 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; font-size: 0.85rem;">
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-green); margin-bottom: 0.5rem;">🟢 DEPLOY NOW (1%)</div>
-                                <div style="color: var(--text-secondary);">Score 4/4 + 5-day change ≤5%<br>Fresh setup, good timing</div>
+                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change ≤5%<br>Fresh setup, good timing</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-yellow); margin-bottom: 0.5rem;">🟡 DEPLOY SMALL (0.5-0.75%)</div>
-                                <div style="color: var(--text-secondary);">Score 4/4 + 5-day change 5-10%<br>Extended but manageable</div>
+                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change 5-10%<br>Extended but manageable</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-red); margin-bottom: 0.5rem;">🔴 TOO LATE (0.25% max or WAIT)</div>
-                                <div style="color: var(--text-secondary);">Score 4/4 + 5-day change >10%<br>Parabolic, high reversal risk</div>
+                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change >10%<br>Parabolic, high reversal risk</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-yellow); margin-bottom: 0.5rem;">⚠️ WATCH (0%)</div>
-                                <div style="color: var(--text-secondary);">Score 2-3 - Don't enter new<br>Hold if already owned</div>
+                                <div style="color: var(--text-secondary);">Score 2 - Don't enter new<br>Hold if already owned</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-red); margin-bottom: 0.5rem;">🔴 EXIT (0%)</div>
@@ -1997,18 +1404,20 @@
                 </div>
             `;
             
-            resultsDiv.innerHTML = deteriorationHTML + stealthHTML + cardsHTML + summaryHTML;
+            resultsDiv.innerHTML = cardsHTML + summaryHTML;
         }
 
         // Process a single batch
         async function processBatch() {
             if (batchState.currentBatch === 0) {
+                // First batch - fetch VOO and SPY
                 updateProgress(0, 2, 'Fetching VOO for regime detection...');
                 batchState.vooData = await fetchStockData('VOO');
                 await new Promise(resolve => setTimeout(resolve, 8000));
                 
                 batchState.regimeMode = batchState.vooData ? getRegimeMode(batchState.vooData.prices) : 'RISK';
                 
+                // Update regime display
                 const regimeModeEl = document.getElementById('regimeMode');
                 const regimeTextEl = document.getElementById('regimeText');
                 const regimeIconEl = document.getElementById('regimeIcon');
@@ -2030,6 +1439,7 @@
                 await new Promise(resolve => setTimeout(resolve, 8000));
             }
             
+            // Process current batch of tickers
             const startIdx = batchState.currentBatch * batchState.batchSize;
             const endIdx = Math.min(startIdx + batchState.batchSize, batchState.allTickers.length);
             const batchTickers = batchState.allTickers.slice(startIdx, endIdx);
@@ -2051,25 +1461,13 @@
                 const data = await fetchStockData(ticker);
                 
                 if (data) {
-                    // Calculate 6-month rolling beta from price data (no extra API call)
-                    const computedBeta = batchState.spyData 
-                        ? calculateRollingBeta(data.prices, batchState.spyData.prices)
-                        : null;
-                    
-                    // Apply 30-day freeze on beta classification
-                    const { betaClass, beta, frozen, reclassified } = getOrSetBetaClass(ticker, computedBeta);
-                    const assetClass = getAssetClass(ticker, beta);
-                    const assetType = assetTypes[ticker] || assetClass;
-                    const mode = getActiveMode(ticker, batchState.regimeMode, assetClass);
+                    const assetType = assetTypes[ticker] || 'RISK';
+                    const mode = getActiveMode(ticker, batchState.regimeMode);
                     const { score, breakdown, perf, perfAnalysis } = calculateScore(ticker, data, batchState.spyData, mode);
                     
                     batchState.results.push({
                         ticker,
                         assetType,
-                        assetClass,
-                        beta,
-                        betaFrozen: frozen,
-                        betaReclassified: reclassified,
                         mode,
                         score,
                         breakdown,
@@ -2077,6 +1475,7 @@
                         perfAnalysis
                     });
                     
+                    // Render incrementally
                     renderResults(batchState.results, batchState.regimeMode);
                 }
                 
@@ -2087,21 +1486,44 @@
             
             batchState.currentBatch++;
             
+            // Check if more batches remain
             if (batchState.currentBatch < totalBatches) {
                 const remainingTickers = batchState.allTickers.length - (batchState.currentBatch * batchState.batchSize);
                 document.getElementById('progressContainer').classList.remove('active');
                 showPauseNotice(batchState.currentBatch, totalBatches, remainingTickers);
             } else {
+                // All done
                 finishAnalysis();
             }
         }
 
+        // Continue to next batch
+        async function continueAnalysis() {
+            document.getElementById('pauseNotice').classList.remove('active');
+            document.getElementById('continueButton').disabled = true;
+            await processBatch();
+        }
+
+        // Finish analysis
+        function finishAnalysis() {
+            document.getElementById('progressContainer').classList.remove('active');
+            document.getElementById('batchInfo').classList.remove('active');
+            document.getElementById('pauseNotice').classList.remove('active');
+            batchState.isProcessing = false;
+            
+            // Start cooldown timer (2 minutes)
+            startCountdownTimer(120);
+        }
+
+        // Main analysis function
         async function runAnalysis() {
+            // Check if still in cooldown
             if (Date.now() < nextAvailableTime) {
                 alert('Please wait for the countdown timer to finish before running another analysis.');
                 return;
             }
             
+            // Parse inputs
             const tickersInput = document.getElementById('tickerInput').value;
             const tickers = tickersInput.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
             
@@ -2117,6 +1539,7 @@
             
             parseAssetTypes();
             
+            // Reset state
             batchState = {
                 allTickers: tickers,
                 currentBatch: 0,
