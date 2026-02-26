@@ -160,7 +160,7 @@
             color: var(--text-secondary);
         }
 
-        input[type="text"], select {
+        input[type="text"], input[type="password"], select {
             width: 100%;
             padding: 0.75rem;
             background: var(--bg-secondary);
@@ -171,7 +171,7 @@
             font-size: 0.9rem;
         }
 
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
             outline: none;
             border-color: var(--accent-blue);
         }
@@ -714,17 +714,46 @@
 
         <div class="controls">
             <div class="input-group">
+                <label for="apiKeyInput">Twelve Data API Key:</label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input type="password" id="apiKeyInput" placeholder="Enter your API key (saved in browser)" style="flex: 1;">
+                    <button onclick="saveApiKey()" style="padding: 0.75rem 1.5rem; white-space: nowrap;">💾 Save Key</button>
+                    <button onclick="clearApiKey()" style="padding: 0.75rem 1rem; background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow));">🗑️</button>
+                </div>
+                <div id="apiKeyStatus" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);"></div>
+            </div>
+
+            <div class="input-group">
                 <label for="tickerInput">Enter Tickers (comma-separated):</label>
                 <input type="text" id="tickerInput" placeholder="NVDA, MSFT, AVGO, VOO, VXUS" value="NVDA, MSFT, AVGO, GOOG, VOO, VXUS, TSM, AMD">
             </div>
 
             <div class="input-group">
-                <label for="assetTypes">Asset Classification (Format: TICKER:TYPE)</label>
-                <input type="text" id="assetTypes" placeholder="NVDA:RISK, VXUS:DEFENSIVE" 
-                       value="NVDA:RISK, MSFT:RISK, AVGO:RISK, GOOG:RISK, VOO:RISK, VXUS:DEFENSIVE, VEA:DEFENSIVE, VGSH:DEFENSIVE, IAUM:DEFENSIVE, TSM:RISK, AMD:RISK, MU:RISK, LRCX:RISK, ASML:RISK, KLAC:RISK, BWXT:RISK, XOM:RISK, ITA:RISK, LHX:RISK, GD:RISK, VUG:RISK">
+                <label for="assetTypes">Asset Classification - DEFENSIVE assets only (beta auto-classifies all others):</label>
+                <input type="text" id="assetTypes" placeholder="IAUM:DEFENSIVE" 
+                       value="IAUM:DEFENSIVE">
             </div>
 
-            <button onclick="runAnalysis()">🚀 ANALYZE MOMENTUM</button>
+            <!-- Mode Toggle -->
+            <div class="mode-toggle" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary);">Scan Mode:</label>
+                <div id="modeToggle" class="toggle-switch" onclick="toggleMode()" style="position: relative; width: 60px; height: 30px; background: var(--border); border-radius: 15px; cursor: pointer; transition: background 0.3s;">
+                    <div class="toggle-slider" style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: transform 0.3s;"></div>
+                </div>
+                <span id="modeLabel" style="font-weight: 700; color: var(--text-secondary);">MANUAL</span>
+            </div>
+
+            <div class="auto-status" id="autoStatus" style="display: none; padding: 1rem; background: var(--bg-secondary); border-left: 4px solid var(--accent-green); border-radius: 8px; margin-bottom: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;"><strong>🤖 AUTO MODE ENABLED</strong></p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• System will automatically process all batches with 60-second delays</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">• You can pause at any time using the pause button</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">• Each batch processes 4 positions to respect API rate limits</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="runAnalysis()">🚀 ANALYZE MOMENTUM</button>
+                <button onclick="pauseAuto()" id="pauseButton" style="display: none; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));">⏸ PAUSE AUTO</button>
+            </div>
 
             <div class="countdown-timer" id="countdownTimer">
                 <div class="timer-display" id="timerDisplay">Ready</div>
@@ -739,6 +768,7 @@
             <div class="pause-notice" id="pauseNotice">
                 <h3>⏸️ BATCH COMPLETE - WAITING FOR RATE LIMIT</h3>
                 <p>Processed 4 tickers. Ready for next batch in <span id="pauseCountdown">60</span> seconds...</p>
+                <div class="countdown-display" id="autoCountdown" style="display: none; font-size: 4rem; color: var(--accent-yellow); margin: 1rem 0;">60</div>
                 <button class="continue-button" id="continueButton" onclick="continueAnalysis()" disabled>
                     ⏳ Continue Next Batch (60s)
                 </button>
@@ -755,14 +785,55 @@
         <div id="results"></div>
 
         <div class="footer">
-            <p>Built for Peter | Score 3+ = DEPLOY | Score 2 = WATCH | Score 0-1 = AVOID/EXIT</p>
+            <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0-1 = EXIT | Beta Auto-Classification Active</p>
             <p style="margin-top: 0.5rem;">Data provided by Twelve Data API</p>
         </div>
     </div>
 
     <script>
-        // Twelve Data API Configuration
-        const TWELVE_DATA_API_KEY = 'e58789837020410bb3a50420942ac926';
+        // API key management
+        function getApiKey() {
+            return localStorage.getItem('twelveDataApiKey') || '';
+        }
+        
+        function saveApiKey() {
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiKey = apiKeyInput.value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+            
+            localStorage.setItem('twelveDataApiKey', apiKey);
+            updateApiKeyStatus();
+            alert('API key saved successfully! It will be used for all future scans.');
+        }
+        
+        function clearApiKey() {
+            if (confirm('Are you sure you want to remove your saved API key?')) {
+                localStorage.removeItem('twelveDataApiKey');
+                document.getElementById('apiKeyInput').value = '';
+                updateApiKeyStatus();
+            }
+        }
+        
+        function updateApiKeyStatus() {
+            const apiKey = getApiKey();
+            const statusEl = document.getElementById('apiKeyStatus');
+            
+            if (apiKey) {
+                const masked = '•'.repeat(Math.min(apiKey.length, 20));
+                statusEl.innerHTML = `✅ API Key saved: <span style="color: var(--accent-green); font-family: monospace;">${masked}</span> <span style="color: var(--text-secondary);">(${apiKey.length} characters)</span>`;
+                statusEl.style.color = 'var(--accent-green)';
+            } else {
+                statusEl.innerHTML = '⚠️ No API key saved. Please enter and save your Twelve Data API key.';
+                statusEl.style.color = 'var(--accent-yellow)';
+            }
+        }
+        
+        // Twelve Data API Configuration - dynamically retrieved
+        const TWELVE_DATA_API_KEY = getApiKey();
         
         // Save inputs to localStorage
         function saveInputs() {
@@ -794,9 +865,241 @@
         
         // Load saved inputs on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Load saved API key
+            const savedKey = getApiKey();
+            if (savedKey) {
+                document.getElementById('apiKeyInput').value = savedKey;
+            }
+            updateApiKeyStatus();
+            
+            // Load saved inputs
             loadSavedInputs();
             setupAutoSave();
+            checkForSavedProgress();
         });
+        
+        // Wake Lock support (keeps screen active during scan)
+        let wakeLock = null;
+        
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('✅ Screen wake lock activated - phone won\'t sleep during scan');
+                    
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Screen wake lock released');
+                    });
+                }
+            } catch (err) {
+                console.log('Wake lock not supported or denied:', err);
+            }
+        }
+        
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+                console.log('Screen wake lock released');
+            }
+        }
+        
+        // Auto mode variables
+        let autoMode = false;
+        let autoPaused = false;
+        let autoCountdownInterval = null;
+        
+        // Toggle between manual and auto mode
+        function toggleMode() {
+            autoMode = !autoMode;
+            const toggle = document.getElementById('modeToggle');
+            const label = document.getElementById('modeLabel');
+            const autoStatus = document.getElementById('autoStatus');
+            
+            if (autoMode) {
+                toggle.style.background = 'var(--accent-green)';
+                toggle.querySelector('.toggle-slider').style.transform = 'translateX(30px)';
+                label.textContent = 'AUTO';
+                label.style.color = 'var(--accent-green)';
+                autoStatus.style.display = 'block';
+            } else {
+                toggle.style.background = 'var(--border)';
+                toggle.querySelector('.toggle-slider').style.transform = 'translateX(0)';
+                label.textContent = 'MANUAL';
+                label.style.color = 'var(--text-secondary)';
+                autoStatus.style.display = 'none';
+            }
+        }
+        
+        // Pause auto mode
+        function pauseAuto() {
+            autoPaused = true;
+            document.getElementById('pauseButton').style.display = 'none';
+            if (autoCountdownInterval) {
+                clearInterval(autoCountdownInterval);
+                autoCountdownInterval = null;
+            }
+        }
+        
+        // Auto countdown between batches
+        function startAutoCountdown(seconds, callback) {
+            const displayEl = document.getElementById('autoCountdown');
+            displayEl.style.display = 'block';
+            displayEl.textContent = seconds;
+            
+            let remaining = seconds;
+            
+            autoCountdownInterval = setInterval(() => {
+                if (autoPaused) {
+                    clearInterval(autoCountdownInterval);
+                    displayEl.style.display = 'none';
+                    return;
+                }
+                
+                remaining--;
+                displayEl.textContent = remaining;
+                
+                if (remaining === 0) {
+                    clearInterval(autoCountdownInterval);
+                    displayEl.style.display = 'none';
+                    callback();
+                }
+            }, 1000);
+        }
+        
+        // Progress saving functions
+        function saveProgress() {
+            const progress = {
+                batchState: {
+                    allTickers: batchState.allTickers,
+                    currentBatch: batchState.currentBatch,
+                    results: batchState.results,
+                    regimeMode: batchState.regimeMode
+                },
+                timestamp: Date.now()
+            };
+            localStorage.setItem('scanProgress', JSON.stringify(progress));
+            console.log(`💾 Progress saved: Batch ${batchState.currentBatch}, ${batchState.results.length} results`);
+        }
+        
+        function clearProgress() {
+            localStorage.removeItem('scanProgress');
+            console.log('🗑️ Progress cleared');
+        }
+        
+        // Score tracking for deterioration alerts
+        function savePreviousScores(results) {
+            const scores = {};
+            results.forEach(r => {
+                scores[r.ticker] = r.score;
+            });
+            localStorage.setItem('previousScores', JSON.stringify(scores));
+            localStorage.setItem('previousScoresTimestamp', Date.now().toString());
+        }
+        
+        function getPreviousScores() {
+            const saved = localStorage.getItem('previousScores');
+            const timestamp = localStorage.getItem('previousScoresTimestamp');
+            
+            if (!saved) return null;
+            
+            // Only use if less than 7 days old
+            const age = Date.now() - parseInt(timestamp || '0');
+            if (age > 7 * 24 * 60 * 60 * 1000) {
+                localStorage.removeItem('previousScores');
+                localStorage.removeItem('previousScoresTimestamp');
+                return null;
+            }
+            
+            return JSON.parse(saved);
+        }
+        
+        function detectDeteriorations(results) {
+            const previousScores = getPreviousScores();
+            if (!previousScores) return [];
+            
+            const deteriorations = [];
+            
+            results.forEach(r => {
+                const prevScore = previousScores[r.ticker];
+                if (prevScore === undefined) return;
+                
+                const assetBeta = r.assetType.includes('HIGHBETA') ? 'HIGH BETA' : 
+                                 r.assetType.includes('LOWBETA') ? 'LOW BETA' : 'RISK';
+                
+                // Detect score drops or critical thresholds
+                if (prevScore > r.score || r.score <= 2) {
+                    let alert = '';
+                    let action = '';
+                    
+                    if (r.score === 0 || r.score === 1) {
+                        if (assetBeta === 'HIGH BETA') {
+                            alert = 'Score at ' + r.score + '/4. Exit immediately.';
+                            action = '⚠️ EMERGENCY EXIT';
+                        } else {
+                            alert = 'Score at ' + r.score + '/4. Exit full position next morning.';
+                            action = '⚠️ FULL EXIT';
+                        }
+                    } else if (r.score === 2) {
+                        alert = 'Score at 2/4. Trim position 20-30%.';
+                        action = '⚠️ TRIM 20-30%';
+                    } else if (prevScore === 4 && r.score === 3) {
+                        alert = 'Score dropped 4→3. Monitor closely.';
+                        action = '⚠️ WATCH';
+                    }
+                    
+                    if (alert) {
+                        deteriorations.push({
+                            ticker: r.ticker,
+                            assetBeta,
+                            prevScore,
+                            currentScore: r.score,
+                            alert,
+                            action
+                        });
+                    }
+                }
+            });
+            
+            return deteriorations;
+        }
+        
+        function checkForSavedProgress() {
+            const saved = localStorage.getItem('scanProgress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                const ageMinutes = (Date.now() - progress.timestamp) / 60000;
+                
+                // Only offer to restore if less than 2 hours old
+                if (ageMinutes < 120) {
+                    const restore = confirm(
+                        `Found incomplete scan from ${Math.round(ageMinutes)} minutes ago.\n\n` +
+                        `Batch ${progress.batchState.currentBatch} with ${progress.batchState.results.length} results.\n\n` +
+                        `Restore progress?`
+                    );
+                    
+                    if (restore) {
+                        // Restore the saved state
+                        batchState.allTickers = progress.batchState.allTickers;
+                        batchState.currentBatch = progress.batchState.currentBatch;
+                        batchState.results = progress.batchState.results;
+                        batchState.regimeMode = progress.batchState.regimeMode;
+                        
+                        // Render existing results
+                        if (batchState.results.length > 0) {
+                            renderResults(batchState.results, batchState.regimeMode);
+                        }
+                        
+                        alert(`Restored ${batchState.results.length} results. Click "Analyze Momentum" to continue.`);
+                    } else {
+                        clearProgress();
+                    }
+                } else {
+                    // Old progress, clear it
+                    clearProgress();
+                }
+            }
+        }
         
         // Batch processing state
         let batchState = {
@@ -882,6 +1185,7 @@
             const pauseNotice = document.getElementById('pauseNotice');
             const pauseCountdown = document.getElementById('pauseCountdown');
             const continueButton = document.getElementById('continueButton');
+            const autoCountdown = document.getElementById('autoCountdown');
             
             pauseNotice.classList.add('active');
             continueButton.disabled = true;
@@ -890,18 +1194,35 @@
             pauseCountdown.textContent = countdown;
             continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
             
-            const countdownTimer = setInterval(() => {
-                countdown--;
-                pauseCountdown.textContent = countdown;
-                continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
+            if (autoMode && !autoPaused) {
+                // Auto mode: start 60-second countdown and auto-continue
+                document.getElementById('pauseButton').style.display = 'block';
+                continueButton.style.display = 'none';
                 
-                if (countdown <= 0) {
-                    clearInterval(countdownTimer);
-                    continueButton.disabled = false;
-                    continueButton.textContent = `✅ Continue with ${remainingTickers} tickers`;
-                    pauseCountdown.textContent = '0';
-                }
-            }, 1000);
+                startAutoCountdown(60, () => {
+                    pauseNotice.classList.remove('active');
+                    document.getElementById('pauseButton').style.display = 'none';
+                    autoPaused = false; // Reset pause flag
+                    processBatch();
+                });
+            } else {
+                // Manual mode or paused: show button and manual countdown
+                continueButton.style.display = 'block';
+                autoCountdown.style.display = 'none';
+                
+                const countdownTimer = setInterval(() => {
+                    countdown--;
+                    pauseCountdown.textContent = countdown;
+                    continueButton.textContent = `⏳ Continue Next Batch (${countdown}s)`;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownTimer);
+                        continueButton.disabled = false;
+                        continueButton.textContent = `✅ Continue with ${remainingTickers} tickers`;
+                        pauseCountdown.textContent = '0';
+                    }
+                }, 1000);
+            }
         }
 
         // Technical indicators
@@ -929,6 +1250,26 @@
             if (prices.length < period) return prices[prices.length - 1];
             const slice = prices.slice(-period);
             return slice.reduce((a, b) => a + b, 0) / period;
+        }
+
+        function calculateVolatility(prices, period = 20) {
+            if (prices.length < period + 1) return 0;
+            
+            // Calculate daily returns
+            const returns = [];
+            for (let i = prices.length - period; i < prices.length; i++) {
+                const dailyReturn = (prices[i] / prices[i - 1]) - 1;
+                returns.push(dailyReturn);
+            }
+            
+            // Calculate standard deviation of returns
+            const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+            const squaredDiffs = returns.map(r => Math.pow(r - mean, 2));
+            const variance = squaredDiffs.reduce((a, b) => a + b, 0) / returns.length;
+            const stdDev = Math.sqrt(variance);
+            
+            // Annualize (252 trading days)
+            return stdDev * Math.sqrt(252);
         }
 
         function calculateVolRatio(volumes, period = 20) {
@@ -1066,13 +1407,21 @@
 
         // Fetch stock data from Twelve Data API
         async function fetchStockData(ticker) {
-            const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=180&apikey=${TWELVE_DATA_API_KEY}`;
+            const apiKey = getApiKey();
+            
+            if (!apiKey) {
+                alert('Please save your API key before running analysis');
+                throw new Error('No API key available');
+            }
+            
+            const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=180&apikey=${apiKey}`;
             
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.status === 'error' || !data.values) {
+                    console.error(`Error for ${ticker}:`, data.message || 'Invalid data');
                     throw new Error(data.message || 'Invalid data');
                 }
                 
@@ -1098,10 +1447,8 @@
         }
 
         // Determine active mode for ticker
-        function getActiveMode(ticker, regimeMode) {
-            const assetType = assetTypes[ticker] || 'RISK';
-            
-            if (regimeMode === 'DEFENSIVE' || assetType === 'DEFENSIVE') {
+        function getActiveMode(assetType, regimeMode) {
+            if (assetType === 'DEFENSIVE' || regimeMode === 'DEFENSIVE') {
                 return 'MODE B';
             }
             return 'MODE A';
@@ -1261,7 +1608,46 @@
         function renderResults(results, regimeMode) {
             const resultsDiv = document.getElementById('results');
             
-            let cardsHTML = '<div class="ticker-grid">';
+            // Check for deteriorations
+            const deteriorations = detectDeteriorations(results);
+            
+            let html = '';
+            
+            // Add deterioration alert if any found
+            if (deteriorations.length > 0) {
+                html += `
+                    <div style="background: linear-gradient(135deg, var(--accent-red), var(--accent-yellow)); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 2px solid var(--accent-red);">
+                        <h2 style="color: white; font-size: 1.3rem; margin-bottom: 1rem;">🚨 DETERIORATION ALERT</h2>
+                        <p style="color: white; margin-bottom: 1rem; opacity: 0.9;">Positions showing score deterioration. Take action per asset class rules.</p>
+                        <div style="display: grid; gap: 0.75rem;">
+                `;
+                
+                deteriorations.forEach(d => {
+                    const betaIcon = d.assetBeta === 'HIGH BETA' ? '⚡' : '📊';
+                    const scoreChange = d.prevScore !== d.currentScore ? `${d.prevScore}/4 → ${d.currentScore}/4` : `${d.currentScore}/4`;
+                    
+                    html += `
+                        <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; border-left: 4px solid white;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <div>
+                                    <div style="color: white; font-weight: 700; font-size: 1.1rem;">${d.ticker}</div>
+                                    <div style="color: white; opacity: 0.9; font-size: 0.85rem;">${betaIcon} ${d.assetBeta}</div>
+                                </div>
+                                <div style="color: white; font-weight: 700; font-size: 1.1rem;">${scoreChange}</div>
+                            </div>
+                            <div style="color: white; opacity: 0.95; margin-bottom: 0.5rem;">${d.alert}</div>
+                            <div style="color: white; font-weight: 700; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 4px; display: inline-block;">${d.action}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '<div class="ticker-grid">';
             
             results.forEach(result => {
                 const signal = getSignal(result.score, result.perf);
@@ -1298,7 +1684,7 @@
                     </div>
                 `;
                 
-                cardsHTML += `
+                html += `
                     <div class="ticker-card">
                         <div class="ticker-header">
                             <div class="ticker-symbol">${result.ticker}</div>
@@ -1328,7 +1714,7 @@
                 `;
             });
             
-            cardsHTML += '</div>';
+            html += '</div>';
             
             const deploy = results.filter(r => r.score >= 3 && r.perf.change5Day <= 5);
             const deploySmall = results.filter(r => r.score >= 3 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
@@ -1404,7 +1790,7 @@
                 </div>
             `;
             
-            resultsDiv.innerHTML = cardsHTML + summaryHTML;
+            resultsDiv.innerHTML = html + summaryHTML;
         }
 
         // Process a single batch
@@ -1461,8 +1847,40 @@
                 const data = await fetchStockData(ticker);
                 
                 if (data) {
-                    const assetType = assetTypes[ticker] || 'RISK';
-                    const mode = getActiveMode(ticker, batchState.regimeMode);
+                    const manualAssetType = assetTypes[ticker]; // Check if manually classified
+                    
+                    // Calculate beta vs SPY (volatility-based) and store beta value
+                    let assetType = 'RISK';
+                    let betaValue = null;
+                    
+                    if (!manualAssetType && batchState.spyData) {
+                        const tickerVolatility = calculateVolatility(data.prices);
+                        const spyVolatility = calculateVolatility(batchState.spyData.prices);
+                        betaValue = tickerVolatility / spyVolatility;
+                        
+                        // Categorize based on beta with symbols
+                        if (betaValue >= 1.5) {
+                            assetType = `HIGHBETA (β${betaValue.toFixed(2)} ⚡)`;
+                        } else if (betaValue < 0.6) {
+                            assetType = `LOWBETA (β${betaValue.toFixed(2)} 🔒)`;
+                        } else {
+                            assetType = `RISK (β${betaValue.toFixed(2)} 🔒)`;
+                        }
+                    } else if (manualAssetType === 'DEFENSIVE') {
+                        // For manual DEFENSIVE classification, still calculate and show beta
+                        if (batchState.spyData) {
+                            const tickerVolatility = calculateVolatility(data.prices);
+                            const spyVolatility = calculateVolatility(batchState.spyData.prices);
+                            betaValue = tickerVolatility / spyVolatility;
+                            assetType = `DEFENSIVE (β${betaValue.toFixed(2)} 🔒)`;
+                        } else {
+                            assetType = 'DEFENSIVE';
+                        }
+                    }
+                    
+                    // Determine mode based on actual classification (strip beta notation for logic)
+                    const baseType = assetType.includes('DEFENSIVE') ? 'DEFENSIVE' : 'RISK';
+                    const mode = getActiveMode(baseType, batchState.regimeMode);
                     const { score, breakdown, perf, perfAnalysis } = calculateScore(ticker, data, batchState.spyData, mode);
                     
                     batchState.results.push({
@@ -1486,6 +1904,9 @@
             
             batchState.currentBatch++;
             
+            // Save progress after each batch
+            saveProgress();
+            
             // Check if more batches remain
             if (batchState.currentBatch < totalBatches) {
                 const remainingTickers = batchState.allTickers.length - (batchState.currentBatch * batchState.batchSize);
@@ -1499,6 +1920,7 @@
 
         // Continue to next batch
         async function continueAnalysis() {
+            autoPaused = false; // Reset pause flag
             document.getElementById('pauseNotice').classList.remove('active');
             document.getElementById('continueButton').disabled = true;
             await processBatch();
@@ -1509,7 +1931,20 @@
             document.getElementById('progressContainer').classList.remove('active');
             document.getElementById('batchInfo').classList.remove('active');
             document.getElementById('pauseNotice').classList.remove('active');
+            document.getElementById('pauseButton').style.display = 'none';
             batchState.isProcessing = false;
+            autoPaused = false;
+            
+            // Save scores for deterioration tracking
+            if (batchState.results && batchState.results.length > 0) {
+                savePreviousScores(batchState.results);
+            }
+            
+            // Release wake lock - allow phone to sleep again
+            releaseWakeLock();
+            
+            // Clear saved progress - scan completed successfully
+            clearProgress();
             
             // Start cooldown timer (2 minutes)
             startCountdownTimer(120);
@@ -1539,26 +1974,35 @@
             
             parseAssetTypes();
             
-            // Reset state
-            batchState = {
-                allTickers: tickers,
-                currentBatch: 0,
-                batchSize: 4,
-                results: [],
-                regimeMode: null,
-                spyData: null,
-                vooData: null,
-                isProcessing: true
-            };
+            // Request wake lock to prevent phone from sleeping
+            await requestWakeLock();
             
-            document.getElementById('results').innerHTML = '';
+            // Reset state (unless resuming from saved progress)
+            if (!batchState.results || batchState.results.length === 0) {
+                batchState = {
+                    allTickers: tickers,
+                    currentBatch: 0,
+                    batchSize: 4,
+                    results: [],
+                    regimeMode: null,
+                    spyData: null,
+                    vooData: null,
+                    isProcessing: true
+                };
+                document.getElementById('results').innerHTML = '';
+            } else {
+                // Resuming - just mark as processing
+                batchState.isProcessing = true;
+            }
+            
             document.getElementById('pauseNotice').classList.remove('active');
             
             try {
                 await processBatch();
             } catch (error) {
                 console.error('Analysis error:', error);
-                alert('Error running analysis. Check console for details.');
+                alert('Error running analysis. Progress has been saved. Check console for details.');
+                saveProgress(); // Save on error
                 finishAnalysis();
             }
         }
