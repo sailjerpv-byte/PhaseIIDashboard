@@ -696,8 +696,9 @@
                     <ul>
                         <li>✓ RSI ≥ 55</li>
                         <li>✓ Above BOTH 20-DMA & 50-DMA</li>
-                        <li>✓ Volume ≥ 1.2× average</li>
-                        <li>✓ RS > 0 (Benchmark ETF: RS ≥ -0.5%)</li>
+                        <li>✓ Volume: Stocks ≥ 1.2x | Broad ETFs ≥ 0.8x</li>
+                        <li>✓ RS: VOO ≥ -0.5% | VXUS/Stocks > 0</li>
+                        <li><strong>✓ Score MUST be 4/4 to deploy</strong></li>
                     </ul>
                 </div>
                 <div class="threshold-col defensive">
@@ -707,6 +708,7 @@
                         <li>✓ Above 20-DMA or repairing</li>
                         <li>✓ Volume ≥ 1.0× average</li>
                         <li>✓ RS ≥ -1.0%</li>
+                        <li><strong>✓ Score MUST be 4/4 to deploy</strong></li>
                     </ul>
                 </div>
             </div>
@@ -1529,16 +1531,35 @@
                     breakdown.push({ text: '❌ Below DMA(s)', pass: false });
                 }
                 
-                // Volume check (simple)
-                if (volRatio >= 1.2) {
+                // Volume check - MODE A: Split by asset type
+                // Broad Index ETFs (VOO, VXUS): 0.8x
+                // Individual Stocks & Thematic ETFs: 1.2x
+                const broadIndexETFs = ['VOO', 'VXUS'];
+                const isBroadETF = broadIndexETFs.includes(ticker);
+                const volumeThreshold = isBroadETF ? 0.8 : 1.2;
+                
+                if (volRatio >= volumeThreshold) {
                     score++;
-                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.2x)`, pass: true });
+                    breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥${volumeThreshold}x)`, pass: true });
                 } else {
-                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.2x)`, pass: false });
+                    breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥${volumeThreshold}x)`, pass: false });
                 }
                 
-                // RS check - MODE A: RS > 0 (benchmark ETFs: RS ≥ -0.5%)
-                const rsThreshold = isBenchmarkETF ? -0.5 : 0;
+                // RS check - MODE A: Different thresholds by classification
+                // VOO (Benchmark ETF): RS ≥ -0.5%
+                // VXUS: RS > 0 (must outperform to justify allocation tilt)
+                // Stocks & Thematic ETFs: RS > 0
+                let rsThreshold = 0;
+                if (ticker === 'VOO') {
+                    rsThreshold = -0.5;
+                } else if (ticker === 'VXUS') {
+                    rsThreshold = 0;
+                } else if (isBenchmarkETF) {
+                    rsThreshold = -0.5;
+                } else {
+                    rsThreshold = 0;
+                }
+                
                 if (vsspy > rsThreshold) {
                     score++;
                     const sign = vsspy >= 0 ? '+' : '';
@@ -1599,7 +1620,8 @@
         }
 
         function getSignal(score, perf) {
-            if (score >= 3) {
+            if (score === 4) {
+                // ONLY 4/4 QUALIFIES FOR DEPLOY
                 // TIMING GATE: Check 5-day performance
                 if (perf.change5Day > 10) {
                     return { 
@@ -1623,6 +1645,15 @@
                         size: '1%'
                     };
                 }
+            }
+            
+            if (score === 3) {
+                return { 
+                    text: '⚠️ WATCH', 
+                    subtext: 'Score 3/4 - Track in Stealth Watch',
+                    class: 'watch',
+                    size: '0%'
+                };
             }
             
             if (score === 2) {
@@ -1762,10 +1793,11 @@
             
             html += '</div>';
             
-            const deploy = results.filter(r => r.score >= 3 && r.perf.change5Day <= 5);
-            const deploySmall = results.filter(r => r.score >= 3 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
-            const tooLate = results.filter(r => r.score >= 3 && r.perf.change5Day > 10);
-            const watch = results.filter(r => r.score === 2);
+            // STRICT 4/4 RULE: Only 4/4 qualifies for deploy
+            const deploy = results.filter(r => r.score === 4 && r.perf.change5Day <= 5);
+            const deploySmall = results.filter(r => r.score === 4 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
+            const tooLate = results.filter(r => r.score === 4 && r.perf.change5Day > 10);
+            const watch = results.filter(r => r.score === 2 || r.score === 3);
             const avoid = results.filter(r => r.score <= 1);
             
             const summaryHTML = `
@@ -1775,7 +1807,7 @@
                         <div class="summary-section">
                             <h3><span>🟢</span> DEPLOY NOW (${deploy.length})</h3>
                             <ul>
-                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} - 1% position (${r.mode}) ${r.score}/4</li>`).join('') : '<li>None - Fresh Score 3-4 setups only</li>'}
+                                ${deploy.length ? deploy.map(r => `<li>• ${r.ticker} - 1% position (${r.mode}) 4/4</li>`).join('') : '<li>None - Only fresh 4/4 setups qualify</li>'}
                             </ul>
                         </div>
                         
@@ -1796,7 +1828,7 @@
                         <div class="summary-section">
                             <h3><span>⚠️</span> WATCH (${watch.length})</h3>
                             <ul>
-                                ${watch.length ? watch.map(r => `<li>• ${r.ticker} - Hold if owned, don't enter new</li>`).join('') : '<li>None</li>'}
+                                ${watch.length ? watch.map(r => `<li>• ${r.ticker} - ${r.score}/4 - ${r.score === 3 ? 'Stealth Watch' : 'Hold if owned, don\'t enter new'}</li>`).join('') : '<li>None</li>'}
                             </ul>
                         </div>
                         
@@ -1813,19 +1845,19 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; font-size: 0.85rem;">
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-green); margin-bottom: 0.5rem;">🟢 DEPLOY NOW (1%)</div>
-                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change ≤5%<br>Fresh setup, good timing</div>
+                                <div style="color: var(--text-secondary);"><strong>Score 4/4 ONLY</strong> + 5-day ≤5%<br>Fresh setup, good timing</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-yellow); margin-bottom: 0.5rem;">🟡 DEPLOY SMALL (0.5-0.75%)</div>
-                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change 5-10%<br>Extended but manageable</div>
+                                <div style="color: var(--text-secondary);"><strong>Score 4/4 ONLY</strong> + 5-day 5-10%<br>Extended but manageable</div>
                             </div>
                             <div>
-                                <div style="font-weight: 700; color: var(--accent-red); margin-bottom: 0.5rem;">🔴 TOO LATE (0.25% max or WAIT)</div>
-                                <div style="color: var(--text-secondary);">Score 3-4 + 5-day change >10%<br>Parabolic, high reversal risk</div>
+                                <div style="font-weight: 700; color: var(--accent-red); margin-bottom: 0.5rem;">🔴 TOO LATE (0.25% max)</div>
+                                <div style="color: var(--text-secondary);"><strong>Score 4/4 ONLY</strong> + 5-day >10%<br>Parabolic, very high risk</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-yellow); margin-bottom: 0.5rem;">⚠️ WATCH (0%)</div>
-                                <div style="color: var(--text-secondary);">Score 2 - Don't enter new<br>Hold if already owned</div>
+                                <div style="color: var(--text-secondary);">Score 3 - Stealth Watch<br>Score 2 - Hold if owned</div>
                             </div>
                             <div>
                                 <div style="font-weight: 700; color: var(--accent-red); margin-bottom: 0.5rem;">🔴 EXIT (0%)</div>
