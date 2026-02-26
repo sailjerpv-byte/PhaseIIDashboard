@@ -697,16 +697,16 @@
                         <li>✓ RSI ≥ 55</li>
                         <li>✓ Above BOTH 20-DMA & 50-DMA</li>
                         <li>✓ Volume ≥ 1.2× average</li>
-                        <li>✓ Positive vs SPY</li>
+                        <li>✓ RS > 0 (Benchmark ETF: RS ≥ -0.5%)</li>
                     </ul>
                 </div>
                 <div class="threshold-col defensive">
                     <h3>MODE B - FLEXIBLE (Defensive Mode)</h3>
                     <ul>
-                        <li>✓ RSI ≥ 45 & rising</li>
+                        <li>✓ RSI ≥ 45 & slope positive (3-day)</li>
                         <li>✓ Above 20-DMA or repairing</li>
                         <li>✓ Volume ≥ 1.0× average</li>
-                        <li>✓ Positive vs SPY</li>
+                        <li>✓ RS ≥ -1.0%</li>
                     </ul>
                 </div>
             </div>
@@ -990,10 +990,23 @@
         // Score tracking for deterioration alerts
         function savePreviousScores(results) {
             const scores = {};
+            const consecutiveTwoScores = JSON.parse(localStorage.getItem('consecutiveTwoScores') || '{}');
+            
             results.forEach(r => {
                 scores[r.ticker] = r.score;
+                
+                // Track consecutive 2/4 scores for high beta assets
+                const isHighBeta = r.assetType.includes('HIGHBETA');
+                if (isHighBeta && r.score === 2) {
+                    consecutiveTwoScores[r.ticker] = (consecutiveTwoScores[r.ticker] || 0) + 1;
+                } else {
+                    // Reset counter if not at 2/4
+                    delete consecutiveTwoScores[r.ticker];
+                }
             });
+            
             localStorage.setItem('previousScores', JSON.stringify(scores));
+            localStorage.setItem('consecutiveTwoScores', JSON.stringify(consecutiveTwoScores));
             localStorage.setItem('previousScoresTimestamp', Date.now().toString());
         }
         
@@ -1008,6 +1021,7 @@
             if (age > 7 * 24 * 60 * 60 * 1000) {
                 localStorage.removeItem('previousScores');
                 localStorage.removeItem('previousScoresTimestamp');
+                localStorage.removeItem('consecutiveTwoScores');
                 return null;
             }
             
@@ -1018,14 +1032,16 @@
             const previousScores = getPreviousScores();
             if (!previousScores) return [];
             
+            const consecutiveTwoScores = JSON.parse(localStorage.getItem('consecutiveTwoScores') || '{}');
             const deteriorations = [];
             
             results.forEach(r => {
                 const prevScore = previousScores[r.ticker];
                 if (prevScore === undefined) return;
                 
-                const assetBeta = r.assetType.includes('HIGHBETA') ? 'HIGH BETA' : 
-                                 r.assetType.includes('LOWBETA') ? 'LOW BETA' : 'RISK';
+                const isHighBeta = r.assetType.includes('HIGHBETA');
+                const isLowBeta = r.assetType.includes('LOWBETA');
+                const assetBeta = isHighBeta ? 'HIGH BETA' : (isLowBeta ? 'LOW BETA' : 'RISK');
                 
                 // Detect score drops or critical thresholds
                 if (prevScore > r.score || r.score <= 2) {
@@ -1033,7 +1049,8 @@
                     let action = '';
                     
                     if (r.score === 0 || r.score === 1) {
-                        if (assetBeta === 'HIGH BETA') {
+                        // Score 0-1: Emergency exit rules
+                        if (isHighBeta) {
                             alert = 'Score at ' + r.score + '/4. Exit immediately.';
                             action = '⚠️ EMERGENCY EXIT';
                         } else {
@@ -1041,8 +1058,20 @@
                             action = '⚠️ FULL EXIT';
                         }
                     } else if (r.score === 2) {
-                        alert = 'Score at 2/4. Trim position 20-30%.';
-                        action = '⚠️ TRIM 20-30%';
+                        // Score 2/4: Different rules for high beta vs low beta
+                        if (isHighBeta) {
+                            const consecutiveCount = consecutiveTwoScores[r.ticker] || 1;
+                            if (consecutiveCount === 1) {
+                                alert = 'First close at 2/4. Cut 50% immediately.';
+                                action = '⚠️ CUT 50% NOW';
+                            } else if (consecutiveCount >= 2) {
+                                alert = 'Second consecutive close at 2/4. Exit remaining 50%.';
+                                action = '⚠️ EXIT REMAINING 50%';
+                            }
+                        } else {
+                            alert = 'Score at 2/4. Trim position 20-30%.';
+                            action = '⚠️ TRIM 20-30%';
+                        }
                     } else if (prevScore === 4 && r.score === 3) {
                         alert = 'Score dropped 4→3. Monitor closely.';
                         action = '⚠️ WATCH';
@@ -1468,6 +1497,7 @@
             const dma50 = calculateMA(prices, 50);
             const rsi = calculateRSI(prices);
             const prevRSI = calculateRSI(prices.slice(0, -1));
+            const rsi3DaysAgo = calculateRSI(prices.slice(0, -3));
             const volRatio = calculateVolRatio(volumes); // Simple number
             
             // Calculate performance metrics
@@ -1479,6 +1509,10 @@
                 const spyReturn = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
                 vsspy = tickerReturn - spyReturn;
             }
+            
+            // Check if ticker is a benchmark ETF (tracks S&P 500)
+            const benchmarkETFs = ['VOO', 'SPY', 'IVV', 'SPLG'];
+            const isBenchmarkETF = benchmarkETFs.includes(ticker);
             
             if (mode === 'MODE A') {
                 if (rsi >= 55) {
@@ -1503,22 +1537,32 @@
                     breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.2x)`, pass: false });
                 }
                 
-                if (vsspy > 0) {
+                // RS check - MODE A: RS > 0 (benchmark ETFs: RS ≥ -0.5%)
+                const rsThreshold = isBenchmarkETF ? -0.5 : 0;
+                if (vsspy > rsThreshold) {
                     score++;
-                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                    const sign = vsspy >= 0 ? '+' : '';
+                    breakdown.push({ text: `✅ ${sign}${vsspy.toFixed(2)}% vs SPY`, pass: true });
                 } else {
                     breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
                 }
             } else {
-                const rsiRising = rsi > prevRSI;
+                // MODE B: Check RSI slope over 3 days (need at least 4 data points)
+                let rsiSlope = 0;
+                if (prices.length >= 17) { // Need 14 for RSI + 3 for slope
+                    const rsi3DaysAgo = calculateRSI(prices.slice(0, -3));
+                    rsiSlope = rsi - rsi3DaysAgo;
+                }
                 
-                if (rsi >= 45 && rsiRising) {
+                const rsiPositiveSlope = rsiSlope > 0;
+                
+                if (rsi >= 45 && rsiPositiveSlope) {
                     score++;
-                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & rising)`, pass: true });
+                    breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & +slope 3d)`, pass: true });
                 } else if (rsi >= 45) {
-                    breakdown.push({ text: `⚠️ RSI ${rsi.toFixed(1)} (≥45 but not rising)`, pass: false });
+                    breakdown.push({ text: `⚠️ RSI ${rsi.toFixed(1)} (≥45 but slope ≤0)`, pass: false });
                 } else {
-                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & rising)`, pass: false });
+                    breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & +slope)`, pass: false });
                 }
                 
                 const repairing = currentPrice > dma20 && prevPrice < dma20;
@@ -1538,9 +1582,11 @@
                     breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.0x)`, pass: false });
                 }
                 
-                if (vsspy > 0) {
+                // RS check - MODE B: RS ≥ -1.0%
+                if (vsspy >= -1.0) {
                     score++;
-                    breakdown.push({ text: `✅ +${vsspy.toFixed(2)}% vs SPY`, pass: true });
+                    const sign = vsspy >= 0 ? '+' : '';
+                    breakdown.push({ text: `✅ ${sign}${vsspy.toFixed(2)}% vs SPY`, pass: true });
                 } else {
                     breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
                 }
