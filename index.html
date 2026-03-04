@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regime-Aware Momentum Dashboard v3.3</title>
+    <title>Regime-Aware Momentum Dashboard v3.4</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,6 +18,7 @@
             --accent-red: #ff3366;
             --accent-yellow: #ffd93d;
             --accent-blue: #6c5ce7;
+            --accent-orange: #ff7b39;
             --border: #2d3561;
             --shadow: rgba(0, 0, 0, 0.3);
         }
@@ -100,7 +101,7 @@
         .threshold-col ul { list-style: none; font-size: 0.85rem; }
         .threshold-col li { padding: 0.25rem 0; color: var(--text-secondary); }
 
-        /* ===== MARKET BREADTH PANEL ===== */
+        /* ===== MARKET BREADTH PANEL (existing — unchanged) ===== */
         .breadth-panel {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -218,7 +219,125 @@
             vertical-align: middle;
         }
 
-        /* ===== EXISTING STYLES ===== */
+        /* ===== v3.4: WATCHLIST BREADTH PANEL ===== */
+        .watchlist-breadth-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease-out 0.35s both;
+        }
+
+        .watchlist-breadth-panel h2 {
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .wb-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .wb-left { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .wb-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            border-left: 4px solid var(--border);
+            transition: border-left-color 0.3s;
+        }
+
+        .wb-card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .wb-card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            transition: color 0.3s;
+        }
+
+        .wb-card-sub { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+
+        .wb-signal-row {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--border);
+            background: var(--bg-secondary);
+            font-size: 0.85rem;
+            transition: border-left-color 0.3s;
+        }
+
+        .wb-signal-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .wb-signal-sub { font-size: 0.78rem; color: var(--text-secondary); }
+
+        .wb-hint {
+            font-size: 0.73rem;
+            color: var(--text-secondary);
+            padding: 0 0.1rem;
+            line-height: 1.5;
+        }
+
+        /* Thrust card */
+        .thrust-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            border-left: 4px solid var(--border);
+            height: 100%;
+            transition: border-left-color 0.3s;
+        }
+
+        .thrust-card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .thrust-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .thrust-sub {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .thrust-tickers {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+            line-height: 1.7;
+        }
+
+        /* ===== EXISTING STYLES (all unchanged) ===== */
         .controls {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -466,6 +585,7 @@
             .ticker-grid { grid-template-columns: 1fr; }
             .regime-header { flex-direction: column; align-items: flex-start; }
             .breadth-proxy-grid { grid-template-columns: 1fr; }
+            .wb-grid { grid-template-columns: 1fr; }
         }
 
         .footer {
@@ -482,7 +602,7 @@
 <div class="container">
     <div class="header">
         <h1>⚡ REGIME-AWARE MOMENTUM DASHBOARD</h1>
-        <p>v3.3 — Adaptive scoring | Auto beta classification | Market breadth panel</p>
+        <p>v3.4 — Adaptive scoring | Auto beta classification | Market breadth | 20-DMA Reclaim Ratio | Breadth Thrust Monitor</p>
     </div>
 
     <div class="regime-status" id="regimeStatus">
@@ -517,7 +637,7 @@
         </div>
     </div>
 
-    <!-- ===== MARKET BREADTH PANEL ===== -->
+    <!-- ===== MARKET BREADTH PANEL (existing — unchanged) ===== -->
     <div class="breadth-panel" id="breadthPanel" style="display:none;">
         <h2>🌐 MARKET BREADTH — SPY / QQQ / IWM</h2>
         <div class="breadth-signal-banner" id="breadthSignalBanner">
@@ -530,6 +650,37 @@
         <div class="recovery-watch-box inactive" id="recoveryWatchBox">
             <div id="recoveryWatchTitle" style="font-weight:700; margin-bottom:0.4rem; color: var(--text-secondary);">🔭 Recovery Watch — run analysis to check conditions</div>
             <div id="recoveryConditionsList"></div>
+        </div>
+    </div>
+
+    <!-- ===== v3.4: WATCHLIST BREADTH INDICATORS ===== -->
+    <div class="watchlist-breadth-panel" id="watchlistBreadthPanel" style="display:none;">
+        <h2>📈 WATCHLIST BREADTH INDICATORS (v3.4)</h2>
+        <div class="wb-grid">
+
+            <!-- LEFT: Reclaim Ratio -->
+            <div class="wb-left">
+                <div class="wb-card" id="reclaimCard">
+                    <div class="wb-card-title">20-DMA Reclaim Ratio</div>
+                    <div class="wb-card-value" id="reclaimPct" style="color: var(--text-secondary);">—</div>
+                    <div class="wb-card-sub" id="reclaimCount">Run analysis to compute</div>
+                </div>
+                <div class="wb-signal-row" id="reclaimSignalRow" style="display:none;">
+                    <div class="wb-signal-title" id="reclaimSignalTitle"></div>
+                    <div class="wb-signal-sub" id="reclaimSignalSub"></div>
+                </div>
+                <div class="wb-hint">
+                    Alert fires when ≥45% of your watchlist reclaimed 20-DMA AND improved ≥10pt vs the previous scan. Delta persists in browser across sessions.
+                </div>
+            </div>
+
+            <!-- RIGHT: Breadth Thrust Monitor -->
+            <div class="thrust-card" id="thrustCard">
+                <div class="thrust-card-title">Breadth Thrust Monitor</div>
+                <div class="thrust-status" id="thrustStatus">No thrust active</div>
+                <div class="thrust-sub" id="thrustSub">Tracking tickers that move score ≤1 → ≥3 within 5 days. Signal fires when ≥10% of watchlist qualifies.</div>
+                <div class="thrust-tickers" id="thrustTickers"></div>
+            </div>
         </div>
     </div>
 
@@ -603,12 +754,12 @@
 
     <div class="footer">
         <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0–1 = EXIT | Beta Auto-Classification Active</p>
-        <p style="margin-top: 0.5rem;">v3.3 — Market Breadth: SPY / QQQ / IWM | Recovery Watch | Volatility Proxy | Data: Twelve Data</p>
+        <p style="margin-top: 0.5rem;">v3.4 — Market Breadth: SPY/QQQ/IWM | 20-DMA Reclaim Ratio | Breadth Thrust Monitor | Volume Fix (ET timezone) | Data: Twelve Data</p>
     </div>
 </div>
 
 <script>
-// ===== API KEY MANAGEMENT =====
+// ===== API KEY MANAGEMENT (unchanged) =====
 function getApiKey() { return localStorage.getItem('twelveDataApiKey') || ''; }
 
 function saveApiKey() {
@@ -639,19 +790,32 @@ function updateApiKeyStatus() {
     }
 }
 
-// ===== MARKET BREADTH STORAGE =====
+// ===== BREADTH HISTORY (existing — unchanged) =====
 const BREADTH_HISTORY_KEY = 'breadthSignalHistory';
+function saveBreadthHistory(signal) { localStorage.setItem(BREADTH_HISTORY_KEY, JSON.stringify({ signal, savedAt: Date.now() })); }
+function loadBreadthHistory() { const raw = localStorage.getItem(BREADTH_HISTORY_KEY); return raw ? JSON.parse(raw) : null; }
 
-function saveBreadthHistory(signal) {
-    localStorage.setItem(BREADTH_HISTORY_KEY, JSON.stringify({ signal, savedAt: Date.now() }));
+// ===== v3.4: RECLAIM RATIO STORAGE =====
+// Persists last scan's reclaim % so the Δ can be calculated across sessions.
+const RECLAIM_HISTORY_KEY = 'reclaimRatioHistory';
+function saveReclaimHistory(pct, count, total) {
+    localStorage.setItem(RECLAIM_HISTORY_KEY, JSON.stringify({ pct, count, total, savedAt: Date.now() }));
 }
-
-function loadBreadthHistory() {
-    const raw = localStorage.getItem(BREADTH_HISTORY_KEY);
+function loadReclaimHistory() {
+    const raw = localStorage.getItem(RECLAIM_HISTORY_KEY);
     return raw ? JSON.parse(raw) : null;
 }
 
-// ===== TECHNICAL INDICATORS =====
+// ===== v3.4: BREADTH THRUST STORAGE =====
+// Persists candidate tracking so the 5-day window works across sessions.
+const THRUST_HISTORY_KEY = 'breadthThrustHistory';
+function saveThrustHistory(h) { localStorage.setItem(THRUST_HISTORY_KEY, JSON.stringify(h)); }
+function loadThrustHistory() {
+    const raw = localStorage.getItem(THRUST_HISTORY_KEY);
+    return raw ? JSON.parse(raw) : { active: false, firingDate: null, candidates: {}, failureChecks: 0 };
+}
+
+// ===== TECHNICAL INDICATORS (unchanged) =====
 function calculateRSI(prices, period = 14) {
     if (prices.length < period + 1) return 50;
     const changes = [];
@@ -678,14 +842,36 @@ function calculateVolatility(prices, period = 20) {
     return Math.sqrt(variance) * Math.sqrt(252);
 }
 
+// ===== v3.3: VOLUME RATIO — ET timezone-aware =====
+// FIX: During morning window (9am–noon ET on weekdays), use previous day's
+// completed bar instead of the partial intraday bar to avoid false low-volume failures.
 function calculateVolRatio(volumes, period = 20) {
     if (volumes.length < period) return 1.0;
-    const now = new Date();
-    const h = now.getHours(), d = now.getDay();
-    const isMarketHours = (d >= 1 && d <= 5) && (h >= 9 && h < 16);
-    const currentVol = (isMarketHours && volumes.length >= 2) ? volumes[volumes.length - 2] : volumes[volumes.length - 1];
-    const avgVol = calculateMA(volumes.slice(0, -1), period);
-    if (!currentVol || !avgVol) return 1.0;
+
+    // Convert to ET (handles DST automatically via toLocaleString)
+    const etString = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+    const etNow    = new Date(etString);
+    const h = etNow.getHours();
+    const d = etNow.getDay(); // 0=Sun, 6=Sat
+
+    // Morning window: weekday, 9am up to (but not including) noon ET
+    const isMorningWindow = (d >= 1 && d <= 5) && (h >= 9 && h < 12);
+
+    let currentVol;
+    if (isMorningWindow && volumes.length >= 2) {
+        // Use yesterday's completed bar — apples-to-apples vs 20-day average of full days
+        currentVol = volumes[volumes.length - 2];
+    } else {
+        currentVol = volumes[volumes.length - 1];
+    }
+
+    // Average excludes whichever bar is being compared
+    const sliceEnd   = isMorningWindow ? volumes.length - 2 : volumes.length - 1;
+    const sliceStart = Math.max(0, sliceEnd - period);
+    const slice      = volumes.slice(sliceStart, sliceEnd);
+    const avgVol     = slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : 0;
+
+    if (!currentVol || !avgVol || avgVol === 0) return 1.0;
     return currentVol / avgVol;
 }
 
@@ -710,7 +896,7 @@ function generatePerformanceWarnings(perf, rsi, score) {
     return { warnings, severity, positionSize };
 }
 
-// ===== FETCH =====
+// ===== FETCH (unchanged) =====
 async function fetchStockData(ticker) {
     const apiKey = getApiKey();
     if (!apiKey) { alert('Please save your API key first'); throw new Error('No API key'); }
@@ -724,7 +910,7 @@ async function fetchStockData(ticker) {
     } catch (e) { console.error(`Fetch error ${ticker}:`, e); return null; }
 }
 
-// ===== REGIME =====
+// ===== REGIME (unchanged) =====
 function getRegimeMode(vooPrices) {
     if (vooPrices.length < 200) return 'RISK';
     return vooPrices[vooPrices.length - 1] > calculateMA(vooPrices, 200) ? 'RISK' : 'DEFENSIVE';
@@ -734,29 +920,29 @@ function getActiveMode(assetType, regimeMode) {
     return (assetType === 'DEFENSIVE' || regimeMode === 'DEFENSIVE') ? 'MODE B' : 'MODE A';
 }
 
-// ===== SCORING =====
+// ===== SCORING — now returns recentlyReclaimedDMA20 =====
 function calculateScore(ticker, data, spyData, mode) {
     let score = 0;
     const breakdown = [];
     const prices = data.prices, volumes = data.volumes;
     const currentPrice = prices[prices.length - 1];
-    const prevPrice = prices[prices.length - 2] || currentPrice;
+    const prevPrice    = prices[prices.length - 2] || currentPrice;
     const dma20 = calculateMA(prices, 20);
     const dma50 = calculateMA(prices, 50);
-    const rsi = calculateRSI(prices);
-    const volRatio = calculateVolRatio(volumes);
-    const perf = calculatePerformanceMetrics(prices);
+    const rsi      = calculateRSI(prices);
+    const volRatio = calculateVolRatio(volumes);   // v3.3 fix applied here
+    const perf     = calculatePerformanceMetrics(prices);
 
     let vsspy = 0;
     if (spyData && prices.length >= 20 && spyData.prices.length >= 20) {
         const tickerReturn = ((currentPrice / prices[prices.length - 20]) - 1) * 100;
-        const spyReturn = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
+        const spyReturn    = ((spyData.prices[spyData.prices.length - 1] / spyData.prices[spyData.prices.length - 20]) - 1) * 100;
         vsspy = tickerReturn - spyReturn;
     }
 
     const broadIndexETFs = ['VOO', 'VXUS'];
-    const benchmarkETFs = ['VOO', 'SPY', 'IVV', 'SPLG'];
-    const isBroadETF = broadIndexETFs.includes(ticker);
+    const benchmarkETFs  = ['VOO', 'SPY', 'IVV', 'SPLG'];
+    const isBroadETF  = broadIndexETFs.includes(ticker);
     const isBenchmark = benchmarkETFs.includes(ticker);
 
     if (mode === 'MODE A') {
@@ -776,7 +962,11 @@ function calculateScore(ticker, data, spyData, mode) {
         vsspy >= -1.0 ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     }
 
-    return { score, breakdown, perf, perfAnalysis: generatePerformanceWarnings(perf, rsi, score) };
+    // v3.4: flag tickers that recently reclaimed their 20-DMA (used by Reclaim Ratio)
+    const recentlyReclaimedDMA20 = (currentPrice > dma20) &&
+        (prices.length >= 4) && (prices[prices.length - 4] < dma20);
+
+    return { score, breakdown, perf, perfAnalysis: generatePerformanceWarnings(perf, rsi, score), recentlyReclaimedDMA20 };
 }
 
 function getSignal(score, perf) {
@@ -791,7 +981,7 @@ function getSignal(score, perf) {
     return { text: '🔴 EXIT', subtext: 'Trend broken — sell', class: 'exit', size: '0%' };
 }
 
-// ===== DETERIORATION TRACKING =====
+// ===== DETERIORATION TRACKING (unchanged) =====
 function savePreviousScores(results) {
     const scores = {};
     const consecutiveTwoScores = JSON.parse(localStorage.getItem('consecutiveTwoScores') || '{}');
@@ -807,7 +997,7 @@ function savePreviousScores(results) {
 
 function getPreviousScores() {
     const saved = localStorage.getItem('previousScores');
-    const ts = localStorage.getItem('previousScoresTimestamp');
+    const ts    = localStorage.getItem('previousScoresTimestamp');
     if (!saved) return null;
     if (Date.now() - parseInt(ts || '0') > 7 * 24 * 60 * 60 * 1000) {
         ['previousScores', 'previousScoresTimestamp', 'consecutiveTwoScores'].forEach(k => localStorage.removeItem(k));
@@ -825,13 +1015,13 @@ function detectDeteriorations(results) {
         const prevScore = prev[r.ticker];
         if (prevScore === undefined) return;
         const isHighBeta = r.assetType.includes('HIGHBETA');
-        const betaLabel = isHighBeta ? 'HIGH BETA' : 'RISK';
+        const betaLabel  = isHighBeta ? 'HIGH BETA' : 'RISK';
         let alert = '', action = '';
         if (r.score <= 1) { alert = `Score at ${r.score}/4. Exit position.`; action = isHighBeta ? '⚠️ EMERGENCY EXIT' : '⚠️ FULL EXIT'; }
         else if (r.score === 2) {
             if (isHighBeta) {
                 const c = consecutive[r.ticker] || 1;
-                alert = c === 1 ? 'First close at 2/4. Cut 50% immediately.' : 'Second close at 2/4. Exit remaining 50%.';
+                alert  = c === 1 ? 'First close at 2/4. Cut 50% immediately.' : 'Second close at 2/4. Exit remaining 50%.';
                 action = c === 1 ? '⚠️ CUT 50% NOW' : '⚠️ EXIT REMAINING 50%';
             } else { alert = 'Score at 2/4. Trim position 20-30%.'; action = '⚠️ TRIM 20-30%'; }
         } else if (prevScore === 4 && r.score === 3) { alert = 'Score dropped 4→3. Monitor closely.'; action = '⚠️ WATCH'; }
@@ -840,23 +1030,192 @@ function detectDeteriorations(results) {
     return dets;
 }
 
-// ===== MARKET BREADTH MODULE =====
+// ===== v3.4: WATCHLIST BREADTH ANALYSIS =====
+
+function analyzeWatchlistBreadth(results) {
+    if (!results || results.length === 0) return;
+    const total = results.length;
+
+    // ── 20-DMA Reclaim Ratio ──────────────────────────────────
+    const reclaimCount = results.filter(r => r.recentlyReclaimedDMA20).length;
+    const reclaimPct   = (reclaimCount / total) * 100;
+
+    const prev  = loadReclaimHistory();
+    let delta   = null, reclaimAlert = false;
+
+    if (prev) {
+        delta = reclaimPct - prev.pct;
+        if (reclaimPct >= 45 && delta >= 10) reclaimAlert = true;
+    }
+
+    saveReclaimHistory(reclaimPct, reclaimCount, total);
+
+    // Render
+    const pctEl     = document.getElementById('reclaimPct');
+    const countEl   = document.getElementById('reclaimCount');
+    const cardEl    = document.getElementById('reclaimCard');
+    const sigRow    = document.getElementById('reclaimSignalRow');
+    const sigTitle  = document.getElementById('reclaimSignalTitle');
+    const sigSub    = document.getElementById('reclaimSignalSub');
+
+    pctEl.textContent = reclaimPct.toFixed(1) + '%';
+
+    if (reclaimPct >= 45)      { pctEl.style.color = 'var(--accent-green)';  cardEl.style.borderLeftColor = 'var(--accent-green)'; }
+    else if (reclaimPct >= 25) { pctEl.style.color = 'var(--accent-yellow)'; cardEl.style.borderLeftColor = 'var(--accent-yellow)'; }
+    else                        { pctEl.style.color = 'var(--text-secondary)'; cardEl.style.borderLeftColor = 'var(--border)'; }
+
+    let subText = `${reclaimCount} of ${total} tickers reclaimed 20-DMA within last 3 days`;
+    if (delta !== null) {
+        const sign   = delta >= 0 ? '+' : '';
+        const dColor = delta >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        subText += ` &nbsp;|&nbsp; <span style="color:${dColor}">Δ ${sign}${delta.toFixed(1)}pt vs prev scan</span>`;
+    }
+    countEl.innerHTML = subText;
+
+    if (reclaimAlert) {
+        sigRow.style.display = 'block';
+        sigRow.style.borderLeftColor = 'var(--accent-green)';
+        sigTitle.style.color = 'var(--accent-green)';
+        sigTitle.textContent = '🔄 RECLAIM SIGNAL TRIGGERED';
+        sigSub.textContent   = `${reclaimPct.toFixed(1)}% of watchlist reclaimed 20-DMA (+${delta.toFixed(1)}pt) — breadth recovering. Watch for thrust confirmation.`;
+    } else if (reclaimPct >= 45) {
+        sigRow.style.display = 'block';
+        sigRow.style.borderLeftColor = 'var(--accent-yellow)';
+        sigTitle.style.color = 'var(--accent-yellow)';
+        sigTitle.textContent = '🔄 Reclaim ratio ≥45% — delta check next scan';
+        sigSub.textContent   = 'Threshold met. Full alert fires when +10pt improvement confirmed between two consecutive scans.';
+    } else {
+        sigRow.style.display = 'none';
+    }
+
+    // ── Breadth Thrust Monitor ────────────────────────────────
+    updateBreadthThrust(results, total);
+
+    document.getElementById('watchlistBreadthPanel').style.display = 'block';
+}
+
+function updateBreadthThrust(results, total) {
+    const history   = loadThrustHistory();
+    const today     = new Date().toDateString();
+    const threshold = Math.max(1, Math.ceil(total * 0.10)); // 10% of watchlist
+
+    // Update candidate tracking
+    results.forEach(r => {
+        const key = r.ticker;
+        if (r.score <= 1) {
+            if (!history.candidates[key]) {
+                history.candidates[key] = { lowDate: today, peaked: false };
+            }
+        } else if (r.score >= 3 && history.candidates[key] && !history.candidates[key].peaked) {
+            // Check if within 5-day window
+            const daysDiff = Math.round((new Date(today) - new Date(history.candidates[key].lowDate)) / 86400000);
+            if (daysDiff <= 5) {
+                history.candidates[key].peaked    = true;
+                history.candidates[key].peakDate  = today;
+                history.candidates[key].peakScore = r.score;
+            } else {
+                delete history.candidates[key]; // Outside window — reset
+            }
+        } else if (r.score === 0) {
+            delete history.candidates[key];
+        }
+    });
+
+    // Stale cleanup — remove candidates older than 7 days
+    Object.keys(history.candidates).forEach(k => {
+        const age = Math.round((new Date(today) - new Date(history.candidates[k].lowDate)) / 86400000);
+        if (age > 7) delete history.candidates[k];
+    });
+
+    // Qualified thrusters (peaked within window)
+    const thrusters = Object.entries(history.candidates)
+        .filter(([, v]) => v.peaked)
+        .map(([ticker]) => ticker);
+
+    // Thrust signal
+    let thrustNew = false;
+    if (thrusters.length >= threshold && !history.active) {
+        history.active       = true;
+        history.firingDate   = today;
+        history.failureChecks = 0;
+        thrustNew = true;
+    }
+
+    // Thrust Failure: if active and >50% of thrusters retreated below 2/4
+    let thrustFailure = false;
+    if (history.active) {
+        const thrusterSet = new Set(thrusters);
+        const retreated   = results.filter(r => thrusterSet.has(r.ticker) && r.score < 2);
+        if (retreated.length / Math.max(thrusters.length, 1) >= 0.5) {
+            thrustFailure         = true;
+            history.active        = false;
+            history.candidates    = {};
+            history.firingDate    = null;
+            history.failureChecks = 0;
+        } else {
+            history.failureChecks = (history.failureChecks || 0) + 1;
+            // Auto-expire thrust after 5 checks with no new confirmation
+            if (history.failureChecks >= 5 && !thrustNew && thrusters.length < threshold) {
+                history.active     = false;
+                history.candidates = {};
+            }
+        }
+    }
+
+    saveThrustHistory(history);
+
+    // ── Render ──
+    const statusEl    = document.getElementById('thrustStatus');
+    const subEl       = document.getElementById('thrustSub');
+    const tickersEl   = document.getElementById('thrustTickers');
+    const cardEl      = document.getElementById('thrustCard');
+    const pendingCount = Object.keys(history.candidates).filter(k => !history.candidates[k].peaked).length;
+
+    if (thrustFailure) {
+        cardEl.style.borderLeftColor  = 'var(--accent-red)';
+        statusEl.style.color          = 'var(--accent-red)';
+        statusEl.textContent          = '🔴 BREADTH THRUST FAILURE';
+        subEl.textContent             = 'Thrust tickers retreated below 2/4. Bearish continuation — maintain defensive posture.';
+        tickersEl.textContent         = '';
+    } else if (history.active) {
+        cardEl.style.borderLeftColor  = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
+        statusEl.style.color          = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
+        statusEl.textContent          = thrustNew
+            ? `⚡ THRUST SIGNAL — ${thrusters.length} tickers (threshold: ${threshold})`
+            : `⚡ Active since ${history.firingDate} | ${thrusters.length} tickers holding`;
+        subEl.textContent             = thrustNew
+            ? `Score ≤1 → ≥3 within 5 days. Monitoring for failure over next 5 scans.`
+            : `Check ${history.failureChecks || 0}/5 — failure triggers if ≥50% of thrust tickers retreat.`;
+        tickersEl.innerHTML           = thrusters.length ? `<span style="color:var(--text-secondary)">Tickers: </span>${thrusters.join(', ')}` : '';
+    } else {
+        cardEl.style.borderLeftColor  = 'var(--border)';
+        statusEl.style.color          = 'var(--text-secondary)';
+        statusEl.textContent          = 'No thrust active';
+        subEl.textContent             = `${pendingCount} candidate(s) tracking | Threshold: ${threshold} tickers (10% of ${total}) | Signal fires when enough move ≤1→≥3 in 5 days.`;
+        tickersEl.innerHTML           = pendingCount > 0
+            ? `<span style="color:var(--text-secondary)">Tracking: </span>` +
+              Object.keys(history.candidates).filter(k => !history.candidates[k].peaked).join(', ')
+            : '';
+    }
+}
+
+// ===== MARKET BREADTH MODULE (existing — unchanged) =====
 function analyzeBreadthProxy(ticker, data) {
     if (!data || !data.prices || data.prices.length < 50) return null;
     const prices = data.prices;
-    const currentPrice = prices[prices.length - 1];
-    const dma20  = calculateMA(prices, 20);
-    const dma50  = calculateMA(prices, 50);
-    const dma200 = prices.length >= 200 ? calculateMA(prices, 200) : null;
-    const rsi    = calculateRSI(prices);
-    const rsiPrev3 = prices.length >= 17 ? calculateRSI(prices.slice(0, -3)) : rsi;
-    const rsiSlope = rsi - rsiPrev3;
-    const change5d  = prices.length >= 6  ? ((currentPrice / prices[prices.length - 6])  - 1) * 100 : 0;
+    const currentPrice  = prices[prices.length - 1];
+    const dma20   = calculateMA(prices, 20);
+    const dma50   = calculateMA(prices, 50);
+    const dma200  = prices.length >= 200 ? calculateMA(prices, 200) : null;
+    const rsi     = calculateRSI(prices);
+    const rsiPrev3  = prices.length >= 17 ? calculateRSI(prices.slice(0, -3)) : rsi;
+    const rsiSlope  = rsi - rsiPrev3;
+    const change5d  = prices.length >= 6 ? ((currentPrice / prices[prices.length - 6]) - 1) * 100 : 0;
     const aboveDMA20  = currentPrice > dma20;
     const aboveDMA50  = currentPrice > dma50;
     const aboveDMA200 = dma200 ? currentPrice > dma200 : null;
-    const recentlyReclaimedDMA20 = aboveDMA20 && prices.length >= 4  && prices[prices.length - 4] < dma20;
-    const recentlyReclaimedDMA50 = aboveDMA50 && prices.length >= 6  && prices[prices.length - 6] < dma50;
+    const recentlyReclaimedDMA20 = aboveDMA20 && prices.length >= 4 && prices[prices.length - 4] < dma20;
+    const recentlyReclaimedDMA50 = aboveDMA50 && prices.length >= 6 && prices[prices.length - 6] < dma50;
     const bullishCount = [aboveDMA20, aboveDMA50, aboveDMA200, rsi > 50].filter(Boolean).length;
     let signal, signalColor;
     if (bullishCount >= 3)      { signal = 'BULLISH';  signalColor = 'var(--accent-green)'; }
@@ -893,21 +1252,20 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     if (iwmData) proxyData['IWM'] = iwmData;
     await sleep(5000);
 
-    // Analyze
     const analysis = {};
     ['SPY', 'QQQ', 'IWM'].forEach(t => { analysis[t] = analyzeBreadthProxy(t, proxyData[t]); });
 
-    const valid = Object.values(analysis).filter(a => a !== null);
-    const bullish = valid.filter(a => a.signal === 'BULLISH').length;
-    const bearish = valid.filter(a => a.signal === 'BEARISH').length;
+    const valid       = Object.values(analysis).filter(a => a !== null);
+    const bullish     = valid.filter(a => a.signal === 'BULLISH').length;
+    const bearish     = valid.filter(a => a.signal === 'BEARISH').length;
     const reclaimCount = valid.filter(a => a.recentlyReclaimedDMA20 || a.recentlyReclaimedDMA50).length;
-    const risingRSI = valid.filter(a => a.rsi > 40 && a.rsiSlope > 0).length;
+    const risingRSI   = valid.filter(a => a.rsi > 40 && a.rsiSlope > 0).length;
 
     let overallSignal, overallColor, overallDesc;
-    if (bullish >= 2)                   { overallSignal = 'BULLISH';      overallColor = 'var(--accent-green)';  overallDesc = 'Broad market trending positively. Risk-on conditions supportive.'; }
-    else if (bearish >= 2)              { overallSignal = 'BEARISH';      overallColor = 'var(--accent-red)';    overallDesc = 'Broad market under pressure. Defensive posture warranted.'; }
+    if (bullish >= 2)                             { overallSignal = 'BULLISH';    overallColor = 'var(--accent-green)';  overallDesc = 'Broad market trending positively. Risk-on conditions supportive.'; }
+    else if (bearish >= 2)                        { overallSignal = 'BEARISH';    overallColor = 'var(--accent-red)';    overallDesc = 'Broad market under pressure. Defensive posture warranted.'; }
     else if (reclaimCount >= 1 || risingRSI >= 2) { overallSignal = 'RECOVERING'; overallColor = 'var(--accent-yellow)'; overallDesc = 'Early recovery signals detected. Monitor for confirmation before re-entry.'; }
-    else                                { overallSignal = 'NEUTRAL';      overallColor = 'var(--text-secondary)'; overallDesc = 'Mixed signals. No clear directional bias.'; }
+    else                                           { overallSignal = 'NEUTRAL';    overallColor = 'var(--text-secondary)'; overallDesc = 'Mixed signals. No clear directional bias.'; }
 
     const prev = loadBreadthHistory();
     let velocity = '';
@@ -915,7 +1273,6 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     else if (prev) velocity = `▶ Holding ${overallSignal} (no change from last scan)`;
     saveBreadthHistory(overallSignal);
 
-    // Render banner
     const banner = document.getElementById('breadthSignalBanner');
     banner.style.borderLeftColor = overallColor;
     document.getElementById('breadthSignalText').textContent = overallSignal;
@@ -923,7 +1280,6 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     document.getElementById('breadthSignalDesc').textContent = overallDesc;
     if (velocity) { document.getElementById('breadthVelocity').textContent = velocity; }
 
-    // Render proxy cards
     const grid = document.getElementById('breadthProxyGrid');
     grid.innerHTML = '';
     ['SPY', 'QQQ', 'IWM'].forEach(ticker => {
@@ -932,18 +1288,15 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
             grid.innerHTML += `<div class="breadth-proxy-card"><div class="breadth-proxy-name">${ticker}</div><div class="breadth-proxy-stat">No data available</div></div>`;
             return;
         }
-
         const reclaimBadge = (a.recentlyReclaimedDMA20 || a.recentlyReclaimedDMA50) ? '<span class="reclaim-badge">🔄 RECLAIM</span>' : '';
         const dma20Color  = a.aboveDMA20  ? 'var(--accent-green)' : 'var(--accent-red)';
         const dma50Color  = a.aboveDMA50  ? 'var(--accent-green)' : 'var(--accent-red)';
         const dma200Color = a.dma200 === null ? 'var(--text-secondary)' : a.aboveDMA200 ? 'var(--accent-green)' : 'var(--accent-red)';
         const chgColor    = a.change5d >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
         const rsiColor    = a.rsi > 55 ? 'var(--accent-green)' : a.rsi < 40 ? 'var(--accent-red)' : 'var(--accent-yellow)';
-
-        const dma20Str  = `${a.aboveDMA20 ? '▲' : '▼'} ${(((a.currentPrice/a.dma20)-1)*100).toFixed(1)}%`;
-        const dma50Str  = `${a.aboveDMA50 ? '▲' : '▼'} ${(((a.currentPrice/a.dma50)-1)*100).toFixed(1)}%`;
-        const dma200Str = a.dma200 ? `${a.aboveDMA200 ? '▲' : '▼'} ${(((a.currentPrice/a.dma200)-1)*100).toFixed(1)}%` : 'N/A';
-
+        const dma20Str    = `${a.aboveDMA20 ? '▲' : '▼'} ${(((a.currentPrice/a.dma20)-1)*100).toFixed(1)}%`;
+        const dma50Str    = `${a.aboveDMA50 ? '▲' : '▼'} ${(((a.currentPrice/a.dma50)-1)*100).toFixed(1)}%`;
+        const dma200Str   = a.dma200 ? `${a.aboveDMA200 ? '▲' : '▼'} ${(((a.currentPrice/a.dma200)-1)*100).toFixed(1)}%` : 'N/A';
         grid.innerHTML += `
             <div class="breadth-proxy-card" style="border-left-color: ${a.signalColor}">
                 <div class="breadth-proxy-name">${labels[ticker] || ticker}${reclaimBadge}</div>
@@ -957,13 +1310,12 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
             </div>`;
     });
 
-    // VIX approximation via realized volatility
     const spyA = analysis['SPY'];
     if (spyA && proxyData['SPY'] && proxyData['SPY'].prices.length >= 21) {
         const spyPrices = proxyData['SPY'].prices;
         const returns = [];
         for (let i = spyPrices.length - 20; i < spyPrices.length; i++) returns.push((spyPrices[i] / spyPrices[i-1]) - 1);
-        const mean = returns.reduce((a,b) => a+b, 0) / returns.length;
+        const mean     = returns.reduce((a,b) => a+b, 0) / returns.length;
         const variance = returns.reduce((a,b) => a + Math.pow(b-mean, 2), 0) / returns.length;
         const vixApprox = Math.sqrt(variance) * Math.sqrt(252) * 100;
         let vixLevel, vixColor;
@@ -975,7 +1327,6 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
             `Volatility Proxy: <strong style="color:${vixColor}">${vixApprox.toFixed(1)}% — ${vixLevel}</strong> <span style="font-size:0.75rem; color:var(--text-secondary);">(SPY 20-day realized vol, directional only)</span>`;
     }
 
-    // Recovery Watch
     const spyAn = analysis['SPY'], qqqAn = analysis['QQQ'], iwmAn = analysis['IWM'];
     const conditions = [];
     if (spyAn) conditions.push(spyAn.rsi > 40 && spyAn.rsiSlope > 0 ? '✅ SPY RSI > 40 and rising' : '❌ SPY RSI not yet turning (need >40 and rising)');
@@ -983,29 +1334,28 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     if (iwmAn && spyAn) conditions.push(iwmAn.change5d > spyAn.change5d ? '✅ IWM outperforming SPY (5d) — small caps leading' : '❌ IWM not yet outperforming SPY (small caps lagging)');
 
     const metCount = conditions.filter(c => c.startsWith('✅')).length;
-    const box = document.getElementById('recoveryWatchBox');
-    const titleEl = document.getElementById('recoveryWatchTitle');
-    const listEl = document.getElementById('recoveryConditionsList');
+    const box      = document.getElementById('recoveryWatchBox');
+    const titleEl  = document.getElementById('recoveryWatchTitle');
+    const listEl   = document.getElementById('recoveryConditionsList');
 
     if (metCount >= 3) {
-        box.className = 'recovery-watch-box active';
+        box.className    = 'recovery-watch-box active';
         titleEl.innerHTML = '<span style="color:var(--accent-green)">🚀 RECOVERY WATCH TRIGGERED — All 3 conditions met</span>';
         titleEl.style.color = 'var(--accent-green)';
     } else {
-        box.className = 'recovery-watch-box inactive';
+        box.className     = 'recovery-watch-box inactive';
         titleEl.innerHTML = `🔭 Recovery Watch (${metCount}/3 conditions met)`;
         titleEl.style.color = 'var(--text-secondary)';
     }
-
     listEl.innerHTML = conditions.map(c => {
         const color = c.startsWith('✅') ? 'var(--accent-green)' : 'var(--accent-red)';
         return `<div class="recovery-condition" style="color:${color}">${c}</div>`;
     }).join('');
 }
 
-// ===== RENDER RESULTS =====
+// ===== RENDER RESULTS — adds recentlyReclaimedDMA20 badge + calls analyzeWatchlistBreadth =====
 function renderResults(results, regimeMode) {
-    const resultsDiv = document.getElementById('results');
+    const resultsDiv    = document.getElementById('results');
     const deteriorations = detectDeteriorations(results);
     let html = '';
 
@@ -1028,13 +1378,17 @@ function renderResults(results, regimeMode) {
 
     html += '<div class="ticker-grid">';
     results.forEach(result => {
-        const signal = getSignal(result.score, result.perf);
+        const signal    = getSignal(result.score, result.perf);
         const scoreClass = `score-${result.score}`;
-        const perfClass = result.perfAnalysis.severity === 'danger' ? 'danger' : result.perfAnalysis.severity === 'warning' ? 'warning' : '';
+        const perfClass  = result.perfAnalysis.severity === 'danger' ? 'danger' : result.perfAnalysis.severity === 'warning' ? 'warning' : '';
+        // v3.4: reclaim badge on ticker card header
+        const reclaimTag = result.recentlyReclaimedDMA20
+            ? ' <span class="reclaim-badge">🔄 RECLAIM</span>'
+            : '';
         html += `
             <div class="ticker-card">
                 <div class="ticker-header">
-                    <div class="ticker-symbol">${result.ticker}</div>
+                    <div class="ticker-symbol">${result.ticker}${reclaimTag}</div>
                     <div class="ticker-meta">
                         <div class="asset-type">${result.assetType} Asset</div>
                         <div class="active-mode ${result.mode === 'MODE A' ? 'mode-a' : 'mode-b'}">${result.mode}</div>
@@ -1063,11 +1417,11 @@ function renderResults(results, regimeMode) {
     });
     html += '</div>';
 
-    const deploy = results.filter(r => r.score === 4 && r.perf.change5Day <= 5);
+    const deploy      = results.filter(r => r.score === 4 && r.perf.change5Day <= 5);
     const deploySmall = results.filter(r => r.score === 4 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
-    const tooLate = results.filter(r => r.score === 4 && r.perf.change5Day > 10);
-    const watch = results.filter(r => r.score === 2 || r.score === 3);
-    const avoid = results.filter(r => r.score <= 1);
+    const tooLate     = results.filter(r => r.score === 4 && r.perf.change5Day > 10);
+    const watch       = results.filter(r => r.score === 2 || r.score === 3);
+    const avoid       = results.filter(r => r.score <= 1);
 
     html += `<div class="summary">
         <h2>📋 DEPLOYMENT RECOMMENDATIONS</h2>
@@ -1081,9 +1435,12 @@ function renderResults(results, regimeMode) {
     </div>`;
 
     resultsDiv.innerHTML = html;
+
+    // v3.4: compute watchlist breadth indicators after every render
+    analyzeWatchlistBreadth(results);
 }
 
-// ===== BATCH ENGINE =====
+// ===== BATCH ENGINE (unchanged) =====
 let batchState = {
     allTickers: [], currentBatch: 0, batchSize: 4,
     results: [], regimeMode: null, spyData: null, vooData: null, isProcessing: false
@@ -1113,7 +1470,7 @@ function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null
 function toggleMode() {
     autoMode = !autoMode;
     const toggle = document.getElementById('modeToggle');
-    const label = document.getElementById('modeLabel');
+    const label  = document.getElementById('modeLabel');
     const status = document.getElementById('autoStatus');
     if (autoMode) {
         toggle.style.background = 'var(--accent-green)';
@@ -1149,7 +1506,7 @@ function startAutoCountdown(seconds, callback) {
 
 function startCountdownTimer(seconds) {
     nextAvailableTime = Date.now() + (seconds * 1000);
-    const timerEl = document.getElementById('countdownTimer');
+    const timerEl   = document.getElementById('countdownTimer');
     const displayEl = document.getElementById('timerDisplay');
     const messageEl = document.getElementById('timerMessage');
     timerEl.classList.add('active', 'waiting'); timerEl.classList.remove('ready');
@@ -1170,9 +1527,9 @@ function startCountdownTimer(seconds) {
 }
 
 function updateProgress(current, total, message) {
-    const pc = document.getElementById('progressContainer');
-    const pf = document.getElementById('progressFill');
-    const pt = document.getElementById('progressText');
+    const pc  = document.getElementById('progressContainer');
+    const pf  = document.getElementById('progressFill');
+    const pt  = document.getElementById('progressText');
     const pct = total > 0 ? Math.round((current / total) * 100) : 0;
     pc.classList.add('active');
     pf.style.width = pct + '%'; pf.textContent = pct + '%';
@@ -1180,7 +1537,7 @@ function updateProgress(current, total, message) {
 }
 
 function showPauseNotice(batchNum, totalBatches, remainingTickers) {
-    const pauseNotice = document.getElementById('pauseNotice');
+    const pauseNotice    = document.getElementById('pauseNotice');
     const pauseCountdown = document.getElementById('pauseCountdown');
     const continueButton = document.getElementById('continueButton');
     pauseNotice.classList.add('active');
@@ -1218,10 +1575,10 @@ function checkForSavedProgress() {
     const ageMinutes = (Date.now() - progress.timestamp) / 60000;
     if (ageMinutes < 120) {
         if (confirm(`Found incomplete scan from ${Math.round(ageMinutes)} minutes ago.\nBatch ${progress.batchState.currentBatch} with ${progress.batchState.results.length} results.\nRestore progress?`)) {
-            batchState.allTickers = progress.batchState.allTickers;
+            batchState.allTickers   = progress.batchState.allTickers;
             batchState.currentBatch = progress.batchState.currentBatch;
-            batchState.results = progress.batchState.results;
-            batchState.regimeMode = progress.batchState.regimeMode;
+            batchState.results      = progress.batchState.results;
+            batchState.regimeMode   = progress.batchState.regimeMode;
             if (batchState.results.length > 0) renderResults(batchState.results, batchState.regimeMode);
         } else { clearProgress(); }
     } else { clearProgress(); }
@@ -1240,9 +1597,9 @@ async function processBatch() {
         document.getElementById('regimeIcon').textContent = batchState.regimeMode === 'RISK' ? '📈' : '🛡️';
 
         if (batchState.vooData) {
-            const cp = batchState.vooData.prices[batchState.vooData.prices.length - 1];
+            const cp   = batchState.vooData.prices[batchState.vooData.prices.length - 1];
             const d200 = calculateMA(batchState.vooData.prices, 200);
-            const pct = ((cp / d200 - 1) * 100).toFixed(2);
+            const pct  = ((cp / d200 - 1) * 100).toFixed(2);
             document.getElementById('vooStatus').textContent = `VOO: $${cp.toFixed(2)} vs 200-DMA: $${d200.toFixed(2)} (${pct > 0 ? '+' : ''}${pct}%)`;
         }
 
@@ -1251,8 +1608,8 @@ async function processBatch() {
         await sleep(8000);
     }
 
-    const startIdx = batchState.currentBatch * batchState.batchSize;
-    const endIdx = Math.min(startIdx + batchState.batchSize, batchState.allTickers.length);
+    const startIdx     = batchState.currentBatch * batchState.batchSize;
+    const endIdx       = Math.min(startIdx + batchState.batchSize, batchState.allTickers.length);
     const batchTickers = batchState.allTickers.slice(startIdx, endIdx);
     const totalBatches = Math.ceil(batchState.allTickers.length / batchState.batchSize);
 
@@ -1260,7 +1617,7 @@ async function processBatch() {
     document.getElementById('batchProgress').textContent = `Batch ${batchState.currentBatch + 1} of ${totalBatches}`;
 
     for (let i = 0; i < batchTickers.length; i++) {
-        const ticker = batchTickers[i];
+        const ticker     = batchTickers[i];
         const overallIdx = startIdx + i;
         updateProgress(overallIdx + 1, batchState.allTickers.length, `Fetching ${ticker} (${overallIdx + 1}/${batchState.allTickers.length})...`);
 
@@ -1284,9 +1641,9 @@ async function processBatch() {
             }
 
             const baseType = assetType.includes('DEFENSIVE') ? 'DEFENSIVE' : 'RISK';
-            const mode = getActiveMode(baseType, batchState.regimeMode);
-            const { score, breakdown, perf, perfAnalysis } = calculateScore(ticker, data, batchState.spyData, mode);
-            batchState.results.push({ ticker, assetType, mode, score, breakdown, perf, perfAnalysis });
+            const mode     = getActiveMode(baseType, batchState.regimeMode);
+            const { score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20 } = calculateScore(ticker, data, batchState.spyData, mode);
+            batchState.results.push({ ticker, assetType, mode, score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20 });
             renderResults(batchState.results, batchState.regimeMode);
         }
 
@@ -1301,7 +1658,6 @@ async function processBatch() {
         document.getElementById('progressContainer').classList.remove('active');
         showPauseNotice(batchState.currentBatch, totalBatches, remaining);
     } else {
-        // All tickers done — fetch breadth panel
         await fetchBreadthAfterTickers();
     }
 }
@@ -1310,10 +1666,8 @@ async function fetchBreadthAfterTickers() {
     document.getElementById('progressContainer').classList.add('active');
     document.getElementById('progressText').textContent = 'Fetching market breadth data (SPY/QQQ/IWM)...';
     document.getElementById('progressFill').style.width = '50%';
-
-    await sleep(8000); // Rate limit gap after last ticker batch
+    await sleep(8000);
     await fetchAndRenderBreadth(batchState.spyData);
-
     finishAnalysis();
 }
 
@@ -1340,7 +1694,7 @@ function finishAnalysis() {
 async function runAnalysis() {
     if (Date.now() < nextAvailableTime) { alert('Please wait for the countdown timer to finish.'); return; }
     const tickersInput = document.getElementById('tickerInput').value;
-    const tickers = tickersInput.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
+    const tickers      = tickersInput.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
     if (tickers.length === 0) { alert('Please enter at least one ticker'); return; }
     if (batchState.isProcessing) { alert('Analysis already in progress.'); return; }
 
@@ -1350,8 +1704,8 @@ async function runAnalysis() {
     if (!batchState.results || batchState.results.length === 0) {
         batchState = { allTickers: tickers, currentBatch: 0, batchSize: 4, results: [], regimeMode: null, spyData: null, vooData: null, isProcessing: true };
         document.getElementById('results').innerHTML = '';
-        // Reset breadth panel
         document.getElementById('breadthPanel').style.display = 'none';
+        document.getElementById('watchlistBreadthPanel').style.display = 'none';
         document.getElementById('breadthSignalText').textContent = '—';
         document.getElementById('breadthSignalDesc').textContent = 'Fetching after ticker scan completes...';
         document.getElementById('breadthProxyGrid').innerHTML = '';
@@ -1373,7 +1727,7 @@ async function runAnalysis() {
     }
 }
 
-// ===== INIT =====
+// ===== INIT (unchanged) =====
 window.addEventListener('DOMContentLoaded', () => {
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
