@@ -206,6 +206,18 @@
 
         .recovery-condition { margin-top: 0.3rem; font-size: 0.8rem; }
 
+        .coil-badge {
+            display: inline-block;
+            padding: 0.1rem 0.35rem;
+            background: rgba(108, 92, 231, 0.2);
+            border: 1px solid var(--accent-blue);
+            border-radius: 3px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-left: 0.4rem;
+            vertical-align: middle;
+        }
         .reclaim-badge {
             display: inline-block;
             padding: 0.1rem 0.35rem;
@@ -875,6 +887,48 @@ function calculateVolRatio(volumes, period = 20) {
     return currentVol / avgVol;
 }
 
+// ===== ATR + COIL DETECTION (v3.4+) =====
+function calculateATR(highs, lows, closes, period) {
+    if (highs.length < period + 1) return { atrShort: 0, atrLong: 0 };
+    const tr = [];
+    for (let i = 1; i < highs.length; i++) {
+        tr.push(Math.max(
+            highs[i] - lows[i],
+            Math.abs(highs[i] - closes[i - 1]),
+            Math.abs(lows[i]  - closes[i - 1])
+        ));
+    }
+    const atrShort = tr.slice(-10).reduce((a, b) => a + b, 0) / 10;
+    const atrLong  = tr.slice(-20).reduce((a, b) => a + b, 0) / 20;
+    return { atrShort, atrLong };
+}
+
+function detectCoil(ticker, data, rsi, dma20, dma50, mode) {
+    const { prices, highs, lows, volumes } = data;
+    if (!highs || highs.length < 25) return false;
+    const price = prices[prices.length - 1];
+    const { atrShort, atrLong } = calculateATR(highs, lows, prices, 20);
+    if (atrShort >= atrLong) return false;
+    const high20 = Math.max(...highs.slice(-20));
+    if (price < high20 * 0.95) return false;
+    const broadETFs  = ['VOO','VXUS','SPY','IVV','VTI'];
+    const sectorETFs = ['XLE','XLK','XLI','XLV','XLF','XLC','XLY','XLU','XLB','XLP','XLRE','VGT','VHT','VTV','VEA','SOXX','ITA','RSP'];
+    const volThresh  = broadETFs.includes(ticker) ? 0.8 : sectorETFs.includes(ticker) ? 1.0 : 1.2;
+    const volRatio   = calculateVolRatio(volumes, 20);
+    if (volRatio < volThresh) return false;
+    if (price <= dma20) return false;
+    if (rsi < 45 || rsi > 65) return false;
+    const dma20prior = prices.length >= 25 ? prices.slice(-25, -5).reduce((a, b) => a + b, 0) / 20 : dma20;
+    const slopePct   = ((dma20 - dma20prior) / dma20prior) * 100;
+    const slopeOk    = mode === 'MODE A' ? slopePct >= 0 : slopePct >= -0.5;
+    if (!slopeOk) return false;
+    const distThresh = broadETFs.includes(ticker) ? 8 : sectorETFs.includes(ticker) ? 10 : 12;
+    const distPct    = dma50 > 0 ? Math.abs(((price / dma50) - 1) * 100) : 999;
+    if (distPct > distThresh) return false;
+    return true;
+}
+
+
 function calculatePerformanceMetrics(prices) {
     const m = { change1Day: 0, change5Day: 0, change10Day: 0 };
     if (prices.length < 2) return m;
@@ -906,7 +960,12 @@ async function fetchStockData(ticker) {
         const data = await r.json();
         if (data.status === 'error' || !data.values) { console.error(`Error for ${ticker}:`, data.message); return null; }
         const vals = data.values.reverse();
-        return { prices: vals.map(v => parseFloat(v.close)), volumes: vals.map(v => parseFloat(v.volume)) };
+        return {
+            prices:  vals.map(v => parseFloat(v.close)),
+            highs:   vals.map(v => parseFloat(v.high  || v.close)),
+            lows:    vals.map(v => parseFloat(v.low   || v.close)),
+            volumes: vals.map(v => parseFloat(v.volume))
+        };
     } catch (e) { console.error(`Fetch error ${ticker}:`, e); return null; }
 }
 
@@ -966,7 +1025,12 @@ function calculateScore(ticker, data, spyData, mode) {
     const recentlyReclaimedDMA20 = (currentPrice > dma20) &&
         (prices.length >= 4) && (prices[prices.length - 4] < dma20);
 
-    return { score, breakdown, perf, perfAnalysis: generatePerformanceWarnings(perf, rsi, score), recentlyReclaimedDMA20 };
+    // v3.4+: coil detection — only computed for score 3 tickers
+    const isCoiling = score === 3
+        ? detectCoil(ticker, data, rsi, dma20, dma50, mode)
+        : false;
+
+    return { score, breakdown, perf, perfAnalysis: generatePerformanceWarnings(perf, rsi, score), recentlyReclaimedDMA20, isCoiling };
 }
 
 function getSignal(score, perf) {
@@ -1385,10 +1449,14 @@ function renderResults(results, regimeMode) {
         const reclaimTag = result.recentlyReclaimedDMA20
             ? ' <span class="reclaim-badge">🔄 RECLAIM</span>'
             : '';
+        // v3.4+: coil badge
+        const coilTag = result.isCoiling
+            ? ' <span class="coil-badge">🗜 COIL</span>'
+            : '';
         html += `
             <div class="ticker-card">
                 <div class="ticker-header">
-                    <div class="ticker-symbol">${result.ticker}${reclaimTag}</div>
+                    <div class="ticker-symbol">${result.ticker}${reclaimTag}${coilTag}</div>
                     <div class="ticker-meta">
                         <div class="asset-type">${result.assetType} Asset</div>
                         <div class="active-mode ${result.mode === 'MODE A' ? 'mode-a' : 'mode-b'}">${result.mode}</div>
@@ -1431,6 +1499,7 @@ function renderResults(results, regimeMode) {
             <div class="summary-section"><h3><span>🔴</span> TOO LATE (${tooLate.length})</h3><ul>${tooLate.length ? tooLate.map(r => `<li>• ${r.ticker} — Wait for pullback (+${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}</ul></div>
             <div class="summary-section"><h3><span>⚠️</span> WATCH (${watch.length})</h3><ul>${watch.length ? watch.map(r => `<li>• ${r.ticker} — ${r.score}/4 ${r.score === 3 ? '(Stealth Watch)' : '(Hold if owned)'}</li>`).join('') : '<li>None</li>'}</ul></div>
             <div class="summary-section"><h3><span>🔴</span> AVOID/EXIT (${avoid.length})</h3><ul>${avoid.length ? avoid.map(r => `<li>• ${r.ticker} (${r.mode}) — ${r.score}/4</li>`).join('') : '<li>None</li>'}</ul></div>
+            <div class="summary-section"><h3><span>🗜</span> COIL SETUPS (${results.filter(r => r.isCoiling).length})</h3><ul>${results.filter(r => r.isCoiling).length ? results.filter(r => r.isCoiling).map(r => `<li>• ${r.ticker} — 3/4 compressing | RSI ${r.breakdown.find(b=>b.text.includes('RSI')) ? r.breakdown.find(b=>b.text.includes('RSI')).text.split(' ')[2] : '—'} | Vol ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`).join('') : '<li>None — no compression setups detected</li>'}</ul></div>
         </div>
     </div>`;
 
@@ -1642,8 +1711,8 @@ async function processBatch() {
 
             const baseType = assetType.includes('DEFENSIVE') ? 'DEFENSIVE' : 'RISK';
             const mode     = getActiveMode(baseType, batchState.regimeMode);
-            const { score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20 } = calculateScore(ticker, data, batchState.spyData, mode);
-            batchState.results.push({ ticker, assetType, mode, score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20 });
+            const { score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20, isCoiling } = calculateScore(ticker, data, batchState.spyData, mode);
+            batchState.results.push({ ticker, assetType, mode, score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20, isCoiling });
             renderResults(batchState.results, batchState.regimeMode);
         }
 
