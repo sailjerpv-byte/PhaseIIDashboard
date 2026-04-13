@@ -1029,8 +1029,15 @@ function calculateScore(ticker, data, spyData, mode) {
     const isCoiling = score === 3
         ? detectCoil(ticker, data, rsi, dma20, dma50, mode)
         : false;
-
-    return { score, breakdown, perf, perfAnalysis: generatePerformanceWarnings(perf, rsi, score), recentlyReclaimedDMA20, isCoiling };
+   return { 
+  score, breakdown, perf, 
+  perfAnalysis: generatePerformanceWarnings(perf, rsi, score), 
+  recentlyReclaimedDMA20, 
+  isCoiling,
+  extensionLabel: perfAnalysis.severity === 'danger' ? 'PARABOLIC' 
+                : perfAnalysis.severity === 'warning' ? 'EXTENDED' 
+                : 'CLEAN'
+};
 }
 
 function getSignal(score, perf) {
@@ -1497,7 +1504,20 @@ function renderResults(results, regimeMode) {
             <div class="summary-section"><h3><span>🟢</span> DEPLOY NOW (${deploy.length})</h3><ul>${deploy.length ? deploy.map(r => `<li>• ${r.ticker} — 1% position (${r.mode}) 4/4</li>`).join('') : '<li>None — Only fresh 4/4 setups qualify</li>'}</ul></div>
             <div class="summary-section"><h3><span>🟡</span> DEPLOY SMALL (${deploySmall.length})</h3><ul>${deploySmall.length ? deploySmall.map(r => `<li>• ${r.ticker} — 0.5-0.75% (extended +${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}</ul></div>
             <div class="summary-section"><h3><span>🔴</span> TOO LATE (${tooLate.length})</h3><ul>${tooLate.length ? tooLate.map(r => `<li>• ${r.ticker} — Wait for pullback (+${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}</ul></div>
-            <div class="summary-section"><h3><span>⚠️</span> WATCH (${watch.length})</h3><ul>${watch.length ? watch.map(r => `<li>• ${r.ticker} — ${r.score}/4 ${r.score === 3 ? '(Stealth Watch)' : '(Hold if owned)'}</li>`).join('') : '<li>None</li>'}</ul></div>
+            <div class="summary-section"><h3><span>⚠️</span> WATCH (${watch.length})</h3><ul>${watch.length ? watch.map(r => {
+  if (r.score === 3) {
+    const extLabel = r.extensionLabel || 'CLEAN';
+    const extColor = extLabel === 'PARABOLIC' ? 'var(--accent-red)'
+                   : extLabel === 'EXTENDED'  ? 'var(--accent-orange)'
+                   : 'var(--accent-green)';
+    const extIcon  = extLabel === 'PARABOLIC' ? '🔴'
+                   : extLabel === 'EXTENDED'  ? '⚠️'
+                   : '✅';
+    const stealthTag = r.stealthDays >= 5 ? ` | Stealth ${r.stealthDays}d` : '';
+    return `<li>• ${r.ticker} — 3/4 (Stealth Watch${stealthTag}) | <span style="color:${extColor}; font-weight:700;">${extIcon} ${extLabel}</span></li>`;
+  }
+  return `<li>• ${r.ticker} — ${r.score}/4 (Hold if owned)</li>`;
+}).join('') : '<li>None</li>'}</ul></div>
             <div class="summary-section"><h3><span>🔴</span> AVOID/EXIT (${avoid.length})</h3><ul>${avoid.length ? avoid.map(r => `<li>• ${r.ticker} (${r.mode}) — ${r.score}/4</li>`).join('') : '<li>None</li>'}</ul></div>
             <div class="summary-section"><h3><span>🗜</span> COIL SETUPS (${results.filter(r => r.isCoiling).length})</h3><ul>${results.filter(r => r.isCoiling).length ? results.filter(r => r.isCoiling).map(r => `<li>• ${r.ticker} — 3/4 compressing | RSI ${r.breakdown.find(b=>b.text.includes('RSI')) ? r.breakdown.find(b=>b.text.includes('RSI')).text.split(' ')[2] : '—'} | Vol ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`).join('') : '<li>None — no compression setups detected</li>'}</ul></div>
         </div>
