@@ -1029,17 +1029,13 @@ function calculateScore(ticker, data, spyData, mode) {
     const isCoiling = score === 3
         ? detectCoil(ticker, data, rsi, dma20, dma50, mode)
         : false;
-   return { 
-  score, breakdown, perf, 
-  perfAnalysis: generatePerformanceWarnings(perf, rsi, score), 
-  recentlyReclaimedDMA20, 
-  isCoiling,
-  extensionLabel: perfAnalysis.severity === 'danger' ? 'PARABOLIC' 
-                : perfAnalysis.severity === 'warning' ? 'EXTENDED' 
-                : 'CLEAN'
-};
+const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
+const extensionLabel = perfAnalysis.severity === 'danger' ? 'PARABOLIC'
+                     : perfAnalysis.severity === 'warning' ? 'EXTENDED'
+                     : 'CLEAN';
+return { score, breakdown, perf, perfAnalysis, 
+recentlyReclaimedDMA20, isCoiling, extensionLabel };
 }
-
 function getSignal(score, perf) {
     if (score === 4) {
         if (perf.change5Day > 10) return { text: '🔴 TOO LATE', subtext: 'Parabolic move — very high risk', class: 'exit', size: '0.25% max' };
