@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regime-Aware Momentum Dashboard v3.4</title>
+    <title>Regime-Aware Momentum Dashboard v3.6.1</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,6 +19,7 @@
             --accent-yellow: #ffd93d;
             --accent-blue: #6c5ce7;
             --accent-orange: #ff7b39;
+            --accent-cyan: #5b8dee;
             --border: #2d3561;
             --shadow: rgba(0, 0, 0, 0.3);
         }
@@ -101,7 +102,7 @@
         .threshold-col ul { list-style: none; font-size: 0.85rem; }
         .threshold-col li { padding: 0.25rem 0; color: var(--text-secondary); }
 
-        /* ===== MARKET BREADTH PANEL (existing — unchanged) ===== */
+        /* ===== MARKET BREADTH PANEL ===== */
         .breadth-panel {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -218,6 +219,7 @@
             margin-left: 0.4rem;
             vertical-align: middle;
         }
+
         .reclaim-badge {
             display: inline-block;
             padding: 0.1rem 0.35rem;
@@ -231,7 +233,7 @@
             vertical-align: middle;
         }
 
-        /* ===== v3.4: WATCHLIST BREADTH PANEL ===== */
+        /* ===== WATCHLIST BREADTH PANEL ===== */
         .watchlist-breadth-panel {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -308,7 +310,6 @@
             line-height: 1.5;
         }
 
-        /* Thrust card */
         .thrust-card {
             background: var(--bg-secondary);
             border-radius: 8px;
@@ -349,7 +350,113 @@
             line-height: 1.7;
         }
 
-        /* ===== EXISTING STYLES (all unchanged) ===== */
+        /* ===== v3.6: COIL PRIORITY BOARD ===== */
+        .coil-priority-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease-out 0.38s both;
+        }
+
+        .coil-priority-panel h2 {
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .coil-filter-summary {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            line-height: 1.6;
+        }
+
+        .coil-filter-summary span { color: var(--text-primary); font-weight: 700; }
+
+        .coil-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .coil-table th {
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .coil-table td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid rgba(45, 53, 97, 0.5);
+        }
+
+        .coil-table tr:hover td { background: rgba(91, 141, 238, 0.05); }
+
+        .coil-table tr.top-setup td { background: rgba(91, 141, 238, 0.06); }
+
+        .coil-score-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .coil-action-enter { color: var(--accent-green); font-weight: 700; }
+        .coil-action-watch { color: var(--accent-yellow); font-weight: 700; }
+        .coil-action-ignore { color: var(--text-secondary); }
+
+        .coil-legend {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .coil-empty {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        /* ===== v3.6.1: EXTENSION GATE ===== */
+        .ext-gate-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ext-gate-full    { background: rgba(0,255,136,0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .ext-gate-half    { background: rgba(255,217,61,0.15); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+        .ext-gate-starter { background: rgba(255,123,57,0.15); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
+        .ext-gate-block   { background: rgba(255,51,102,0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+        .ext-gate-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.72rem;
+        }
+
+        /* ===== CONTROLS ===== */
         .controls {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -487,6 +594,7 @@
 
         .progress-text { font-size: 0.85rem; color: var(--text-secondary); text-align: center; }
 
+        /* ===== TICKER CARDS ===== */
         .ticker-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -504,6 +612,12 @@
         }
 
         .ticker-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px var(--shadow); }
+
+        /* v3.6.1: blocked card styling */
+        .ticker-card.blocked {
+            border-color: rgba(255, 51, 102, 0.4);
+            opacity: 0.75;
+        }
 
         .ticker-header {
             display: flex;
@@ -572,6 +686,7 @@
         .perf-value.positive { color: var(--accent-green); }
         .perf-value.negative { color: var(--accent-red); }
 
+        /* ===== SUMMARY ===== */
         .summary {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -588,6 +703,7 @@
         .summary-section ul { list-style: none; font-size: 0.85rem; }
         .summary-section li { padding: 0.25rem 0; color: var(--text-secondary); }
 
+        /* ===== ANIMATIONS ===== */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -598,6 +714,8 @@
             .regime-header { flex-direction: column; align-items: flex-start; }
             .breadth-proxy-grid { grid-template-columns: 1fr; }
             .wb-grid { grid-template-columns: 1fr; }
+            .coil-table { font-size: 0.75rem; }
+            .ext-gate-legend { gap: 0.4rem; }
         }
 
         .footer {
@@ -614,7 +732,7 @@
 <div class="container">
     <div class="header">
         <h1>⚡ REGIME-AWARE MOMENTUM DASHBOARD</h1>
-        <p>v3.4 — Adaptive scoring | Auto beta classification | Market breadth | 20-DMA Reclaim Ratio | Breadth Thrust Monitor</p>
+        <p>v3.6.1 — COIL Priority Board | Extension Gate | Auto beta | Market breadth | 20-DMA Reclaim | Breadth Thrust</p>
     </div>
 
     <div class="regime-status" id="regimeStatus">
@@ -630,16 +748,16 @@
                 <h3>MODE A — STRICT (Risk Mode)</h3>
                 <ul>
                     <li>✓ RSI ≥ 55</li>
-                    <li>✓ Above BOTH 20-DMA & 50-DMA</li>
+                    <li>✓ Above BOTH 20-DMA &amp; 50-DMA</li>
                     <li>✓ Volume: Stocks ≥ 1.2x | Broad ETFs ≥ 0.8x</li>
-                    <li>✓ RS: VOO ≥ -0.5% | VXUS/Stocks > 0</li>
+                    <li>✓ RS vs SPY &gt; 0%</li>
                     <li><strong>✓ Score MUST be 4/4 to deploy</strong></li>
                 </ul>
             </div>
             <div class="threshold-col defensive">
                 <h3>MODE B — FLEXIBLE (Defensive Mode)</h3>
                 <ul>
-                    <li>✓ RSI ≥ 45 & slope positive (3-day)</li>
+                    <li>✓ RSI ≥ 45 &amp; slope positive (3-day)</li>
                     <li>✓ Above 20-DMA or repairing</li>
                     <li>✓ Volume ≥ 1.0× average</li>
                     <li>✓ RS ≥ -1.0%</li>
@@ -649,7 +767,7 @@
         </div>
     </div>
 
-    <!-- ===== MARKET BREADTH PANEL (existing — unchanged) ===== -->
+    <!-- MARKET BREADTH PANEL -->
     <div class="breadth-panel" id="breadthPanel" style="display:none;">
         <h2>🌐 MARKET BREADTH — SPY / QQQ / IWM</h2>
         <div class="breadth-signal-banner" id="breadthSignalBanner">
@@ -665,12 +783,10 @@
         </div>
     </div>
 
-    <!-- ===== v3.4: WATCHLIST BREADTH INDICATORS ===== -->
+    <!-- WATCHLIST BREADTH INDICATORS -->
     <div class="watchlist-breadth-panel" id="watchlistBreadthPanel" style="display:none;">
         <h2>📈 WATCHLIST BREADTH INDICATORS (v3.4)</h2>
         <div class="wb-grid">
-
-            <!-- LEFT: Reclaim Ratio -->
             <div class="wb-left">
                 <div class="wb-card" id="reclaimCard">
                     <div class="wb-card-title">20-DMA Reclaim Ratio</div>
@@ -682,11 +798,9 @@
                     <div class="wb-signal-sub" id="reclaimSignalSub"></div>
                 </div>
                 <div class="wb-hint">
-                    Alert fires when ≥45% of your watchlist reclaimed 20-DMA AND improved ≥10pt vs the previous scan. Delta persists in browser across sessions.
+                    Alert fires when ≥45% of your watchlist reclaimed 20-DMA AND improved ≥10pt vs the previous scan.
                 </div>
             </div>
-
-            <!-- RIGHT: Breadth Thrust Monitor -->
             <div class="thrust-card" id="thrustCard">
                 <div class="thrust-card-title">Breadth Thrust Monitor</div>
                 <div class="thrust-status" id="thrustStatus">No thrust active</div>
@@ -694,6 +808,13 @@
                 <div class="thrust-tickers" id="thrustTickers"></div>
             </div>
         </div>
+    </div>
+
+    <!-- v3.6: COIL PRIORITY BOARD -->
+    <div class="coil-priority-panel" id="coilPriorityPanel" style="display:none;">
+        <h2>⚡ COIL PRIORITY BOARD v3.6</h2>
+        <div class="coil-filter-summary" id="coilFilterSummary">Run analysis to populate</div>
+        <div id="coilPriorityContent"></div>
     </div>
 
     <div class="controls">
@@ -713,7 +834,7 @@
         </div>
 
         <div class="input-group">
-            <label for="assetTypes">Asset Classification — DEFENSIVE assets only (beta auto-classifies all others):</label>
+            <label for="assetTypes">Asset Classification — DEFENSIVE assets only:</label>
             <input type="text" id="assetTypes" placeholder="IAUM:DEFENSIVE" value="IAUM:DEFENSIVE">
         </div>
 
@@ -765,13 +886,13 @@
     <div id="results"></div>
 
     <div class="footer">
-        <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0–1 = EXIT | Beta Auto-Classification Active</p>
-        <p style="margin-top: 0.5rem;">v3.4 — Market Breadth: SPY/QQQ/IWM | 20-DMA Reclaim Ratio | Breadth Thrust Monitor | Volume Fix (ET timezone) | Data: Twelve Data</p>
+        <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0–1 = EXIT</p>
+        <p style="margin-top: 0.5rem;">v3.6.1 — COIL Priority Board | Extension Gate | Market Breadth | 20-DMA Reclaim | Breadth Thrust | Data: Twelve Data</p>
     </div>
 </div>
 
 <script>
-// ===== API KEY MANAGEMENT (unchanged) =====
+// ===== API KEY MANAGEMENT =====
 function getApiKey() { return localStorage.getItem('twelveDataApiKey') || ''; }
 
 function saveApiKey() {
@@ -802,14 +923,14 @@ function updateApiKeyStatus() {
     }
 }
 
-// ===== BREADTH HISTORY (existing — unchanged) =====
-const BREADTH_HISTORY_KEY = 'breadthSignalHistory';
+// ===== STORAGE =====
+const BREADTH_HISTORY_KEY  = 'breadthSignalHistory';
+const RECLAIM_HISTORY_KEY  = 'reclaimRatioHistory';
+const THRUST_HISTORY_KEY   = 'breadthThrustHistory';
+
 function saveBreadthHistory(signal) { localStorage.setItem(BREADTH_HISTORY_KEY, JSON.stringify({ signal, savedAt: Date.now() })); }
 function loadBreadthHistory() { const raw = localStorage.getItem(BREADTH_HISTORY_KEY); return raw ? JSON.parse(raw) : null; }
 
-// ===== v3.4: RECLAIM RATIO STORAGE =====
-// Persists last scan's reclaim % so the Δ can be calculated across sessions.
-const RECLAIM_HISTORY_KEY = 'reclaimRatioHistory';
 function saveReclaimHistory(pct, count, total) {
     localStorage.setItem(RECLAIM_HISTORY_KEY, JSON.stringify({ pct, count, total, savedAt: Date.now() }));
 }
@@ -818,23 +939,20 @@ function loadReclaimHistory() {
     return raw ? JSON.parse(raw) : null;
 }
 
-// ===== v3.4: BREADTH THRUST STORAGE =====
-// Persists candidate tracking so the 5-day window works across sessions.
-const THRUST_HISTORY_KEY = 'breadthThrustHistory';
 function saveThrustHistory(h) { localStorage.setItem(THRUST_HISTORY_KEY, JSON.stringify(h)); }
 function loadThrustHistory() {
     const raw = localStorage.getItem(THRUST_HISTORY_KEY);
     return raw ? JSON.parse(raw) : { active: false, firingDate: null, candidates: {}, failureChecks: 0 };
 }
 
-// ===== TECHNICAL INDICATORS (unchanged) =====
+// ===== TECHNICAL INDICATORS =====
 function calculateRSI(prices, period = 14) {
     if (prices.length < period + 1) return 50;
     const changes = [];
     for (let i = 1; i < prices.length; i++) changes.push(prices[i] - prices[i - 1]);
-    const gains = changes.slice(-period).filter(x => x > 0);
+    const gains  = changes.slice(-period).filter(x => x > 0);
     const losses = changes.slice(-period).filter(x => x < 0).map(Math.abs);
-    const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / period : 0;
+    const avgGain = gains.length  ? gains.reduce((a, b) => a + b, 0) / period : 0;
     const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / period : 0;
     if (avgLoss === 0) return 100;
     return 100 - (100 / (1 + avgGain / avgLoss));
@@ -849,45 +967,34 @@ function calculateVolatility(prices, period = 20) {
     if (prices.length < period + 1) return 0;
     const returns = [];
     for (let i = prices.length - period; i < prices.length; i++) returns.push((prices[i] / prices[i - 1]) - 1);
-    const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+    const mean     = returns.reduce((a, b) => a + b, 0) / returns.length;
     const variance = returns.map(r => Math.pow(r - mean, 2)).reduce((a, b) => a + b, 0) / returns.length;
     return Math.sqrt(variance) * Math.sqrt(252);
 }
 
-// ===== v3.3: VOLUME RATIO — ET timezone-aware =====
-// FIX: During morning window (9am–noon ET on weekdays), use previous day's
-// completed bar instead of the partial intraday bar to avoid false low-volume failures.
+// v3.3: Volume ratio ET timezone-aware
 function calculateVolRatio(volumes, period = 20) {
     if (volumes.length < period) return 1.0;
-
-    // Convert to ET (handles DST automatically via toLocaleString)
     const etString = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
     const etNow    = new Date(etString);
     const h = etNow.getHours();
-    const d = etNow.getDay(); // 0=Sun, 6=Sat
-
-    // Morning window: weekday, 9am up to (but not including) noon ET
+    const d = etNow.getDay();
     const isMorningWindow = (d >= 1 && d <= 5) && (h >= 9 && h < 12);
-
     let currentVol;
     if (isMorningWindow && volumes.length >= 2) {
-        // Use yesterday's completed bar — apples-to-apples vs 20-day average of full days
         currentVol = volumes[volumes.length - 2];
     } else {
         currentVol = volumes[volumes.length - 1];
     }
-
-    // Average excludes whichever bar is being compared
     const sliceEnd   = isMorningWindow ? volumes.length - 2 : volumes.length - 1;
     const sliceStart = Math.max(0, sliceEnd - period);
     const slice      = volumes.slice(sliceStart, sliceEnd);
     const avgVol     = slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : 0;
-
     if (!currentVol || !avgVol || avgVol === 0) return 1.0;
     return currentVol / avgVol;
 }
 
-// ===== ATR + COIL DETECTION (v3.4+) =====
+// ===== ATR + COIL DETECTION =====
 function calculateATR(highs, lows, closes, period) {
     if (highs.length < period + 1) return { atrShort: 0, atrLong: 0 };
     const tr = [];
@@ -905,29 +1012,47 @@ function calculateATR(highs, lows, closes, period) {
 
 function detectCoil(ticker, data, rsi, dma20, dma50, mode) {
     const { prices, highs, lows, volumes } = data;
-    if (!highs || highs.length < 25) return false;
+    if (!highs || highs.length < 25) return { isCoiling: false, atrPct: 99, nearHigh20: false };
     const price = prices[prices.length - 1];
     const { atrShort, atrLong } = calculateATR(highs, lows, prices, 20);
-    if (atrShort >= atrLong) return false;
-    const high20 = Math.max(...highs.slice(-20));
-    if (price < high20 * 0.95) return false;
+    const high20   = Math.max(...highs.slice(-20));
+    const atrPct   = price > 0 && atrShort > 0 ? (atrShort / price) * 100 : 99;
+    const nearHigh20 = price >= high20 * 0.95;
+    if (atrShort >= atrLong) return { isCoiling: false, atrPct, nearHigh20 };
+    if (!nearHigh20)          return { isCoiling: false, atrPct, nearHigh20 };
     const broadETFs  = ['VOO','VXUS','SPY','IVV','VTI'];
     const sectorETFs = ['XLE','XLK','XLI','XLV','XLF','XLC','XLY','XLU','XLB','XLP','XLRE','VGT','VHT','VTV','VEA','SOXX','ITA','RSP'];
     const volThresh  = broadETFs.includes(ticker) ? 0.8 : sectorETFs.includes(ticker) ? 1.0 : 1.2;
     const volRatio   = calculateVolRatio(volumes, 20);
-    if (volRatio < volThresh) return false;
-    if (price <= dma20) return false;
-    if (rsi < 45 || rsi > 65) return false;
+    if (volRatio < volThresh) return { isCoiling: false, atrPct, nearHigh20 };
+    if (price <= dma20)       return { isCoiling: false, atrPct, nearHigh20 };
+    if (rsi < 45 || rsi > 65) return { isCoiling: false, atrPct, nearHigh20 };
     const dma20prior = prices.length >= 25 ? prices.slice(-25, -5).reduce((a, b) => a + b, 0) / 20 : dma20;
     const slopePct   = ((dma20 - dma20prior) / dma20prior) * 100;
     const slopeOk    = mode === 'MODE A' ? slopePct >= 0 : slopePct >= -0.5;
-    if (!slopeOk) return false;
+    if (!slopeOk) return { isCoiling: false, atrPct, nearHigh20 };
     const distThresh = broadETFs.includes(ticker) ? 8 : sectorETFs.includes(ticker) ? 10 : 12;
     const distPct    = dma50 > 0 ? Math.abs(((price / dma50) - 1) * 100) : 999;
-    if (distPct > distThresh) return false;
-    return true;
+    if (distPct > distThresh) return { isCoiling: false, atrPct, nearHigh20 };
+    return { isCoiling: true, atrPct, nearHigh20 };
 }
 
+// ===== v3.6.1: EXTENSION GATE =====
+function getExtensionGate(distFromSma20Pct) {
+    const d = Math.abs(distFromSma20Pct);
+    if (d <= 8)  return { gate: 'FULL',    size: '2–3%',     cssClass: 'ext-gate-full',    icon: '✅' };
+    if (d <= 12) return { gate: 'HALF',    size: '1–1.5%',   cssClass: 'ext-gate-half',    icon: '⚠️' };
+    if (d <= 15) return { gate: 'STARTER', size: '≤1%',      cssClass: 'ext-gate-starter', icon: '🔶' };
+    return         { gate: 'BLOCK',   size: 'NO ENTRY', cssClass: 'ext-gate-block',   icon: '🚫' };
+}
+
+// ===== v3.6: COIL PRIORITY BOARD SCORE =====
+function calculateCoilScore(atrPct, vsSpyPct, stealthDays) {
+    const atrComponent = Math.max(0, (2.0 - Math.min(atrPct, 2.0)) / 2.0) * 40;
+    const rsComponent  = Math.min(Math.max(vsSpyPct / 10, 0), 1) * 35;
+    const dmaComponent = Math.min(stealthDays / 40, 1) * 25;
+    return Math.round(atrComponent + rsComponent + dmaComponent);
+}
 
 function calculatePerformanceMetrics(prices) {
     const m = { change1Day: 0, change5Day: 0, change10Day: 0 };
@@ -950,7 +1075,7 @@ function generatePerformanceWarnings(perf, rsi, score) {
     return { warnings, severity, positionSize };
 }
 
-// ===== FETCH (unchanged) =====
+// ===== FETCH =====
 async function fetchStockData(ticker) {
     const apiKey = getApiKey();
     if (!apiKey) { alert('Please save your API key first'); throw new Error('No API key'); }
@@ -969,7 +1094,7 @@ async function fetchStockData(ticker) {
     } catch (e) { console.error(`Fetch error ${ticker}:`, e); return null; }
 }
 
-// ===== REGIME (unchanged) =====
+// ===== REGIME =====
 function getRegimeMode(vooPrices) {
     if (vooPrices.length < 200) return 'RISK';
     return vooPrices[vooPrices.length - 1] > calculateMA(vooPrices, 200) ? 'RISK' : 'DEFENSIVE';
@@ -979,7 +1104,7 @@ function getActiveMode(assetType, regimeMode) {
     return (assetType === 'DEFENSIVE' || regimeMode === 'DEFENSIVE') ? 'MODE B' : 'MODE A';
 }
 
-// ===== SCORING — now returns recentlyReclaimedDMA20 =====
+// ===== SCORING =====
 function calculateScore(ticker, data, spyData, mode) {
     let score = 0;
     const breakdown = [];
@@ -989,7 +1114,7 @@ function calculateScore(ticker, data, spyData, mode) {
     const dma20 = calculateMA(prices, 20);
     const dma50 = calculateMA(prices, 50);
     const rsi      = calculateRSI(prices);
-    const volRatio = calculateVolRatio(volumes);   // v3.3 fix applied here
+    const volRatio = calculateVolRatio(volumes);
     const perf     = calculatePerformanceMetrics(prices);
 
     let vsspy = 0;
@@ -1021,25 +1146,43 @@ function calculateScore(ticker, data, spyData, mode) {
         vsspy >= -1.0 ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     }
 
-    // v3.4: flag tickers that recently reclaimed their 20-DMA (used by Reclaim Ratio)
     const recentlyReclaimedDMA20 = (currentPrice > dma20) &&
         (prices.length >= 4) && (prices[prices.length - 4] < dma20);
 
-    // v3.4+: coil detection — only computed for score 3 tickers
-    const isCoiling = score === 3
+    const distFromSma20Pct = dma20 > 0 ? ((currentPrice - dma20) / dma20) * 100 : 0;
+
+    // Extension label
+    let extensionLabel = 'CLEAN';
+    if (Math.abs(distFromSma20Pct) >= 15 || rsi >= 80) extensionLabel = 'PARABOLIC';
+    else if (Math.abs(distFromSma20Pct) >= 8 || rsi >= 75) extensionLabel = 'EXTENDED';
+
+    // Coil detection — returns object with atrPct and nearHigh20
+    const coilResult = score === 3
         ? detectCoil(ticker, data, rsi, dma20, dma50, mode)
-        : false;
-const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
-const extensionLabel = perfAnalysis.severity === 'danger' ? 'PARABOLIC'
-                     : perfAnalysis.severity === 'warning' ? 'EXTENDED'
-                     : 'CLEAN';
-return { score, breakdown, perf, perfAnalysis, 
-recentlyReclaimedDMA20, isCoiling, extensionLabel };
+        : { isCoiling: false, atrPct: 99, nearHigh20: false };
+
+    const isCoiling  = coilResult.isCoiling;
+    const atrPct     = coilResult.atrPct;
+    const nearHigh20 = coilResult.nearHigh20;
+
+    // Extension gate — only for 4/4
+    const extensionGate = score >= 4 ? getExtensionGate(distFromSma20Pct) : null;
+
+    const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
+
+    return {
+        score, breakdown, perf, perfAnalysis,
+        recentlyReclaimedDMA20, isCoiling, extensionLabel,
+        distFromSma20Pct, atrPct, nearHigh20,
+        extensionGate, vsspy, rsi, dma20,
+        stealthDays: 0  // stealthDays tracked separately via localStorage
+    };
 }
-function getSignal(score, perf) {
+
+function getSignal(score, perf, extensionGate) {
     if (score === 4) {
-        if (perf.change5Day > 10) return { text: '🔴 TOO LATE', subtext: 'Parabolic move — very high risk', class: 'exit', size: '0.25% max' };
-        if (perf.change5Day > 5)  return { text: '🟡 DEPLOY SMALL', subtext: 'Extended — reduced size or wait for pullback', class: 'watch', size: '0.5-0.75%' };
+        if (extensionGate && extensionGate.gate === 'BLOCK') return { text: '🚫 BLOCKED', subtext: `>15% above 20DMA — wait for pullback`, class: 'exit', size: 'NO ENTRY' };
+        if (extensionGate) return { text: '🟢 DEPLOY NOW', subtext: `Fresh setup — ${extensionGate.gate} sizing`, class: 'deploy', size: extensionGate.size };
         return { text: '🟢 DEPLOY NOW', subtext: 'Fresh setup — good timing', class: 'deploy', size: '1%' };
     }
     if (score === 3) return { text: '⚠️ WATCH', subtext: 'Score 3/4 — Track in Stealth Watch', class: 'watch', size: '0%' };
@@ -1048,7 +1191,27 @@ function getSignal(score, perf) {
     return { text: '🔴 EXIT', subtext: 'Trend broken — sell', class: 'exit', size: '0%' };
 }
 
-// ===== DETERIORATION TRACKING (unchanged) =====
+// ===== STEALTH DAYS TRACKING =====
+function loadStealthDays() {
+    const raw = localStorage.getItem('stealthDays');
+    return raw ? JSON.parse(raw) : {};
+}
+
+function saveStealthDays(sd) {
+    localStorage.setItem('stealthDays', JSON.stringify(sd));
+}
+
+function updateStealthDays(results) {
+    const sd = loadStealthDays();
+    results.forEach(r => {
+        if (r.score >= 3) sd[r.ticker] = (sd[r.ticker] || 0) + 1;
+        else sd[r.ticker] = 0;
+    });
+    saveStealthDays(sd);
+    return sd;
+}
+
+// ===== DETERIORATION TRACKING =====
 function savePreviousScores(results) {
     const scores = {};
     const consecutiveTwoScores = JSON.parse(localStorage.getItem('consecutiveTwoScores') || '{}');
@@ -1097,13 +1260,96 @@ function detectDeteriorations(results) {
     return dets;
 }
 
-// ===== v3.4: WATCHLIST BREADTH ANALYSIS =====
+// ===== v3.6: COIL PRIORITY BOARD RENDER =====
+function renderCoilPriorityBoard(results, stealthDaysMap) {
+    const panel    = document.getElementById('coilPriorityPanel');
+    const summary  = document.getElementById('coilFilterSummary');
+    const content  = document.getElementById('coilPriorityContent');
+    panel.style.display = 'block';
 
-function analyzeWatchlistBreadth(results) {
+    const total3s = results.filter(r => r.score === 3).length;
+
+    // Pre-filter: score 3, nearHigh20, ATR <= 2%
+    const qualified = results
+        .filter(r => r.score === 3 && r.nearHigh20 === true && r.atrPct <= 2.0)
+        .map(r => {
+            const sd = stealthDaysMap[r.ticker] || 0;
+            const coilScore = calculateCoilScore(r.atrPct, r.vsspy || 0, sd);
+            return { ...r, stealthDays: sd, coilScore };
+        })
+        .sort((a, b) => b.coilScore - a.coilScore);
+
+    const filteredOut  = total3s - qualified.length;
+    const displayList  = qualified.filter(r => r.coilScore >= 60);
+    const ignoredCount = qualified.filter(r => r.coilScore < 60).length;
+
+    summary.innerHTML =
+        `${total3s} names at 3/4 → ` +
+        `<span>${filteredOut} removed</span> by pre-filter (ATR &gt;2% or price extended from 20D high) → ` +
+        `<span>${qualified.length} qualified</span> → ` +
+        `${ignoredCount} scored &lt;60 ignored → ` +
+        `<span style="color:var(--text-primary)">${displayList.length} actionable</span>`;
+
+    if (displayList.length === 0) {
+        content.innerHTML = `<div class="coil-empty">No qualified COIL setups this session. ${filteredOut > 0 ? filteredOut + ' name(s) failed pre-filter.' : 'No names at 3/4 passed ATR and proximity filters.'}</div>`;
+        return;
+    }
+
+    let html = `
+    <div class="ext-gate-legend">
+        <span style="color:var(--text-secondary);">Score: </span>
+        <span style="color:var(--accent-green);">≥80 ⚡ ENTER if 4/4</span>
+        <span style="color:var(--text-secondary);">|</span>
+        <span style="color:var(--accent-yellow);">60–79 👁 Stealth Watch</span>
+        <span style="color:var(--text-secondary);">|</span>
+        <span style="color:var(--text-secondary);">&lt;60 Ignored (${ignoredCount} suppressed)</span>
+    </div>
+    <table class="coil-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>TICKER</th>
+                <th>ATR%</th>
+                <th>RS/SPY</th>
+                <th>DAYS&gt;20D</th>
+                <th>SCORE</th>
+                <th>RSI</th>
+                <th>5D%</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    displayList.forEach((r, idx) => {
+        const isTop    = r.coilScore >= 80;
+        const scoreColor = isTop ? 'var(--accent-green)' : 'var(--accent-yellow)';
+        const actionText = isTop ? '<span class="coil-action-enter">⚡ ENTER if 4/4</span>' : '<span class="coil-action-watch">👁 Stealth Watch</span>';
+        const rsColor    = (r.vsspy || 0) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        const chgColor   = r.perf.change5Day >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        const coilIcon   = r.isCoiling ? ' 🗜' : '';
+        html += `
+        <tr class="${isTop ? 'top-setup' : ''}">
+            <td style="color:var(--text-secondary);">${idx + 1}</td>
+            <td style="font-family:'JetBrains Mono',monospace; font-weight:700;">${r.ticker}${coilIcon}</td>
+            <td>${r.atrPct.toFixed(2)}%</td>
+            <td style="color:${rsColor};">${(r.vsspy || 0) >= 0 ? '+' : ''}${(r.vsspy || 0).toFixed(1)}%</td>
+            <td>${r.stealthDays}d</td>
+            <td><span class="coil-score-badge" style="color:${scoreColor};">${r.coilScore}</span></td>
+            <td style="color:${r.rsi >= 65 ? 'var(--accent-yellow)' : 'var(--text-primary)'};">${r.rsi.toFixed(0)}</td>
+            <td style="color:${chgColor};">${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}%</td>
+            <td>${actionText}</td>
+        </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    content.innerHTML = html;
+}
+
+// ===== WATCHLIST BREADTH =====
+function analyzeWatchlistBreadth(results, stealthDaysMap) {
     if (!results || results.length === 0) return;
     const total = results.length;
 
-    // ── 20-DMA Reclaim Ratio ──────────────────────────────────
     const reclaimCount = results.filter(r => r.recentlyReclaimedDMA20).length;
     const reclaimPct   = (reclaimCount / total) * 100;
 
@@ -1117,13 +1363,12 @@ function analyzeWatchlistBreadth(results) {
 
     saveReclaimHistory(reclaimPct, reclaimCount, total);
 
-    // Render
-    const pctEl     = document.getElementById('reclaimPct');
-    const countEl   = document.getElementById('reclaimCount');
-    const cardEl    = document.getElementById('reclaimCard');
-    const sigRow    = document.getElementById('reclaimSignalRow');
-    const sigTitle  = document.getElementById('reclaimSignalTitle');
-    const sigSub    = document.getElementById('reclaimSignalSub');
+    const pctEl    = document.getElementById('reclaimPct');
+    const countEl  = document.getElementById('reclaimCount');
+    const cardEl   = document.getElementById('reclaimCard');
+    const sigRow   = document.getElementById('reclaimSignalRow');
+    const sigTitle = document.getElementById('reclaimSignalTitle');
+    const sigSub   = document.getElementById('reclaimSignalSub');
 
     pctEl.textContent = reclaimPct.toFixed(1) + '%';
 
@@ -1144,133 +1389,104 @@ function analyzeWatchlistBreadth(results) {
         sigRow.style.borderLeftColor = 'var(--accent-green)';
         sigTitle.style.color = 'var(--accent-green)';
         sigTitle.textContent = '🔄 RECLAIM SIGNAL TRIGGERED';
-        sigSub.textContent   = `${reclaimPct.toFixed(1)}% of watchlist reclaimed 20-DMA (+${delta.toFixed(1)}pt) — breadth recovering. Watch for thrust confirmation.`;
+        sigSub.textContent   = `${reclaimPct.toFixed(1)}% of watchlist reclaimed 20-DMA (+${delta.toFixed(1)}pt).`;
     } else if (reclaimPct >= 45) {
         sigRow.style.display = 'block';
         sigRow.style.borderLeftColor = 'var(--accent-yellow)';
         sigTitle.style.color = 'var(--accent-yellow)';
         sigTitle.textContent = '🔄 Reclaim ratio ≥45% — delta check next scan';
-        sigSub.textContent   = 'Threshold met. Full alert fires when +10pt improvement confirmed between two consecutive scans.';
+        sigSub.textContent   = 'Threshold met. Full alert fires when +10pt improvement confirmed.';
     } else {
         sigRow.style.display = 'none';
     }
 
-    // ── Breadth Thrust Monitor ────────────────────────────────
     updateBreadthThrust(results, total);
-
     document.getElementById('watchlistBreadthPanel').style.display = 'block';
+
+    // v3.6: render COIL Priority Board
+    renderCoilPriorityBoard(results, stealthDaysMap);
 }
 
 function updateBreadthThrust(results, total) {
     const history   = loadThrustHistory();
     const today     = new Date().toDateString();
-    const threshold = Math.max(1, Math.ceil(total * 0.10)); // 10% of watchlist
+    const threshold = Math.max(1, Math.ceil(total * 0.10));
 
-    // Update candidate tracking
     results.forEach(r => {
         const key = r.ticker;
         if (r.score <= 1) {
-            if (!history.candidates[key]) {
-                history.candidates[key] = { lowDate: today, peaked: false };
-            }
+            if (!history.candidates[key]) history.candidates[key] = { lowDate: today, peaked: false };
         } else if (r.score >= 3 && history.candidates[key] && !history.candidates[key].peaked) {
-            // Check if within 5-day window
             const daysDiff = Math.round((new Date(today) - new Date(history.candidates[key].lowDate)) / 86400000);
-            if (daysDiff <= 5) {
-                history.candidates[key].peaked    = true;
-                history.candidates[key].peakDate  = today;
-                history.candidates[key].peakScore = r.score;
-            } else {
-                delete history.candidates[key]; // Outside window — reset
-            }
-        } else if (r.score === 0) {
-            delete history.candidates[key];
-        }
+            if (daysDiff <= 5) { history.candidates[key].peaked = true; history.candidates[key].peakDate = today; history.candidates[key].peakScore = r.score; }
+            else { delete history.candidates[key]; }
+        } else if (r.score === 0) { delete history.candidates[key]; }
     });
 
-    // Stale cleanup — remove candidates older than 7 days
     Object.keys(history.candidates).forEach(k => {
         const age = Math.round((new Date(today) - new Date(history.candidates[k].lowDate)) / 86400000);
         if (age > 7) delete history.candidates[k];
     });
 
-    // Qualified thrusters (peaked within window)
-    const thrusters = Object.entries(history.candidates)
-        .filter(([, v]) => v.peaked)
-        .map(([ticker]) => ticker);
+    const thrusters = Object.entries(history.candidates).filter(([, v]) => v.peaked).map(([ticker]) => ticker);
 
-    // Thrust signal
     let thrustNew = false;
     if (thrusters.length >= threshold && !history.active) {
-        history.active       = true;
-        history.firingDate   = today;
-        history.failureChecks = 0;
-        thrustNew = true;
+        history.active = true; history.firingDate = today; history.failureChecks = 0; thrustNew = true;
     }
 
-    // Thrust Failure: if active and >50% of thrusters retreated below 2/4
     let thrustFailure = false;
     if (history.active) {
         const thrusterSet = new Set(thrusters);
         const retreated   = results.filter(r => thrusterSet.has(r.ticker) && r.score < 2);
         if (retreated.length / Math.max(thrusters.length, 1) >= 0.5) {
-            thrustFailure         = true;
-            history.active        = false;
-            history.candidates    = {};
-            history.firingDate    = null;
-            history.failureChecks = 0;
+            thrustFailure = true; history.active = false; history.candidates = {}; history.firingDate = null; history.failureChecks = 0;
         } else {
             history.failureChecks = (history.failureChecks || 0) + 1;
-            // Auto-expire thrust after 5 checks with no new confirmation
-            if (history.failureChecks >= 5 && !thrustNew && thrusters.length < threshold) {
-                history.active     = false;
-                history.candidates = {};
-            }
+            if (history.failureChecks >= 5 && !thrustNew && thrusters.length < threshold) { history.active = false; history.candidates = {}; }
         }
     }
 
     saveThrustHistory(history);
 
-    // ── Render ──
-    const statusEl    = document.getElementById('thrustStatus');
-    const subEl       = document.getElementById('thrustSub');
-    const tickersEl   = document.getElementById('thrustTickers');
-    const cardEl      = document.getElementById('thrustCard');
+    const statusEl  = document.getElementById('thrustStatus');
+    const subEl     = document.getElementById('thrustSub');
+    const tickersEl = document.getElementById('thrustTickers');
+    const cardEl    = document.getElementById('thrustCard');
     const pendingCount = Object.keys(history.candidates).filter(k => !history.candidates[k].peaked).length;
 
     if (thrustFailure) {
-        cardEl.style.borderLeftColor  = 'var(--accent-red)';
-        statusEl.style.color          = 'var(--accent-red)';
-        statusEl.textContent          = '🔴 BREADTH THRUST FAILURE';
-        subEl.textContent             = 'Thrust tickers retreated below 2/4. Bearish continuation — maintain defensive posture.';
-        tickersEl.textContent         = '';
+        cardEl.style.borderLeftColor = 'var(--accent-red)';
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.textContent = '🔴 BREADTH THRUST FAILURE';
+        subEl.textContent = 'Thrust tickers retreated below 2/4. Bearish continuation.';
+        tickersEl.textContent = '';
     } else if (history.active) {
-        cardEl.style.borderLeftColor  = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
-        statusEl.style.color          = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
-        statusEl.textContent          = thrustNew
+        cardEl.style.borderLeftColor = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
+        statusEl.style.color = thrustNew ? 'var(--accent-yellow)' : 'var(--accent-green)';
+        statusEl.textContent = thrustNew
             ? `⚡ THRUST SIGNAL — ${thrusters.length} tickers (threshold: ${threshold})`
             : `⚡ Active since ${history.firingDate} | ${thrusters.length} tickers holding`;
-        subEl.textContent             = thrustNew
+        subEl.textContent = thrustNew
             ? `Score ≤1 → ≥3 within 5 days. Monitoring for failure over next 5 scans.`
             : `Check ${history.failureChecks || 0}/5 — failure triggers if ≥50% of thrust tickers retreat.`;
-        tickersEl.innerHTML           = thrusters.length ? `<span style="color:var(--text-secondary)">Tickers: </span>${thrusters.join(', ')}` : '';
+        tickersEl.innerHTML = thrusters.length ? `<span style="color:var(--text-secondary)">Tickers: </span>${thrusters.join(', ')}` : '';
     } else {
-        cardEl.style.borderLeftColor  = 'var(--border)';
-        statusEl.style.color          = 'var(--text-secondary)';
-        statusEl.textContent          = 'No thrust active';
-        subEl.textContent             = `${pendingCount} candidate(s) tracking | Threshold: ${threshold} tickers (10% of ${total}) | Signal fires when enough move ≤1→≥3 in 5 days.`;
-        tickersEl.innerHTML           = pendingCount > 0
-            ? `<span style="color:var(--text-secondary)">Tracking: </span>` +
-              Object.keys(history.candidates).filter(k => !history.candidates[k].peaked).join(', ')
+        cardEl.style.borderLeftColor = 'var(--border)';
+        statusEl.style.color = 'var(--text-secondary)';
+        statusEl.textContent = 'No thrust active';
+        subEl.textContent = `${pendingCount} candidate(s) tracking | Threshold: ${threshold} tickers | Signal fires when enough move ≤1→≥3 in 5 days.`;
+        tickersEl.innerHTML = pendingCount > 0
+            ? `<span style="color:var(--text-secondary)">Tracking: </span>` + Object.keys(history.candidates).filter(k => !history.candidates[k].peaked).join(', ')
             : '';
     }
 }
 
-// ===== MARKET BREADTH MODULE (existing — unchanged) =====
+// ===== MARKET BREADTH MODULE =====
 function analyzeBreadthProxy(ticker, data) {
     if (!data || !data.prices || data.prices.length < 50) return null;
     const prices = data.prices;
-    const currentPrice  = prices[prices.length - 1];
+    const currentPrice = prices[prices.length - 1];
     const dma20   = calculateMA(prices, 20);
     const dma50   = calculateMA(prices, 50);
     const dma200  = prices.length >= 200 ? calculateMA(prices, 200) : null;
@@ -1322,11 +1538,11 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     const analysis = {};
     ['SPY', 'QQQ', 'IWM'].forEach(t => { analysis[t] = analyzeBreadthProxy(t, proxyData[t]); });
 
-    const valid       = Object.values(analysis).filter(a => a !== null);
-    const bullish     = valid.filter(a => a.signal === 'BULLISH').length;
-    const bearish     = valid.filter(a => a.signal === 'BEARISH').length;
+    const valid        = Object.values(analysis).filter(a => a !== null);
+    const bullish      = valid.filter(a => a.signal === 'BULLISH').length;
+    const bearish      = valid.filter(a => a.signal === 'BEARISH').length;
     const reclaimCount = valid.filter(a => a.recentlyReclaimedDMA20 || a.recentlyReclaimedDMA50).length;
-    const risingRSI   = valid.filter(a => a.rsi > 40 && a.rsiSlope > 0).length;
+    const risingRSI    = valid.filter(a => a.rsi > 40 && a.rsiSlope > 0).length;
 
     let overallSignal, overallColor, overallDesc;
     if (bullish >= 2)                             { overallSignal = 'BULLISH';    overallColor = 'var(--accent-green)';  overallDesc = 'Broad market trending positively. Risk-on conditions supportive.'; }
@@ -1345,16 +1561,13 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     document.getElementById('breadthSignalText').textContent = overallSignal;
     document.getElementById('breadthSignalText').style.color = overallColor;
     document.getElementById('breadthSignalDesc').textContent = overallDesc;
-    if (velocity) { document.getElementById('breadthVelocity').textContent = velocity; }
+    if (velocity) document.getElementById('breadthVelocity').textContent = velocity;
 
     const grid = document.getElementById('breadthProxyGrid');
     grid.innerHTML = '';
     ['SPY', 'QQQ', 'IWM'].forEach(ticker => {
         const a = analysis[ticker];
-        if (!a) {
-            grid.innerHTML += `<div class="breadth-proxy-card"><div class="breadth-proxy-name">${ticker}</div><div class="breadth-proxy-stat">No data available</div></div>`;
-            return;
-        }
+        if (!a) { grid.innerHTML += `<div class="breadth-proxy-card"><div class="breadth-proxy-name">${ticker}</div><div class="breadth-proxy-stat">No data available</div></div>`; return; }
         const reclaimBadge = (a.recentlyReclaimedDMA20 || a.recentlyReclaimedDMA50) ? '<span class="reclaim-badge">🔄 RECLAIM</span>' : '';
         const dma20Color  = a.aboveDMA20  ? 'var(--accent-green)' : 'var(--accent-red)';
         const dma50Color  = a.aboveDMA50  ? 'var(--accent-green)' : 'var(--accent-red)';
@@ -1380,10 +1593,10 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     const spyA = analysis['SPY'];
     if (spyA && proxyData['SPY'] && proxyData['SPY'].prices.length >= 21) {
         const spyPrices = proxyData['SPY'].prices;
-        const returns = [];
+        const returns   = [];
         for (let i = spyPrices.length - 20; i < spyPrices.length; i++) returns.push((spyPrices[i] / spyPrices[i-1]) - 1);
-        const mean     = returns.reduce((a,b) => a+b, 0) / returns.length;
-        const variance = returns.reduce((a,b) => a + Math.pow(b-mean, 2), 0) / returns.length;
+        const mean      = returns.reduce((a,b) => a+b, 0) / returns.length;
+        const variance  = returns.reduce((a,b) => a + Math.pow(b-mean, 2), 0) / returns.length;
         const vixApprox = Math.sqrt(variance) * Math.sqrt(252) * 100;
         let vixLevel, vixColor;
         if (vixApprox >= 30)      { vixLevel = 'EXTREME FEAR'; vixColor = 'var(--accent-red)'; }
@@ -1391,14 +1604,14 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
         else if (vixApprox >= 15) { vixLevel = 'NORMAL';       vixColor = 'var(--accent-yellow)'; }
         else                       { vixLevel = 'COMPLACENT';   vixColor = 'var(--accent-green)'; }
         document.getElementById('breadthVixRow').innerHTML =
-            `Volatility Proxy: <strong style="color:${vixColor}">${vixApprox.toFixed(1)}% — ${vixLevel}</strong> <span style="font-size:0.75rem; color:var(--text-secondary);">(SPY 20-day realized vol, directional only)</span>`;
+            `Volatility Proxy: <strong style="color:${vixColor}">${vixApprox.toFixed(1)}% — ${vixLevel}</strong> <span style="font-size:0.75rem; color:var(--text-secondary);">(SPY 20-day realized vol)</span>`;
     }
 
     const spyAn = analysis['SPY'], qqqAn = analysis['QQQ'], iwmAn = analysis['IWM'];
     const conditions = [];
-    if (spyAn) conditions.push(spyAn.rsi > 40 && spyAn.rsiSlope > 0 ? '✅ SPY RSI > 40 and rising' : '❌ SPY RSI not yet turning (need >40 and rising)');
+    if (spyAn) conditions.push(spyAn.rsi > 40 && spyAn.rsiSlope > 0 ? '✅ SPY RSI > 40 and rising' : '❌ SPY RSI not yet turning');
     if (qqqAn) conditions.push(qqqAn.aboveDMA20 ? '✅ QQQ above 20-DMA' : '❌ QQQ still below 20-DMA');
-    if (iwmAn && spyAn) conditions.push(iwmAn.change5d > spyAn.change5d ? '✅ IWM outperforming SPY (5d) — small caps leading' : '❌ IWM not yet outperforming SPY (small caps lagging)');
+    if (iwmAn && spyAn) conditions.push(iwmAn.change5d > spyAn.change5d ? '✅ IWM outperforming SPY (5d)' : '❌ IWM not yet outperforming SPY');
 
     const metCount = conditions.filter(c => c.startsWith('✅')).length;
     const box      = document.getElementById('recoveryWatchBox');
@@ -1420,10 +1633,11 @@ async function fetchAndRenderBreadth(spyDataAlreadyFetched) {
     }).join('');
 }
 
-// ===== RENDER RESULTS — adds recentlyReclaimedDMA20 badge + calls analyzeWatchlistBreadth =====
+// ===== RENDER RESULTS =====
 function renderResults(results, regimeMode) {
-    const resultsDiv    = document.getElementById('results');
+    const resultsDiv     = document.getElementById('results');
     const deteriorations = detectDeteriorations(results);
+    const stealthDaysMap = updateStealthDays(results);
     let html = '';
 
     if (deteriorations.length > 0) {
@@ -1445,19 +1659,25 @@ function renderResults(results, regimeMode) {
 
     html += '<div class="ticker-grid">';
     results.forEach(result => {
-        const signal    = getSignal(result.score, result.perf);
+        const signal    = getSignal(result.score, result.perf, result.extensionGate);
         const scoreClass = `score-${result.score}`;
         const perfClass  = result.perfAnalysis.severity === 'danger' ? 'danger' : result.perfAnalysis.severity === 'warning' ? 'warning' : '';
-        // v3.4: reclaim badge on ticker card header
-        const reclaimTag = result.recentlyReclaimedDMA20
-            ? ' <span class="reclaim-badge">🔄 RECLAIM</span>'
-            : '';
-        // v3.4+: coil badge
-        const coilTag = result.isCoiling
-            ? ' <span class="coil-badge">🗜 COIL</span>'
-            : '';
+        const reclaimTag = result.recentlyReclaimedDMA20 ? ' <span class="reclaim-badge">🔄 RECLAIM</span>' : '';
+        const coilTag    = result.isCoiling ? ' <span class="coil-badge">🗜 COIL</span>' : '';
+        const isBlocked  = result.extensionGate && result.extensionGate.gate === 'BLOCK';
+
+        // v3.6.1: Extension gate display for 4/4 cards
+        let gateHtml = '';
+        if (result.score >= 4 && result.extensionGate) {
+            const gate = result.extensionGate;
+            gateHtml = `<div style="margin-top:0.5rem; padding:0.4rem 0.75rem; border-radius:4px;" class="${gate.cssClass}">
+                ${gate.icon} ${gate.gate} — Position Size: <strong>${gate.size}</strong>
+                <span style="font-size:0.72rem; opacity:0.8; margin-left:0.5rem;">(${result.distFromSma20Pct >= 0 ? '+' : ''}${result.distFromSma20Pct.toFixed(1)}% vs 20DMA)</span>
+            </div>`;
+        }
+
         html += `
-            <div class="ticker-card">
+            <div class="ticker-card${isBlocked ? ' blocked' : ''}">
                 <div class="ticker-header">
                     <div class="ticker-symbol">${result.ticker}${reclaimTag}${coilTag}</div>
                     <div class="ticker-meta">
@@ -1470,7 +1690,7 @@ function renderResults(results, regimeMode) {
                     <div class="score-info">
                         <div class="signal ${signal.class}">${signal.text}</div>
                         <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">${signal.subtext}</div>
-                        ${signal.size ? `<div style="font-size:0.85rem; font-weight:700; color:var(--accent-blue); margin-top:0.5rem;">Position: ${signal.size}</div>` : ''}
+                        ${gateHtml}
                     </div>
                 </div>
                 <div class="performance-metrics ${perfClass}">
@@ -1488,44 +1708,79 @@ function renderResults(results, regimeMode) {
     });
     html += '</div>';
 
-    const deploy      = results.filter(r => r.score === 4 && r.perf.change5Day <= 5);
-    const deploySmall = results.filter(r => r.score === 4 && r.perf.change5Day > 5 && r.perf.change5Day <= 10);
-    const tooLate     = results.filter(r => r.score === 4 && r.perf.change5Day > 10);
-    const watch       = results.filter(r => r.score === 2 || r.score === 3);
-    const avoid       = results.filter(r => r.score <= 1);
+    // ===== DEPLOYMENT RECOMMENDATIONS — v3.6.1: Extension Gate integrated =====
+    const deploy4  = results.filter(r => r.score >= 4);
+    const watch    = results.filter(r => r.score === 2 || r.score === 3);
+    const avoid    = results.filter(r => r.score <= 1);
+    const coilers  = results.filter(r => r.isCoiling);
+
+    const deployFull    = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'FULL');
+    const deployHalf    = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'HALF');
+    const deployStarter = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'STARTER');
+    const deployBlocked = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'BLOCK');
 
     html += `<div class="summary">
-        <h2>📋 DEPLOYMENT RECOMMENDATIONS</h2>
+        <h2>📋 DEPLOYMENT RECOMMENDATIONS — v3.6.1</h2>
+
+        <!-- Extension Gate Legend -->
+        <div class="ext-gate-legend" style="margin-bottom:1rem;">
+            <span style="color:var(--text-secondary); font-size:0.8rem;">Extension Gate:</span>
+            <span class="ext-gate-badge ext-gate-full">✅ FULL 2–3%</span>
+            <span style="color:var(--text-secondary); font-size:0.75rem;">≤8% above 20DMA</span>
+            <span class="ext-gate-badge ext-gate-half">⚠️ HALF 1–1.5%</span>
+            <span style="color:var(--text-secondary); font-size:0.75rem;">8–12%</span>
+            <span class="ext-gate-badge ext-gate-starter">🔶 STARTER ≤1%</span>
+            <span style="color:var(--text-secondary); font-size:0.75rem;">12–15%</span>
+            <span class="ext-gate-badge ext-gate-block">🚫 BLOCK</span>
+            <span style="color:var(--text-secondary); font-size:0.75rem;">&gt;15%</span>
+        </div>
+
         <div class="summary-grid">
-            <div class="summary-section"><h3><span>🟢</span> DEPLOY NOW (${deploy.length})</h3><ul>${deploy.length ? deploy.map(r => `<li>• ${r.ticker} — 1% position (${r.mode}) 4/4</li>`).join('') : '<li>None — Only fresh 4/4 setups qualify</li>'}</ul></div>
-            <div class="summary-section"><h3><span>🟡</span> DEPLOY SMALL (${deploySmall.length})</h3><ul>${deploySmall.length ? deploySmall.map(r => `<li>• ${r.ticker} — 0.5-0.75% (extended +${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}</ul></div>
-            <div class="summary-section"><h3><span>🔴</span> TOO LATE (${tooLate.length})</h3><ul>${tooLate.length ? tooLate.map(r => `<li>• ${r.ticker} — Wait for pullback (+${r.perf.change5Day.toFixed(1)}%)</li>`).join('') : '<li>None</li>'}</ul></div>
-            <div class="summary-section"><h3><span>⚠️</span> WATCH (${watch.length})</h3><ul>${watch.length ? watch.map(r => {
-  if (r.score === 3) {
-    const extLabel = r.extensionLabel || 'CLEAN';
-    const extColor = extLabel === 'PARABOLIC' ? 'var(--accent-red)'
-                   : extLabel === 'EXTENDED'  ? 'var(--accent-orange)'
-                   : 'var(--accent-green)';
-    const extIcon  = extLabel === 'PARABOLIC' ? '🔴'
-                   : extLabel === 'EXTENDED'  ? '⚠️'
-                   : '✅';
-    const stealthTag = r.stealthDays >= 5 ? ` | Stealth ${r.stealthDays}d` : '';
-    return `<li>• ${r.ticker} — 3/4 (Stealth Watch${stealthTag}) | <span style="color:${extColor}; font-weight:700;">${extIcon} ${extLabel}</span></li>`;
-  }
-  return `<li>• ${r.ticker} — ${r.score}/4 (Hold if owned)</li>`;
-}).join('') : '<li>None</li>'}</ul></div>
-            <div class="summary-section"><h3><span>🔴</span> AVOID/EXIT (${avoid.length})</h3><ul>${avoid.length ? avoid.map(r => `<li>• ${r.ticker} (${r.mode}) — ${r.score}/4</li>`).join('') : '<li>None</li>'}</ul></div>
-            <div class="summary-section"><h3><span>🗜</span> COIL SETUPS (${results.filter(r => r.isCoiling).length})</h3><ul>${results.filter(r => r.isCoiling).length ? results.filter(r => r.isCoiling).map(r => `<li>• ${r.ticker} — 3/4 compressing | RSI ${r.breakdown.find(b=>b.text.includes('RSI')) ? r.breakdown.find(b=>b.text.includes('RSI')).text.split(' ')[2] : '—'} | Vol ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`).join('') : '<li>None — no compression setups detected</li>'}</ul></div>
+            <div class="summary-section">
+                <h3><span>✅</span> FULL SIZE — 2–3% (${deployFull.length})</h3>
+                <ul>${deployFull.length ? deployFull.map(r => `<li>• ${r.ticker} — FULL 2–3% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>⚠️</span> HALF SIZE — 1–1.5% (${deployHalf.length})</h3>
+                <ul>${deployHalf.length ? deployHalf.map(r => `<li>• ${r.ticker} — HALF 1–1.5% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>🔶</span> STARTER — ≤1% (${deployStarter.length})</h3>
+                <ul>${deployStarter.length ? deployStarter.map(r => `<li>• ${r.ticker} — STARTER ≤1% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>🚫</span> BLOCKED — Extension Gate (${deployBlocked.length})</h3>
+                <ul>${deployBlocked.length ? deployBlocked.map(r => `<li>• ${r.ticker} — NO ENTRY | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA — wait for pullback</li>`).join('') : '<li>None blocked</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>⚠️</span> WATCH (${watch.length})</h3>
+                <ul>${watch.length ? watch.map(r => {
+                    if (r.score === 3) {
+                        const extColor = r.extensionLabel === 'PARABOLIC' ? 'var(--accent-red)' : r.extensionLabel === 'EXTENDED' ? 'var(--accent-orange)' : 'var(--accent-green)';
+                        const extIcon  = r.extensionLabel === 'PARABOLIC' ? '🔴' : r.extensionLabel === 'EXTENDED' ? '⚠️' : '✅';
+                        const sd = stealthDaysMap[r.ticker] || 0;
+                        const stealthTag = sd >= 5 ? ` | Stealth ${sd}d` : '';
+                        return `<li>• ${r.ticker} — 3/4${stealthTag} | <span style="color:${extColor}">${extIcon} ${r.extensionLabel}</span></li>`;
+                    }
+                    return `<li>• ${r.ticker} — ${r.score}/4 (Hold if owned)</li>`;
+                }).join('') : '<li>None</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>🔴</span> AVOID/EXIT (${avoid.length})</h3>
+                <ul>${avoid.length ? avoid.map(r => `<li>• ${r.ticker} (${r.mode}) — ${r.score}/4</li>`).join('') : '<li>None</li>'}</ul>
+            </div>
+            <div class="summary-section">
+                <h3><span>🗜</span> COIL SETUPS (${coilers.length})</h3>
+                <ul>${coilers.length ? coilers.map(r => `<li>• ${r.ticker} — ATR ${r.atrPct.toFixed(2)}% | RSI ${r.rsi.toFixed(0)} | ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`).join('') : '<li>None — see COIL Priority Board above</li>'}</ul>
+            </div>
         </div>
     </div>`;
 
     resultsDiv.innerHTML = html;
-
-    // v3.4: compute watchlist breadth indicators after every render
-    analyzeWatchlistBreadth(results);
+    analyzeWatchlistBreadth(results, stealthDaysMap);
 }
 
-// ===== BATCH ENGINE (unchanged) =====
+// ===== BATCH ENGINE =====
 let batchState = {
     allTickers: [], currentBatch: 0, batchSize: 4,
     results: [], regimeMode: null, spyData: null, vooData: null, isProcessing: false
@@ -1727,8 +1982,8 @@ async function processBatch() {
 
             const baseType = assetType.includes('DEFENSIVE') ? 'DEFENSIVE' : 'RISK';
             const mode     = getActiveMode(baseType, batchState.regimeMode);
-            const { score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20, isCoiling } = calculateScore(ticker, data, batchState.spyData, mode);
-            batchState.results.push({ ticker, assetType, mode, score, breakdown, perf, perfAnalysis, recentlyReclaimedDMA20, isCoiling });
+            const scoreResult = calculateScore(ticker, data, batchState.spyData, mode);
+            batchState.results.push({ ticker, assetType, mode, ...scoreResult });
             renderResults(batchState.results, batchState.regimeMode);
         }
 
@@ -1791,6 +2046,7 @@ async function runAnalysis() {
         document.getElementById('results').innerHTML = '';
         document.getElementById('breadthPanel').style.display = 'none';
         document.getElementById('watchlistBreadthPanel').style.display = 'none';
+        document.getElementById('coilPriorityPanel').style.display = 'none';
         document.getElementById('breadthSignalText').textContent = '—';
         document.getElementById('breadthSignalDesc').textContent = 'Fetching after ticker scan completes...';
         document.getElementById('breadthProxyGrid').innerHTML = '';
@@ -1812,7 +2068,7 @@ async function runAnalysis() {
     }
 }
 
-// ===== INIT (unchanged) =====
+// ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
     const savedKey = getApiKey();
     if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
