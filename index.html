@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regime-Aware Momentum Dashboard v3.6.1</title>
+    <title>Regime-Aware Momentum Dashboard v3.7</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,6 +20,7 @@
             --accent-blue: #6c5ce7;
             --accent-orange: #ff7b39;
             --accent-cyan: #5b8dee;
+            --accent-teal: #00cec9;
             --border: #2d3561;
             --shadow: rgba(0, 0, 0, 0.3);
         }
@@ -101,6 +102,162 @@
         .threshold-col.defensive h3 { color: var(--accent-yellow); }
         .threshold-col ul { list-style: none; font-size: 0.85rem; }
         .threshold-col li { padding: 0.25rem 0; color: var(--text-secondary); }
+
+        /* ===== v3.7: RRI PANEL ===== */
+        .rri-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s ease-out 0.25s both;
+            transition: border-color 0.4s;
+        }
+
+        .rri-panel.tech-driven  { border-color: #f9a825; }
+        .rri-panel.transition   { border-color: #039be5; }
+        .rri-panel.broad        { border-color: #43a047; }
+
+        .rri-panel h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            transition: color 0.4s;
+        }
+
+        .rri-regime-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+
+        .rri-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .rri-metric-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border-left: 3px solid var(--border);
+            transition: border-left-color 0.3s;
+        }
+
+        .rri-metric-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+        }
+
+        .rri-metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+            transition: color 0.3s;
+        }
+
+        .rri-metric-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .rri-sector-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+        }
+
+        .rri-sector-table th {
+            padding: 0.4rem 0.75rem;
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rri-sector-table td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid rgba(45, 53, 97, 0.4);
+        }
+
+        .rri-sector-table tr:hover td { background: rgba(91, 141, 238, 0.04); }
+
+        .rri-sector-table tr.rank-1 td { background: rgba(0,255,136,0.04); }
+        .rri-sector-table tr.rank-2 td { background: rgba(0,255,136,0.02); }
+
+        .rri-tag-tech {
+            display: inline-block;
+            padding: 0.05rem 0.3rem;
+            background: rgba(255,217,61,0.15);
+            border: 1px solid rgba(255,217,61,0.4);
+            border-radius: 3px;
+            font-size: 0.65rem;
+            color: var(--accent-yellow);
+            margin-left: 0.3rem;
+            font-weight: 700;
+        }
+
+        .rri-tag-cycl {
+            display: inline-block;
+            padding: 0.05rem 0.3rem;
+            background: rgba(0,206,201,0.15);
+            border: 1px solid rgba(0,206,201,0.4);
+            border-radius: 3px;
+            font-size: 0.65rem;
+            color: var(--accent-teal);
+            margin-left: 0.3rem;
+            font-weight: 700;
+        }
+
+        .rri-posture-bar {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            border-left: 4px solid var(--border);
+            transition: border-left-color 0.3s;
+            margin-bottom: 0.75rem;
+        }
+
+        .rri-posture-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .rri-alt-signal {
+            padding: 0.75rem 1rem;
+            background: rgba(67, 160, 71, 0.1);
+            border: 2px solid #43a047;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+        }
+
+        .rri-no-data {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 1rem 0;
+            font-style: italic;
+        }
 
         /* ===== MARKET BREADTH PANEL ===== */
         .breadth-panel {
@@ -403,7 +560,6 @@
         }
 
         .coil-table tr:hover td { background: rgba(91, 141, 238, 0.05); }
-
         .coil-table tr.top-setup td { background: rgba(91, 141, 238, 0.06); }
 
         .coil-score-badge {
@@ -613,7 +769,6 @@
 
         .ticker-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px var(--shadow); }
 
-        /* v3.6.1: blocked card styling */
         .ticker-card.blocked {
             border-color: rgba(255, 51, 102, 0.4);
             opacity: 0.75;
@@ -716,6 +871,8 @@
             .wb-grid { grid-template-columns: 1fr; }
             .coil-table { font-size: 0.75rem; }
             .ext-gate-legend { gap: 0.4rem; }
+            .rri-metrics-grid { grid-template-columns: 1fr 1fr; }
+            .rri-sector-table { font-size: 0.75rem; }
         }
 
         .footer {
@@ -732,9 +889,10 @@
 <div class="container">
     <div class="header">
         <h1>⚡ REGIME-AWARE MOMENTUM DASHBOARD</h1>
-        <p>v3.6.1 — COIL Priority Board | Extension Gate | Auto beta | Market breadth | 20-DMA Reclaim | Breadth Thrust</p>
+        <p>v3.7 — RRI Regime Rotation | COIL Priority Board | Extension Gate | Auto beta | Market breadth | 20-DMA Reclaim | Breadth Thrust</p>
     </div>
 
+    <!-- REGIME STATUS (MODE A/B) -->
     <div class="regime-status" id="regimeStatus">
         <div class="regime-header">
             <div class="regime-mode risk" id="regimeMode">
@@ -765,6 +923,12 @@
                 </ul>
             </div>
         </div>
+    </div>
+
+    <!-- v3.7: RRI PANEL — Layer 4 context filter -->
+    <div class="rri-panel" id="rriPanel" style="display:none;">
+        <h2 id="rriPanelTitle">🔬 REGIME ROTATION INDICATOR (RRI) v3.7</h2>
+        <div id="rriContent"></div>
     </div>
 
     <!-- MARKET BREADTH PANEL -->
@@ -887,7 +1051,7 @@
 
     <div class="footer">
         <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0–1 = EXIT</p>
-        <p style="margin-top: 0.5rem;">v3.6.1 — COIL Priority Board | Extension Gate | Market Breadth | 20-DMA Reclaim | Breadth Thrust | Data: Twelve Data</p>
+        <p style="margin-top: 0.5rem;">v3.7 — RRI Regime Rotation | COIL Priority Board | Extension Gate | Market Breadth | 20-DMA Reclaim | Breadth Thrust | Data: Twelve Data</p>
     </div>
 </div>
 
@@ -946,12 +1110,9 @@ function loadThrustHistory() {
 }
 
 // ===== TECHNICAL INDICATORS =====
-// RSI — Wilder RMA (period:14, source:close, timeframe:daily)
-// Seed = SMA of first 14 changes, then RMA smoothing (α = 1/period)
-// Matches TOS / TradingView / StockCharts standard exactly
+// RSI — Wilder RMA (period:14) — matches TOS / TradingView / StockCharts exactly
 function calculateRSI(prices, period = 14) {
     if (prices.length < period + 1) return 50;
-    // Step 1: seed with SMA of first `period` changes
     let avgGain = 0, avgLoss = 0;
     for (let i = 1; i <= period; i++) {
         const diff = prices[i] - prices[i - 1];
@@ -960,7 +1121,6 @@ function calculateRSI(prices, period = 14) {
     }
     avgGain /= period;
     avgLoss /= period;
-    // Step 2: RMA (Wilder smoothing) for all subsequent bars
     for (let i = period + 1; i < prices.length; i++) {
         const diff = prices[i] - prices[i - 1];
         const gain = diff > 0 ? diff : 0;
@@ -1060,7 +1220,7 @@ function getExtensionGate(distFromSma20Pct) {
     return         { gate: 'BLOCK',   size: 'NO ENTRY', cssClass: 'ext-gate-block',   icon: '🚫' };
 }
 
-// ===== v3.6: COIL PRIORITY BOARD SCORE =====
+// ===== v3.6: COIL PRIORITY SCORE =====
 function calculateCoilScore(atrPct, vsSpyPct, stealthDays) {
     const atrComponent = Math.max(0, (2.0 - Math.min(atrPct, 2.0)) / 2.0) * 40;
     const rsComponent  = Math.min(Math.max(vsSpyPct / 10, 0), 1) * 35;
@@ -1165,12 +1325,10 @@ function calculateScore(ticker, data, spyData, mode) {
 
     const distFromSma20Pct = dma20 > 0 ? ((currentPrice - dma20) / dma20) * 100 : 0;
 
-    // Extension label
     let extensionLabel = 'CLEAN';
     if (Math.abs(distFromSma20Pct) >= 15 || rsi >= 80) extensionLabel = 'PARABOLIC';
     else if (Math.abs(distFromSma20Pct) >= 8 || rsi >= 75) extensionLabel = 'EXTENDED';
 
-    // Coil detection — returns object with atrPct and nearHigh20
     const coilResult = score === 3
         ? detectCoil(ticker, data, rsi, dma20, dma50, mode)
         : { isCoiling: false, atrPct: 99, nearHigh20: false };
@@ -1179,17 +1337,21 @@ function calculateScore(ticker, data, spyData, mode) {
     const atrPct     = coilResult.atrPct;
     const nearHigh20 = coilResult.nearHigh20;
 
-    // Extension gate — only for 4/4
     const extensionGate = score >= 4 ? getExtensionGate(distFromSma20Pct) : null;
+    const perfAnalysis  = generatePerformanceWarnings(perf, rsi, score);
 
-    const perfAnalysis = generatePerformanceWarnings(perf, rsi, score);
+    // Store change5d on result for RRI
+    const change5d = prices.length >= 6
+        ? ((currentPrice / prices[prices.length - 6]) - 1) * 100
+        : 0;
 
     return {
         score, breakdown, perf, perfAnalysis,
         recentlyReclaimedDMA20, isCoiling, extensionLabel,
         distFromSma20Pct, atrPct, nearHigh20,
         extensionGate, vsspy, rsi, dma20,
-        stealthDays: 0  // stealthDays tracked separately via localStorage
+        change5d,
+        stealthDays: 0
     };
 }
 
@@ -1274,6 +1436,256 @@ function detectDeteriorations(results) {
     return dets;
 }
 
+// ===================================================================
+// v3.7: RRI — REGIME ROTATION INDICATOR
+// Layer 4 context filter. Uses change5d already computed per ticker.
+// Zero additional API calls.
+// ===================================================================
+
+/**
+ * calculateRRI(results, stealthDaysMap)
+ * Classifies market regime from scored ticker results.
+ * Mirrors calculateRRI_() in Market Digest v3.7 exactly.
+ *
+ * @param {Array}  results        — scored result objects
+ * @param {Object} reclaimPctVal  — reclaim ratio pct (0-100)
+ * @returns {Object} rri
+ */
+function calculateRRI(results, reclaimPctVal) {
+    try {
+        // Sector ETFs present in standard watchlist
+        const sectorTickers   = ['XLK','XLY','XLE','XLI','XLF','XLB','XLV','XLP','XLU','XLRE','XLC'];
+        const spyResult       = results.find(r => r.ticker === 'SPY');
+        const spyChange5d     = spyResult ? (spyResult.change5d || 0) : 0;
+
+        // Build sector perf array from scored results
+        const sectorPerf = [];
+        sectorTickers.forEach(ticker => {
+            const r = results.find(res => res.ticker === ticker);
+            if (r && r.change5d !== undefined) {
+                sectorPerf.push({ ticker, change5d: r.change5d, score: r.score });
+            }
+        });
+
+        if (sectorPerf.length < 3) {
+            // Not enough sector data — mark as insufficient
+            return { regime: 'INSUFFICIENT', sectorPerf, sectorsAboveSpy: 0, totalSectors: sectorPerf.length };
+        }
+
+        // Sort descending by 5d return
+        sectorPerf.sort((a, b) => b.change5d - a.change5d);
+
+        // Top 2 leaders
+        const top2            = sectorPerf.slice(0, 2).map(s => s.ticker);
+        const techLeading     = top2.includes('XLK') || top2.includes('XLY');
+        const cyclicalTickers = ['XLE','XLI','XLF','XLB'];
+        const cyclicalLeading = top2.some(t => cyclicalTickers.includes(t));
+
+        // Breadth — how many sectors beat SPY 5d
+        const sectorsAboveSpy = sectorPerf.filter(s => s.change5d > spyChange5d).length;
+
+        // Reclaim ratio
+        const reclaimPct = reclaimPctVal || 0;
+
+        // RS Dispersion — XLK vs cyclical average
+        const xlkR = results.find(r => r.ticker === 'XLK');
+        const xleR = results.find(r => r.ticker === 'XLE');
+        const xliR = results.find(r => r.ticker === 'XLI');
+        const xlfR = results.find(r => r.ticker === 'XLF');
+
+        const xlkChange  = xlkR ? (xlkR.change5d || 0) : 0;
+        const xleChange  = xleR ? (xleR.change5d || 0) : 0;
+        const xliChange  = xliR ? (xliR.change5d || 0) : 0;
+        const xlfChange  = xlfR ? (xlfR.change5d || 0) : 0;
+
+        const cyclicalAvg  = (xleChange + xliChange + xlfChange) / 3;
+        const rsDispersion = parseFloat((xlkChange - cyclicalAvg).toFixed(2));
+
+        // 4/4 signal distribution
+        const deploy4of4   = results.filter(r => r.score >= 4);
+        const techNames    = ['NVDA','AVGO','MSFT','ASML','KLAC','LRCX','MU','AMD','XLK','QQQ','SOXX','VGT','ARM'];
+        const techSignals  = deploy4of4.filter(r => techNames.includes(r.ticker)).length;
+        const totalSignals = deploy4of4.length;
+        const techSignalPct = totalSignals > 0 ? parseFloat(((techSignals / totalSignals) * 100).toFixed(0)) : 0;
+
+        // Classification
+        let regime, regimeLabel, regimeEmoji, postureSummary, badgeColor;
+
+        if (techLeading && sectorsAboveSpy <= 4 && reclaimPct < 20) {
+            regime         = 'TECH-DRIVEN';
+            regimeLabel    = 'TECH-DRIVEN (NARROW / FRAGILE)';
+            regimeEmoji    = '🔬';
+            postureSummary = 'Limit concentration · No chasing EXT/PARABOLIC · Strict sizing · Await breadth confirmation';
+            badgeColor     = '#f9a825';
+        } else if (sectorsAboveSpy >= 7 && cyclicalLeading && reclaimPct >= 30) {
+            regime         = 'BROAD';
+            regimeLabel    = 'BROAD / NON-TECH (HEALTHY EXPANSION)';
+            regimeEmoji    = '🌐';
+            postureSummary = 'Scale exposure · Diversify sectors · Allow pullback entries · Evaluate MODE A-ALT portfolio';
+            badgeColor     = '#43a047';
+        } else {
+            regime         = 'TRANSITION';
+            regimeLabel    = 'TRANSITION (ROTATION BUILDING)';
+            regimeEmoji    = '🔄';
+            postureSummary = 'Selective deployment · Watch 4/4 clusters · Use 2–3% early sizing · Await BROAD confirmation';
+            badgeColor     = '#039be5';
+        }
+
+        return {
+            regime, regimeLabel, regimeEmoji, postureSummary, badgeColor,
+            top2, techLeading, cyclicalLeading,
+            sectorsAboveSpy, totalSectors: sectorPerf.length,
+            reclaimPct, rsDispersion,
+            techSignalPct, totalSignals, techSignals,
+            sectorPerf
+        };
+
+    } catch(e) {
+        console.error('calculateRRI error:', e);
+        return { regime: 'UNKNOWN', sectorPerf: [], sectorsAboveSpy: 0, totalSectors: 0 };
+    }
+}
+
+/**
+ * renderRRIPanel(results, reclaimPctVal)
+ * Renders the RRI panel in the dashboard.
+ * Called after results are available.
+ */
+function renderRRIPanel(results, reclaimPctVal) {
+    const panel   = document.getElementById('rriPanel');
+    const title   = document.getElementById('rriPanelTitle');
+    const content = document.getElementById('rriContent');
+
+    const rri = calculateRRI(results, reclaimPctVal);
+
+    // Handle insufficient sector data
+    if (rri.regime === 'INSUFFICIENT' || rri.regime === 'UNKNOWN') {
+        panel.style.display = 'block';
+        panel.className = 'rri-panel';
+        title.textContent = '🔬 REGIME ROTATION INDICATOR (RRI) v3.7';
+        title.style.color = 'var(--text-secondary)';
+        content.innerHTML = `<div class="rri-no-data">
+            Insufficient sector ETF data — add XLK, XLY, XLE, XLI, XLF, XLB to your ticker list for RRI classification.
+            Currently have ${rri.totalSectors || 0} of 11 sector ETFs scored.
+        </div>`;
+        return;
+    }
+
+    // Panel styling by regime
+    const panelClass = rri.regime === 'TECH-DRIVEN' ? 'tech-driven'
+                     : rri.regime === 'BROAD'        ? 'broad'
+                     : 'transition';
+    panel.style.display = 'block';
+    panel.className = `rri-panel ${panelClass}`;
+    title.innerHTML = `${rri.regimeEmoji} REGIME ROTATION INDICATOR (RRI) v3.7`;
+    title.style.color = rri.badgeColor;
+
+    // RS dispersion color
+    const rsSign  = rri.rsDispersion >= 0 ? '+' : '';
+    const rsColor = rri.rsDispersion >= 0 ? 'var(--accent-yellow)' : 'var(--accent-teal)';
+
+    // Top 2 display
+    const top2Display = rri.top2.length > 0 ? rri.top2.join(' · ') : '—';
+
+    // Sector ranking table rows
+    let sectorRows = '';
+    rri.sectorPerf.forEach((sec, idx) => {
+        const chg      = parseFloat(sec.change5d || 0);
+        const chgColor = chg >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        const arrow    = chg >= 0 ? '▲' : '▼';
+        const isTech   = ['XLK','XLY'].includes(sec.ticker);
+        const isCycl   = ['XLE','XLI','XLF','XLB'].includes(sec.ticker);
+        const tag      = isTech ? '<span class="rri-tag-tech">TECH</span>'
+                       : isCycl ? '<span class="rri-tag-cycl">CYCL</span>'
+                       : '';
+        const rowClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : '';
+        sectorRows += `
+        <tr class="${rowClass}">
+            <td style="color:var(--text-secondary); font-size:0.75rem;">${idx + 1}</td>
+            <td style="font-family:'JetBrains Mono',monospace; font-weight:700;">${sec.ticker}${tag}</td>
+            <td style="color:${chgColor}; font-family:'JetBrains Mono',monospace;">${arrow} ${Math.abs(chg).toFixed(2)}%</td>
+            <td style="color:var(--text-secondary); font-size:0.75rem;">${sec.score}/4</td>
+        </tr>`;
+    });
+
+    // Cyclical leading indicator
+    const cyclicalIcon = rri.cyclicalLeading
+        ? '<span style="color:var(--accent-teal); font-weight:700;">✅ YES</span>'
+        : '<span style="color:var(--text-secondary);">❌ NO</span>';
+
+    // MODE A-ALT signal block
+    const altSignalHtml = rri.regime === 'BROAD' ? `
+        <div class="rri-alt-signal">
+            <span style="color:#66bb6a; font-weight:800; font-size:1rem;">🌐 MODE A-ALT SIGNAL</span>
+            <span style="color:var(--text-secondary);"> — Broad non-tech regime confirmed. Consider redeployment into diversified value/energy/international portfolio. All standard entry rules still apply.</span>
+        </div>` : '';
+
+    content.innerHTML = `
+        <!-- Regime Badge -->
+        <div class="rri-regime-badge" style="background:${rri.badgeColor};">
+            ${rri.regimeLabel}
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="rri-metrics-grid">
+            <div class="rri-metric-card" style="border-left-color:${rri.badgeColor};">
+                <div class="rri-metric-label">Sectors &gt; SPY (5d)</div>
+                <div class="rri-metric-value" style="color:${rri.badgeColor};">${rri.sectorsAboveSpy}<span style="font-size:1rem; color:var(--text-secondary);"> / ${rri.totalSectors}</span></div>
+                <div class="rri-metric-sub">Sectors outperforming SPY</div>
+            </div>
+            <div class="rri-metric-card">
+                <div class="rri-metric-label">Reclaim Ratio</div>
+                <div class="rri-metric-value" style="color:${rri.reclaimPct >= 30 ? 'var(--accent-green)' : rri.reclaimPct >= 15 ? 'var(--accent-yellow)' : 'var(--text-secondary)'};">${rri.reclaimPct.toFixed(1)}<span style="font-size:1rem; color:var(--text-secondary);">%</span></div>
+                <div class="rri-metric-sub">Tickers above 20-DMA</div>
+            </div>
+            <div class="rri-metric-card">
+                <div class="rri-metric-label">XLK vs Cyclicals (5d)</div>
+                <div class="rri-metric-value" style="color:${rsColor};">${rsSign}${rri.rsDispersion}<span style="font-size:0.9rem;">%</span></div>
+                <div class="rri-metric-sub">${rri.rsDispersion >= 0 ? 'Tech outperforming' : 'Rotation building'}</div>
+            </div>
+            <div class="rri-metric-card">
+                <div class="rri-metric-label">Top Leaders</div>
+                <div class="rri-metric-value" style="font-size:1.1rem; color:var(--text-primary);">${top2Display}</div>
+                <div class="rri-metric-sub">5-day sector leaders</div>
+            </div>
+            <div class="rri-metric-card">
+                <div class="rri-metric-label">4/4 Tech Signal %</div>
+                <div class="rri-metric-value" style="color:${rri.techSignalPct > 70 ? 'var(--accent-yellow)' : 'var(--text-primary)'};">${rri.techSignalPct}<span style="font-size:0.9rem; color:var(--text-secondary);">%</span></div>
+                <div class="rri-metric-sub">${rri.techSignals}/${rri.totalSignals} deploy signals are tech</div>
+            </div>
+            <div class="rri-metric-card">
+                <div class="rri-metric-label">Cyclical Leading</div>
+                <div class="rri-metric-value" style="font-size:1rem; margin-top:0.25rem;">${cyclicalIcon}</div>
+                <div class="rri-metric-sub">XLE/XLI/XLF/XLB in top 2</div>
+            </div>
+        </div>
+
+        <!-- Sector Leadership Table -->
+        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.5rem; font-weight:700;">
+            Sector Leadership — 5-Day Return (Ranked)
+        </div>
+        <table class="rri-sector-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>SECTOR</th>
+                    <th>5D RETURN</th>
+                    <th>SCORE</th>
+                </tr>
+            </thead>
+            <tbody>${sectorRows}</tbody>
+        </table>
+
+        <!-- Posture -->
+        <div class="rri-posture-bar" style="border-left-color:${rri.badgeColor};">
+            <div class="rri-posture-label" style="color:${rri.badgeColor};">POSTURE</div>
+            <div style="color:var(--text-primary);">${rri.postureSummary}</div>
+        </div>
+
+        ${altSignalHtml}
+    `;
+}
+
 // ===== v3.6: COIL PRIORITY BOARD RENDER =====
 function renderCoilPriorityBoard(results, stealthDaysMap) {
     const panel    = document.getElementById('coilPriorityPanel');
@@ -1283,7 +1695,6 @@ function renderCoilPriorityBoard(results, stealthDaysMap) {
 
     const total3s = results.filter(r => r.score === 3).length;
 
-    // Pre-filter: score 3, nearHigh20, ATR <= 2%
     const qualified = results
         .filter(r => r.score === 3 && r.nearHigh20 === true && r.atrPct <= 2.0)
         .map(r => {
@@ -1321,21 +1732,14 @@ function renderCoilPriorityBoard(results, stealthDaysMap) {
     <table class="coil-table">
         <thead>
             <tr>
-                <th>#</th>
-                <th>TICKER</th>
-                <th>ATR%</th>
-                <th>RS/SPY</th>
-                <th>DAYS&gt;20D</th>
-                <th>SCORE</th>
-                <th>RSI</th>
-                <th>5D%</th>
-                <th>ACTION</th>
+                <th>#</th><th>TICKER</th><th>ATR%</th><th>RS/SPY</th>
+                <th>DAYS&gt;20D</th><th>SCORE</th><th>RSI</th><th>5D%</th><th>ACTION</th>
             </tr>
         </thead>
         <tbody>`;
 
     displayList.forEach((r, idx) => {
-        const isTop    = r.coilScore >= 80;
+        const isTop      = r.coilScore >= 80;
         const scoreColor = isTop ? 'var(--accent-green)' : 'var(--accent-yellow)';
         const actionText = isTop ? '<span class="coil-action-enter">⚡ ENTER if 4/4</span>' : '<span class="coil-action-watch">👁 Stealth Watch</span>';
         const rsColor    = (r.vsspy || 0) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
@@ -1417,8 +1821,11 @@ function analyzeWatchlistBreadth(results, stealthDaysMap) {
     updateBreadthThrust(results, total);
     document.getElementById('watchlistBreadthPanel').style.display = 'block';
 
-    // v3.6: render COIL Priority Board
+    // v3.6: COIL Priority Board
     renderCoilPriorityBoard(results, stealthDaysMap);
+
+    // v3.7: RRI Panel — pass current reclaim pct as context
+    renderRRIPanel(results, reclaimPct);
 }
 
 function updateBreadthThrust(results, total) {
@@ -1680,7 +2087,6 @@ function renderResults(results, regimeMode) {
         const coilTag    = result.isCoiling ? ' <span class="coil-badge">🗜 COIL</span>' : '';
         const isBlocked  = result.extensionGate && result.extensionGate.gate === 'BLOCK';
 
-        // v3.6.1: Extension gate display for 4/4 cards
         let gateHtml = '';
         if (result.score >= 4 && result.extensionGate) {
             const gate = result.extensionGate;
@@ -1722,7 +2128,7 @@ function renderResults(results, regimeMode) {
     });
     html += '</div>';
 
-    // ===== DEPLOYMENT RECOMMENDATIONS — v3.6.1: Extension Gate integrated =====
+    // DEPLOYMENT RECOMMENDATIONS
     const deploy4  = results.filter(r => r.score >= 4);
     const watch    = results.filter(r => r.score === 2 || r.score === 3);
     const avoid    = results.filter(r => r.score <= 1);
@@ -1734,9 +2140,8 @@ function renderResults(results, regimeMode) {
     const deployBlocked = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'BLOCK');
 
     html += `<div class="summary">
-        <h2>📋 DEPLOYMENT RECOMMENDATIONS — v3.6.1</h2>
+        <h2>📋 DEPLOYMENT RECOMMENDATIONS — v3.7</h2>
 
-        <!-- Extension Gate Legend -->
         <div class="ext-gate-legend" style="margin-bottom:1rem;">
             <span style="color:var(--text-secondary); font-size:0.8rem;">Extension Gate:</span>
             <span class="ext-gate-badge ext-gate-full">✅ FULL 2–3%</span>
@@ -2061,6 +2466,7 @@ async function runAnalysis() {
         document.getElementById('breadthPanel').style.display = 'none';
         document.getElementById('watchlistBreadthPanel').style.display = 'none';
         document.getElementById('coilPriorityPanel').style.display = 'none';
+        document.getElementById('rriPanel').style.display = 'none';
         document.getElementById('breadthSignalText').textContent = '—';
         document.getElementById('breadthSignalDesc').textContent = 'Fetching after ticker scan completes...';
         document.getElementById('breadthProxyGrid').innerHTML = '';
