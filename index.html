@@ -907,7 +907,7 @@
                 <ul>
                     <li>✓ RSI ≥ 55</li>
                     <li>✓ Above BOTH 20-DMA &amp; 50-DMA</li>
-                    <li>✓ Volume: Stocks ≥ 1.2x | Broad ETFs ≥ 0.8x</li>
+                    <li>✓ Volume: Stocks ≥ 1.2x | Sector ETFs ≥ 1.0x | Broad ETFs ≥ 0.8x</li>
                     <li>✓ RS vs SPY &gt; 0%</li>
                     <li><strong>✓ Score MUST be 4/4 to deploy</strong></li>
                 </ul>
@@ -1298,17 +1298,24 @@ function calculateScore(ticker, data, spyData, mode) {
         vsspy = tickerReturn - spyReturn;
     }
 
-    const broadIndexETFs = ['VOO', 'VXUS'];
-    const benchmarkETFs  = ['VOO', 'SPY', 'IVV', 'SPLG'];
-    const isBroadETF  = broadIndexETFs.includes(ticker);
+    // Three-tier classification — mirrors Apps Script scoreTicker_() exactly
+    const broadETFs  = ['VOO','VXUS','SPY','IVV','VTI','QQQ'];
+    const sectorETFs = ['XLE','XLK','XLI','XLV','XLF','XLC','XLY','XLU','XLB','XLP','XLRE',
+                        'VGT','VHT','VTV','VEA','SOXX','ITA','XAR','RSP'];
+    const benchmarkETFs = ['VOO','SPY','IVV','SPLG'];
+    const isBroadETF  = broadETFs.includes(ticker);
+    const isSectorETF = sectorETFs.includes(ticker);
     const isBenchmark = benchmarkETFs.includes(ticker);
+
+    // Volume threshold: broad ETFs 0.8x | sector ETFs 1.0x | individual stocks 1.2x
+    // Matches Apps Script: broadETFs → 0.8, sectorETFs → 1.0, everything else → 1.2
 
     if (mode === 'MODE A') {
         rsi >= 55 ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥55)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥55)`, pass: false });
         (currentPrice > dma20 && currentPrice > dma50) ? (score++, breakdown.push({ text: '✅ Above both DMAs', pass: true })) : breakdown.push({ text: '❌ Below DMA(s)', pass: false });
-        const volThr = isBroadETF ? 0.8 : 1.2;
+        const volThr = isBroadETF ? 0.8 : isSectorETF ? 1.0 : 1.2;
         volRatio >= volThr ? (score++, breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥${volThr}x)`, pass: true })) : breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥${volThr}x)`, pass: false });
-        const rsThr = (ticker === 'VOO' || isBenchmark) ? -0.5 : 0;
+        const rsThr = isBenchmark ? -0.5 : 0;
         vsspy > rsThr ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     } else {
         let rsiSlope = 0;
@@ -1316,7 +1323,9 @@ function calculateScore(ticker, data, spyData, mode) {
         (rsi >= 45 && rsiSlope > 0) ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & +slope)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & +slope)`, pass: false });
         const repairing = currentPrice > dma20 && prevPrice < dma20;
         currentPrice > dma20 ? (score++, breakdown.push({ text: `✅ Above 20-DMA${repairing ? ' (🔧 REPAIR)' : ''}`, pass: true })) : breakdown.push({ text: '❌ Below 20-DMA', pass: false });
-        volRatio >= 1.0 ? (score++, breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥1.0x)`, pass: true })) : breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥1.0x)`, pass: false });
+        // MODE B volume threshold also uses same three-tier logic
+        const volThrB = isBroadETF ? 0.8 : isSectorETF ? 1.0 : 1.2;
+        volRatio >= volThrB ? (score++, breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥${volThrB}x)`, pass: true })) : breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥${volThrB}x)`, pass: false });
         vsspy >= -1.0 ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     }
 
