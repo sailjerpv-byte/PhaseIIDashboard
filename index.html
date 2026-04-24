@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regime-Aware Momentum Dashboard v3.7</title>
+    <title>Regime-Aware Momentum Dashboard v3.8</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -197,7 +197,6 @@
         }
 
         .rri-sector-table tr:hover td { background: rgba(91, 141, 238, 0.04); }
-
         .rri-sector-table tr.rank-1 td { background: rgba(0,255,136,0.04); }
         .rri-sector-table tr.rank-2 td { background: rgba(0,255,136,0.02); }
 
@@ -889,7 +888,7 @@
 <div class="container">
     <div class="header">
         <h1>⚡ REGIME-AWARE MOMENTUM DASHBOARD</h1>
-        <p>v3.7 — RRI Regime Rotation | COIL Priority Board | Extension Gate | Auto beta | Market breadth | 20-DMA Reclaim | Breadth Thrust</p>
+        <p>v3.8 — RSI 3-Day Slope | RRI Regime Rotation | COIL Priority Board | Extension Gate | Auto beta | Market breadth | 20-DMA Reclaim | Breadth Thrust</p>
     </div>
 
     <!-- REGIME STATUS (MODE A/B) -->
@@ -1051,7 +1050,7 @@
 
     <div class="footer">
         <p>Built for Peter | Score 4 = DEPLOY | Score 3 = WATCH (Stealth) | Score 2 = HOLD | Score 0–1 = EXIT</p>
-        <p style="margin-top: 0.5rem;">v3.7 — RRI Regime Rotation | COIL Priority Board | Extension Gate | Market Breadth | 20-DMA Reclaim | Breadth Thrust | Data: Twelve Data</p>
+        <p style="margin-top: 0.5rem;">v3.8 — RSI 3-Day Slope | RRI Regime Rotation | COIL Priority Board | Extension Gate | Market Breadth | 20-DMA Reclaim | Breadth Thrust | Data: Twelve Data</p>
     </div>
 </div>
 
@@ -1130,6 +1129,32 @@ function calculateRSI(prices, period = 14) {
     }
     if (avgLoss === 0) return 100;
     return 100 - (100 / (1 + avgGain / avgLoss));
+}
+
+// ===== v3.8: RSI 3-DAY SLOPE HELPER =====
+// Thresholds: ≥+2 strong | +1–+2 acceptable | -1–+1 neutral | -2–-1 fading | -4–-2 momentum fading | ≤-4 strong deterioration
+function getRsiSlopeInfo(rsiNow, rsiPrev3) {
+    const slope = parseFloat((rsiNow - rsiPrev3).toFixed(2));
+    let label, color, icon, tier;
+
+    if      (slope >= 2)  { label = 'Strong momentum';      color = 'var(--accent-green)';  icon = '↑↑';  tier = 'STRONG_POS'; }
+    else if (slope >= 1)  { label = 'Acceptable';            color = 'var(--accent-green)';  icon = '↑';   tier = 'WEAK_POS';   }
+    else if (slope > -1)  { label = 'Neutral — no edge';    color = 'var(--accent-yellow)'; icon = '→';   tier = 'NEUTRAL';    }
+    else if (slope > -2)  { label = 'Fading';                color = 'var(--accent-yellow)'; icon = '↓';   tier = 'WEAK_NEG';   }
+    else if (slope > -4)  { label = 'Momentum fading';      color = 'var(--accent-red)';    icon = '↓↓';  tier = 'STRONG_NEG'; }
+    else                  { label = 'Strong deterioration';  color = 'var(--accent-red)';    icon = '↓↓↓'; tier = 'CRIT_NEG';   }
+
+    return {
+        slope,
+        label,
+        color,
+        icon,
+        tier,
+        allowExtendedEntry : slope >= 1,   // 4/4 EXTENDED/PARABOLIC: require Δ3D ≥ +1
+        blockExtendedEntry : slope <= -2,  // 4/4 EXTENDED/PARABOLIC: block if Δ3D ≤ -2
+        allow3of4Entry     : slope >= 1,   // 3/4 volume-only or RS-only miss
+        reduceHolding      : slope < 0     // slope turns negative while holding → reduce
+    };
 }
 
 function calculateMA(prices, period) {
@@ -1291,6 +1316,11 @@ function calculateScore(ticker, data, spyData, mode) {
     const volRatio = calculateVolRatio(volumes);
     const perf     = calculatePerformanceMetrics(prices);
 
+    // ===== v3.8: RSI 3-day slope — computed once, used everywhere =====
+    const rsiPrev3     = prices.length >= 17 ? calculateRSI(prices.slice(0, -3)) : rsi;
+    const rsiSlopeInfo = getRsiSlopeInfo(rsi, rsiPrev3);
+    const rsiSlope     = rsiSlopeInfo.slope; // kept for MODE B check below
+
     let vsspy = 0;
     if (spyData && prices.length >= 20 && spyData.prices.length >= 20) {
         const tickerReturn = ((currentPrice / prices[prices.length - 20]) - 1) * 100;
@@ -1307,9 +1337,6 @@ function calculateScore(ticker, data, spyData, mode) {
     const isSectorETF = sectorETFs.includes(ticker);
     const isBenchmark = benchmarkETFs.includes(ticker);
 
-    // Volume threshold: broad ETFs 0.8x | sector ETFs 1.0x | individual stocks 1.2x
-    // Matches Apps Script: broadETFs → 0.8, sectorETFs → 1.0, everything else → 1.2
-
     if (mode === 'MODE A') {
         rsi >= 55 ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥55)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥55)`, pass: false });
         (currentPrice > dma20 && currentPrice > dma50) ? (score++, breakdown.push({ text: '✅ Above both DMAs', pass: true })) : breakdown.push({ text: '❌ Below DMA(s)', pass: false });
@@ -1318,12 +1345,10 @@ function calculateScore(ticker, data, spyData, mode) {
         const rsThr = isBenchmark ? -0.5 : 0;
         vsspy > rsThr ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     } else {
-        let rsiSlope = 0;
-        if (prices.length >= 17) rsiSlope = rsi - calculateRSI(prices.slice(0, -3));
+        // MODE B — uses rsiSlope (already computed above from rsiSlopeInfo)
         (rsi >= 45 && rsiSlope > 0) ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & +slope)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & +slope)`, pass: false });
         const repairing = currentPrice > dma20 && prevPrice < dma20;
         currentPrice > dma20 ? (score++, breakdown.push({ text: `✅ Above 20-DMA${repairing ? ' (🔧 REPAIR)' : ''}`, pass: true })) : breakdown.push({ text: '❌ Below 20-DMA', pass: false });
-        // MODE B volume threshold also uses same three-tier logic
         const volThrB = isBroadETF ? 0.8 : isSectorETF ? 1.0 : 1.2;
         volRatio >= volThrB ? (score++, breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥${volThrB}x)`, pass: true })) : breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥${volThrB}x)`, pass: false });
         vsspy >= -1.0 ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
@@ -1349,7 +1374,6 @@ function calculateScore(ticker, data, spyData, mode) {
     const extensionGate = score >= 4 ? getExtensionGate(distFromSma20Pct) : null;
     const perfAnalysis  = generatePerformanceWarnings(perf, rsi, score);
 
-    // Store change5d on result for RRI
     const change5d = prices.length >= 6
         ? ((currentPrice / prices[prices.length - 6]) - 1) * 100
         : 0;
@@ -1360,20 +1384,48 @@ function calculateScore(ticker, data, spyData, mode) {
         distFromSma20Pct, atrPct, nearHigh20,
         extensionGate, vsspy, rsi, dma20,
         change5d,
-        stealthDays: 0
+        stealthDays: 0,
+        rsiSlopeInfo   // ← v3.8: slope metadata on every result
     };
 }
 
-function getSignal(score, perf, extensionGate) {
+// ===== v3.8: getSignal — slope-aware =====
+function getSignal(score, perf, extensionGate, rsiSlopeInfo) {
+    const si = rsiSlopeInfo || { slope: 0, tier: 'NEUTRAL', icon: '→', allowExtendedEntry: true, blockExtendedEntry: false, allow3of4Entry: true, reduceHolding: false };
+    const sign = si.slope >= 0 ? '+' : '';
+
     if (score === 4) {
-        if (extensionGate && extensionGate.gate === 'BLOCK') return { text: '🚫 BLOCKED', subtext: `>15% above 20DMA — wait for pullback`, class: 'exit', size: 'NO ENTRY' };
-        if (extensionGate) return { text: '🟢 DEPLOY NOW', subtext: `Fresh setup — ${extensionGate.gate} sizing`, class: 'deploy', size: extensionGate.size };
-        return { text: '🟢 DEPLOY NOW', subtext: 'Fresh setup — good timing', class: 'deploy', size: '1%' };
+        if (extensionGate && extensionGate.gate === 'BLOCK') {
+            // PARABOLIC — override allowed if slope ≥ +1 (TECH-DRIVEN regime rule)
+            if (si.allowExtendedEntry) {
+                return { text: '🟡 PARABOLIC — MICRO ENTRY', subtext: `Δ3D ${sign}${si.slope} ${si.icon} — ≤1% max, prior-day-low stop`, class: 'watch', size: '≤1%' };
+            }
+            return { text: '🚫 BLOCKED', subtext: `>15% above 20DMA · Δ3D ${sign}${si.slope} ${si.icon} — wait for pullback`, class: 'exit', size: 'NO ENTRY' };
+        }
+        if (extensionGate) {
+            if (si.blockExtendedEntry) {
+                return { text: '🚫 SLOPE BLOCK', subtext: `Δ3D ${sign}${si.slope} ${si.icon} — momentum fading, no entry`, class: 'exit', size: 'NO ENTRY' };
+            }
+            if (!si.allowExtendedEntry && (extensionGate.gate === 'STARTER' || extensionGate.gate === 'HALF')) {
+                return { text: '⚠️ WATCH — SLOPE WEAK', subtext: `Δ3D ${sign}${si.slope} ${si.icon} — need ≥+1 to enter extended`, class: 'watch', size: '0%' };
+            }
+            return { text: '🟢 DEPLOY NOW', subtext: `${extensionGate.gate} sizing · Δ3D ${sign}${si.slope} ${si.icon}`, class: 'deploy', size: extensionGate.size };
+        }
+        return { text: '🟢 DEPLOY NOW', subtext: `Fresh setup · Δ3D ${sign}${si.slope} ${si.icon}`, class: 'deploy', size: '1%' };
     }
-    if (score === 3) return { text: '⚠️ WATCH', subtext: 'Score 3/4 — Track in Stealth Watch', class: 'watch', size: '0%' };
-    if (score === 2) return { text: '⚠️ WATCH', subtext: "Don't enter new — hold if owned", class: 'watch', size: '0%' };
-    if (score === 1) return { text: '🔴 HOLD', subtext: 'Weakening — prepare to exit', class: 'hold', size: '0%' };
-    return { text: '🔴 EXIT', subtext: 'Trend broken — sell', class: 'exit', size: '0%' };
+
+    if (score === 3) {
+        if (si.allow3of4Entry) {
+            return { text: '⚠️ WATCH', subtext: `Score 3/4 · Δ3D ${sign}${si.slope} ${si.icon} — micro entry eligible in TECH-DRIVEN`, class: 'watch', size: '0%' };
+        }
+        return { text: '⚠️ WATCH', subtext: `Score 3/4 · Δ3D ${sign}${si.slope} ${si.icon} — slope negative, no entry`, class: 'watch', size: '0%' };
+    }
+
+    if (score === 2) {
+        return { text: '⚠️ WATCH', subtext: si.reduceHolding ? `Δ3D ${sign}${si.slope} ${si.icon} — slope negative, reduce if holding` : "Don't enter new — hold if owned", class: 'watch', size: '0%' };
+    }
+    if (score === 1) return { text: '🔴 HOLD',  subtext: 'Weakening — prepare to exit', class: 'hold',  size: '0%' };
+    return             { text: '🔴 EXIT',  subtext: 'Trend broken — sell',        class: 'exit',  size: '0%' };
 }
 
 // ===== STEALTH DAYS TRACKING =====
@@ -1447,27 +1499,13 @@ function detectDeteriorations(results) {
 
 // ===================================================================
 // v3.7: RRI — REGIME ROTATION INDICATOR
-// Layer 4 context filter. Uses change5d already computed per ticker.
-// Zero additional API calls.
 // ===================================================================
-
-/**
- * calculateRRI(results, stealthDaysMap)
- * Classifies market regime from scored ticker results.
- * Mirrors calculateRRI_() in Market Digest v3.7 exactly.
- *
- * @param {Array}  results        — scored result objects
- * @param {Object} reclaimPctVal  — reclaim ratio pct (0-100)
- * @returns {Object} rri
- */
 function calculateRRI(results, reclaimPctVal) {
     try {
-        // Sector ETFs present in standard watchlist
         const sectorTickers   = ['XLK','XLY','XLE','XLI','XLF','XLB','XLV','XLP','XLU','XLRE','XLC'];
         const spyResult       = results.find(r => r.ticker === 'SPY');
         const spyChange5d     = spyResult ? (spyResult.change5d || 0) : 0;
 
-        // Build sector perf array from scored results
         const sectorPerf = [];
         sectorTickers.forEach(ticker => {
             const r = results.find(res => res.ticker === ticker);
@@ -1477,26 +1515,18 @@ function calculateRRI(results, reclaimPctVal) {
         });
 
         if (sectorPerf.length < 3) {
-            // Not enough sector data — mark as insufficient
             return { regime: 'INSUFFICIENT', sectorPerf, sectorsAboveSpy: 0, totalSectors: sectorPerf.length };
         }
 
-        // Sort descending by 5d return
         sectorPerf.sort((a, b) => b.change5d - a.change5d);
 
-        // Top 2 leaders
         const top2            = sectorPerf.slice(0, 2).map(s => s.ticker);
         const techLeading     = top2.includes('XLK') || top2.includes('XLY');
         const cyclicalTickers = ['XLE','XLI','XLF','XLB'];
         const cyclicalLeading = top2.some(t => cyclicalTickers.includes(t));
-
-        // Breadth — how many sectors beat SPY 5d
         const sectorsAboveSpy = sectorPerf.filter(s => s.change5d > spyChange5d).length;
-
-        // Reclaim ratio
         const reclaimPct = reclaimPctVal || 0;
 
-        // RS Dispersion — XLK vs cyclical average
         const xlkR = results.find(r => r.ticker === 'XLK');
         const xleR = results.find(r => r.ticker === 'XLE');
         const xliR = results.find(r => r.ticker === 'XLI');
@@ -1510,14 +1540,12 @@ function calculateRRI(results, reclaimPctVal) {
         const cyclicalAvg  = (xleChange + xliChange + xlfChange) / 3;
         const rsDispersion = parseFloat((xlkChange - cyclicalAvg).toFixed(2));
 
-        // 4/4 signal distribution
-        const deploy4of4   = results.filter(r => r.score >= 4);
-        const techNames    = ['NVDA','AVGO','MSFT','ASML','KLAC','LRCX','MU','AMD','XLK','QQQ','SOXX','VGT','ARM'];
-        const techSignals  = deploy4of4.filter(r => techNames.includes(r.ticker)).length;
-        const totalSignals = deploy4of4.length;
+        const deploy4of4    = results.filter(r => r.score >= 4);
+        const techNames     = ['NVDA','AVGO','MSFT','ASML','KLAC','LRCX','MU','AMD','XLK','QQQ','SOXX','VGT','ARM'];
+        const techSignals   = deploy4of4.filter(r => techNames.includes(r.ticker)).length;
+        const totalSignals  = deploy4of4.length;
         const techSignalPct = totalSignals > 0 ? parseFloat(((techSignals / totalSignals) * 100).toFixed(0)) : 0;
 
-        // Classification
         let regime, regimeLabel, regimeEmoji, postureSummary, badgeColor;
 
         if (techLeading && sectorsAboveSpy <= 4 && reclaimPct < 20) {
@@ -1555,11 +1583,6 @@ function calculateRRI(results, reclaimPctVal) {
     }
 }
 
-/**
- * renderRRIPanel(results, reclaimPctVal)
- * Renders the RRI panel in the dashboard.
- * Called after results are available.
- */
 function renderRRIPanel(results, reclaimPctVal) {
     const panel   = document.getElementById('rriPanel');
     const title   = document.getElementById('rriPanelTitle');
@@ -1567,7 +1590,6 @@ function renderRRIPanel(results, reclaimPctVal) {
 
     const rri = calculateRRI(results, reclaimPctVal);
 
-    // Handle insufficient sector data
     if (rri.regime === 'INSUFFICIENT' || rri.regime === 'UNKNOWN') {
         panel.style.display = 'block';
         panel.className = 'rri-panel';
@@ -1580,7 +1602,6 @@ function renderRRIPanel(results, reclaimPctVal) {
         return;
     }
 
-    // Panel styling by regime
     const panelClass = rri.regime === 'TECH-DRIVEN' ? 'tech-driven'
                      : rri.regime === 'BROAD'        ? 'broad'
                      : 'transition';
@@ -1589,14 +1610,10 @@ function renderRRIPanel(results, reclaimPctVal) {
     title.innerHTML = `${rri.regimeEmoji} REGIME ROTATION INDICATOR (RRI) v3.7`;
     title.style.color = rri.badgeColor;
 
-    // RS dispersion color
     const rsSign  = rri.rsDispersion >= 0 ? '+' : '';
     const rsColor = rri.rsDispersion >= 0 ? 'var(--accent-yellow)' : 'var(--accent-teal)';
-
-    // Top 2 display
     const top2Display = rri.top2.length > 0 ? rri.top2.join(' · ') : '—';
 
-    // Sector ranking table rows
     let sectorRows = '';
     rri.sectorPerf.forEach((sec, idx) => {
         const chg      = parseFloat(sec.change5d || 0);
@@ -1617,12 +1634,10 @@ function renderRRIPanel(results, reclaimPctVal) {
         </tr>`;
     });
 
-    // Cyclical leading indicator
     const cyclicalIcon = rri.cyclicalLeading
         ? '<span style="color:var(--accent-teal); font-weight:700;">✅ YES</span>'
         : '<span style="color:var(--text-secondary);">❌ NO</span>';
 
-    // MODE A-ALT signal block
     const altSignalHtml = rri.regime === 'BROAD' ? `
         <div class="rri-alt-signal">
             <span style="color:#66bb6a; font-weight:800; font-size:1rem;">🌐 MODE A-ALT SIGNAL</span>
@@ -1630,12 +1645,7 @@ function renderRRIPanel(results, reclaimPctVal) {
         </div>` : '';
 
     content.innerHTML = `
-        <!-- Regime Badge -->
-        <div class="rri-regime-badge" style="background:${rri.badgeColor};">
-            ${rri.regimeLabel}
-        </div>
-
-        <!-- Key Metrics Grid -->
+        <div class="rri-regime-badge" style="background:${rri.badgeColor};">${rri.regimeLabel}</div>
         <div class="rri-metrics-grid">
             <div class="rri-metric-card" style="border-left-color:${rri.badgeColor};">
                 <div class="rri-metric-label">Sectors &gt; SPY (5d)</div>
@@ -1668,29 +1678,15 @@ function renderRRIPanel(results, reclaimPctVal) {
                 <div class="rri-metric-sub">XLE/XLI/XLF/XLB in top 2</div>
             </div>
         </div>
-
-        <!-- Sector Leadership Table -->
-        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.5rem; font-weight:700;">
-            Sector Leadership — 5-Day Return (Ranked)
-        </div>
+        <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:0.5rem; font-weight:700;">Sector Leadership — 5-Day Return (Ranked)</div>
         <table class="rri-sector-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>SECTOR</th>
-                    <th>5D RETURN</th>
-                    <th>SCORE</th>
-                </tr>
-            </thead>
+            <thead><tr><th>#</th><th>SECTOR</th><th>5D RETURN</th><th>SCORE</th></tr></thead>
             <tbody>${sectorRows}</tbody>
         </table>
-
-        <!-- Posture -->
         <div class="rri-posture-bar" style="border-left-color:${rri.badgeColor};">
             <div class="rri-posture-label" style="color:${rri.badgeColor};">POSTURE</div>
             <div style="color:var(--text-primary);">${rri.postureSummary}</div>
         </div>
-
         ${altSignalHtml}
     `;
 }
@@ -1742,7 +1738,7 @@ function renderCoilPriorityBoard(results, stealthDaysMap) {
         <thead>
             <tr>
                 <th>#</th><th>TICKER</th><th>ATR%</th><th>RS/SPY</th>
-                <th>DAYS&gt;20D</th><th>SCORE</th><th>RSI</th><th>5D%</th><th>ACTION</th>
+                <th>DAYS&gt;20D</th><th>SCORE</th><th>RSI</th><th>Δ3D</th><th>5D%</th><th>ACTION</th>
             </tr>
         </thead>
         <tbody>`;
@@ -1754,6 +1750,11 @@ function renderCoilPriorityBoard(results, stealthDaysMap) {
         const rsColor    = (r.vsspy || 0) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
         const chgColor   = r.perf.change5Day >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
         const coilIcon   = r.isCoiling ? ' 🗜' : '';
+        // v3.8: slope cell for COIL board
+        const csi        = r.rsiSlopeInfo;
+        const slopeCell  = csi
+            ? `<td style="color:${csi.color}; font-family:'JetBrains Mono',monospace; font-weight:700; white-space:nowrap;">${csi.slope >= 0 ? '+' : ''}${csi.slope}${csi.icon}</td>`
+            : `<td style="color:var(--text-secondary);">—</td>`;
         html += `
         <tr class="${isTop ? 'top-setup' : ''}">
             <td style="color:var(--text-secondary);">${idx + 1}</td>
@@ -1763,6 +1764,7 @@ function renderCoilPriorityBoard(results, stealthDaysMap) {
             <td>${r.stealthDays}d</td>
             <td><span class="coil-score-badge" style="color:${scoreColor};">${r.coilScore}</span></td>
             <td style="color:${r.rsi >= 65 ? 'var(--accent-yellow)' : 'var(--text-primary)'};">${r.rsi.toFixed(0)}</td>
+            ${slopeCell}
             <td style="color:${chgColor};">${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}%</td>
             <td>${actionText}</td>
         </tr>`;
@@ -1830,10 +1832,7 @@ function analyzeWatchlistBreadth(results, stealthDaysMap) {
     updateBreadthThrust(results, total);
     document.getElementById('watchlistBreadthPanel').style.display = 'block';
 
-    // v3.6: COIL Priority Board
     renderCoilPriorityBoard(results, stealthDaysMap);
-
-    // v3.7: RRI Panel — pass current reclaim pct as context
     renderRRIPanel(results, reclaimPct);
 }
 
@@ -2089,21 +2088,47 @@ function renderResults(results, regimeMode) {
 
     html += '<div class="ticker-grid">';
     results.forEach(result => {
-        const signal    = getSignal(result.score, result.perf, result.extensionGate);
+        // v3.8: pass rsiSlopeInfo to getSignal
+        const signal    = getSignal(result.score, result.perf, result.extensionGate, result.rsiSlopeInfo);
         const scoreClass = `score-${result.score}`;
         const perfClass  = result.perfAnalysis.severity === 'danger' ? 'danger' : result.perfAnalysis.severity === 'warning' ? 'warning' : '';
         const reclaimTag = result.recentlyReclaimedDMA20 ? ' <span class="reclaim-badge">🔄 RECLAIM</span>' : '';
         const coilTag    = result.isCoiling ? ' <span class="coil-badge">🗜 COIL</span>' : '';
-        const isBlocked  = result.extensionGate && result.extensionGate.gate === 'BLOCK';
+        const isBlocked  = result.extensionGate && result.extensionGate.gate === 'BLOCK' && signal.size === 'NO ENTRY';
 
+        // v3.8: Extension gate with slope warnings
         let gateHtml = '';
         if (result.score >= 4 && result.extensionGate) {
             const gate = result.extensionGate;
+            const si   = result.rsiSlopeInfo;
+            const sign = si && si.slope >= 0 ? '+' : '';
+            let slopeWarning = '';
+            if (si && si.blockExtendedEntry) {
+                slopeWarning = `<div style="margin-top:0.35rem; font-size:0.72rem; color:var(--accent-red);">🚫 Δ3D ${sign}${si.slope} ${si.icon} — slope ≤−2 · entry blocked</div>`;
+            } else if (si && !si.allowExtendedEntry && gate.gate !== 'FULL') {
+                slopeWarning = `<div style="margin-top:0.35rem; font-size:0.72rem; color:var(--accent-yellow);">⚠️ Δ3D ${sign}${si.slope} ${si.icon} — need ≥+1 to enter extended</div>`;
+            } else if (si && si.reduceHolding && gate.gate !== 'FULL') {
+                slopeWarning = `<div style="margin-top:0.35rem; font-size:0.72rem; color:var(--accent-yellow);">⚠️ Δ3D ${sign}${si.slope} ${si.icon} — slope negative · reduce to MICRO if holding</div>`;
+            }
             gateHtml = `<div style="margin-top:0.5rem; padding:0.4rem 0.75rem; border-radius:4px;" class="${gate.cssClass}">
                 ${gate.icon} ${gate.gate} — Position Size: <strong>${gate.size}</strong>
                 <span style="font-size:0.72rem; opacity:0.8; margin-left:0.5rem;">(${result.distFromSma20Pct >= 0 ? '+' : ''}${result.distFromSma20Pct.toFixed(1)}% vs 20DMA)</span>
+                ${slopeWarning}
             </div>`;
         }
+
+        // v3.8: RSI slope row for breakdown list
+        const si = result.rsiSlopeInfo;
+        const slopeSign = si && si.slope >= 0 ? '+' : '';
+        const slopeRowHtml = si ? `
+            <li style="padding:0.5rem; margin-bottom:0.25rem; background:var(--bg-secondary); border-radius:4px;
+                       border-left:3px solid ${si.color}; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:var(--text-secondary); font-size:0.85rem;">RSI Slope (3d)</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-weight:700; color:${si.color}; font-size:0.85rem;">
+                    ${slopeSign}${si.slope} ${si.icon}
+                    <span style="font-size:0.72rem; font-weight:400; margin-left:0.4rem; color:${si.color}; opacity:0.8;">${si.label}</span>
+                </span>
+            </li>` : '';
 
         html += `
             <div class="ticker-card${isBlocked ? ' blocked' : ''}">
@@ -2132,6 +2157,7 @@ function renderResults(results, regimeMode) {
                 </div>
                 <ul class="breakdown">
                     ${result.breakdown.map(item => `<li class="${item.pass ? 'pass' : 'fail'}">${item.text}</li>`).join('')}
+                    ${slopeRowHtml}
                 </ul>
             </div>`;
     });
@@ -2149,7 +2175,7 @@ function renderResults(results, regimeMode) {
     const deployBlocked = deploy4.filter(r => r.extensionGate && r.extensionGate.gate === 'BLOCK');
 
     html += `<div class="summary">
-        <h2>📋 DEPLOYMENT RECOMMENDATIONS — v3.7</h2>
+        <h2>📋 DEPLOYMENT RECOMMENDATIONS — v3.8</h2>
 
         <div class="ext-gate-legend" style="margin-bottom:1rem;">
             <span style="color:var(--text-secondary); font-size:0.8rem;">Extension Gate:</span>
@@ -2166,19 +2192,35 @@ function renderResults(results, regimeMode) {
         <div class="summary-grid">
             <div class="summary-section">
                 <h3><span>✅</span> FULL SIZE — 2–3% (${deployFull.length})</h3>
-                <ul>${deployFull.length ? deployFull.map(r => `<li>• ${r.ticker} — FULL 2–3% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+                <ul>${deployFull.length ? deployFull.map(r => {
+                    const si = r.rsiSlopeInfo;
+                    const slopeTag = si ? ` | <span style="color:${si.color}">Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}</span>` : '';
+                    return `<li>• ${r.ticker} — FULL 2–3% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA${slopeTag}</li>`;
+                }).join('') : '<li>None</li>'}</ul>
             </div>
             <div class="summary-section">
                 <h3><span>⚠️</span> HALF SIZE — 1–1.5% (${deployHalf.length})</h3>
-                <ul>${deployHalf.length ? deployHalf.map(r => `<li>• ${r.ticker} — HALF 1–1.5% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+                <ul>${deployHalf.length ? deployHalf.map(r => {
+                    const si = r.rsiSlopeInfo;
+                    const slopeTag = si ? ` | <span style="color:${si.color}">Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}</span>` : '';
+                    return `<li>• ${r.ticker} — HALF 1–1.5% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA${slopeTag}</li>`;
+                }).join('') : '<li>None</li>'}</ul>
             </div>
             <div class="summary-section">
                 <h3><span>🔶</span> STARTER — ≤1% (${deployStarter.length})</h3>
-                <ul>${deployStarter.length ? deployStarter.map(r => `<li>• ${r.ticker} — STARTER ≤1% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA</li>`).join('') : '<li>None</li>'}</ul>
+                <ul>${deployStarter.length ? deployStarter.map(r => {
+                    const si = r.rsiSlopeInfo;
+                    const slopeTag = si ? ` | <span style="color:${si.color}">Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}</span>` : '';
+                    return `<li>• ${r.ticker} — STARTER ≤1% | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA${slopeTag}</li>`;
+                }).join('') : '<li>None</li>'}</ul>
             </div>
             <div class="summary-section">
                 <h3><span>🚫</span> BLOCKED — Extension Gate (${deployBlocked.length})</h3>
-                <ul>${deployBlocked.length ? deployBlocked.map(r => `<li>• ${r.ticker} — NO ENTRY | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA — wait for pullback</li>`).join('') : '<li>None blocked</li>'}</ul>
+                <ul>${deployBlocked.length ? deployBlocked.map(r => {
+                    const si = r.rsiSlopeInfo;
+                    const slopeTag = si ? ` | <span style="color:${si.color}">Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}</span>` : '';
+                    return `<li>• ${r.ticker} — NO ENTRY | +${r.distFromSma20Pct.toFixed(1)}% vs 20DMA${slopeTag}</li>`;
+                }).join('') : '<li>None blocked</li>'}</ul>
             </div>
             <div class="summary-section">
                 <h3><span>⚠️</span> WATCH (${watch.length})</h3>
@@ -2188,7 +2230,9 @@ function renderResults(results, regimeMode) {
                         const extIcon  = r.extensionLabel === 'PARABOLIC' ? '🔴' : r.extensionLabel === 'EXTENDED' ? '⚠️' : '✅';
                         const sd = stealthDaysMap[r.ticker] || 0;
                         const stealthTag = sd >= 5 ? ` | Stealth ${sd}d` : '';
-                        return `<li>• ${r.ticker} — 3/4${stealthTag} | <span style="color:${extColor}">${extIcon} ${r.extensionLabel}</span></li>`;
+                        const si = r.rsiSlopeInfo;
+                        const slopeTag = si ? ` | <span style="color:${si.color}">Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}</span>` : '';
+                        return `<li>• ${r.ticker} — 3/4${stealthTag} | <span style="color:${extColor}">${extIcon} ${r.extensionLabel}</span>${slopeTag}</li>`;
                     }
                     return `<li>• ${r.ticker} — ${r.score}/4 (Hold if owned)</li>`;
                 }).join('') : '<li>None</li>'}</ul>
@@ -2199,7 +2243,11 @@ function renderResults(results, regimeMode) {
             </div>
             <div class="summary-section">
                 <h3><span>🗜</span> COIL SETUPS (${coilers.length})</h3>
-                <ul>${coilers.length ? coilers.map(r => `<li>• ${r.ticker} — ATR ${r.atrPct.toFixed(2)}% | RSI ${r.rsi.toFixed(0)} | ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`).join('') : '<li>None — see COIL Priority Board above</li>'}</ul>
+                <ul>${coilers.length ? coilers.map(r => {
+                    const si = r.rsiSlopeInfo;
+                    const slopeTag = si ? ` | Δ3D ${si.slope >= 0 ? '+' : ''}${si.slope}${si.icon}` : '';
+                    return `<li>• ${r.ticker} — ATR ${r.atrPct.toFixed(2)}% | RSI ${r.rsi.toFixed(0)}${slopeTag} | ${r.perf.change5Day >= 0 ? '+' : ''}${r.perf.change5Day.toFixed(1)}% 5d</li>`;
+                }).join('') : '<li>None — see COIL Priority Board above</li>'}</ul>
             </div>
         </div>
     </div>`;
