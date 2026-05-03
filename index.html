@@ -2139,14 +2139,26 @@ function renderResults(results, regimeMode) {
                         <div class="active-mode ${result.mode === 'MODE A' ? 'mode-a' : 'mode-b'}">${result.mode}</div>
                     </div>
                 </div>
-                <div class="score-display">
-                    <div class="score-number ${scoreClass}">${result.score}<span style="font-size:1rem; color:var(--text-secondary);">/4</span></div>
-                    <div class="score-info">
-                        <div class="signal ${signal.class}">${signal.text}</div>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">${signal.subtext}</div>
-                        ${gateHtml}
-                    </div>
-                </div>
+               <div class="score-display">
+    <div class="score-number ${scoreClass}">${result.score}<span style="font-size:1rem; color:var(--text-secondary);">/4</span></div>
+    <div class="score-info">
+        <div class="signal ${signal.class}">${signal.text}</div>
+        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">${signal.subtext}</div>
+        ${(() => {
+            const extIcon  = result.extensionLabel === 'PARABOLIC' ? '🔴' : result.extensionLabel === 'EXTENDED' ? '⚠️' : '✅';
+            const extColor = result.extensionLabel === 'PARABOLIC' ? 'var(--accent-red)' : result.extensionLabel === 'EXTENDED' ? 'var(--accent-orange)' : 'var(--accent-green)';
+            const extBg    = result.extensionLabel === 'PARABOLIC' ? 'rgba(255,51,102,0.12)' : result.extensionLabel === 'EXTENDED' ? 'rgba(255,123,57,0.12)' : 'rgba(0,255,136,0.10)';
+            const distStr  = `${result.distFromSma20Pct >= 0 ? '+' : ''}${result.distFromSma20Pct.toFixed(1)}% vs 20-DMA`;
+            return `<div style="margin-top:0.5rem; padding:0.35rem 0.75rem; border-radius:4px; background:${extBg}; border:1px solid ${extColor}; display:inline-flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:0.85rem;">${extIcon}</span>
+                <span style="color:${extColor}; font-weight:700; font-size:0.8rem; font-family:'JetBrains Mono',monospace;">${result.extensionLabel}</span>
+                <span style="color:var(--text-secondary); font-size:0.75rem;">${distStr}</span>
+            </div>`;
+        })()}
+        ${gateHtml}
+    </div>
+</div>
+        
                 <div class="performance-metrics ${perfClass}">
                     <div class="perf-title">📊 Recent Performance</div>
                     <div class="perf-stats">
