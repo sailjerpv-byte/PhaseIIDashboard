@@ -1346,12 +1346,11 @@ function calculateScore(ticker, data, spyData, mode) {
     } else {
         
         // MODE B — uses rsiSlope (already computed above from rsiSlopeInfo)
-        (rsi >= 45 && rsiSlope > 0) ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥45 & +slope)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥45 & +slope)`, pass: false });
-        const repairing = currentPrice > dma20 && prevPrice < dma20;
-        currentPrice > dma20 ? (score++, breakdown.push({ text: `✅ Above 20-DMA${repairing ? ' (🔧 REPAIR)' : ''}`, pass: true })) : breakdown.push({ text: '❌ Below 20-DMA', pass: false });
+        rsi >= 50 ? (score++, breakdown.push({ text: `✅ RSI ${rsi.toFixed(1)} (≥50)`, pass: true })) : breakdown.push({ text: `❌ RSI ${rsi.toFixed(1)} (need ≥50)`, pass: false });
+        currentPrice > dma20 ? (score++, breakdown.push({ text: `✅ Above 20-DMA`, pass: true })) : breakdown.push({ text: `❌ Below 20-DMA`, pass: false });
+        currentPrice > dma50 ? (score++, breakdown.push({ text: `✅ Above 50-DMA`, pass: true })) : breakdown.push({ text: `❌ Below 50-DMA`, pass: false });
         const volThrB = isBroadETF ? 0.8 : isSectorETF ? 1.0 : 1.2;
         volRatio >= volThrB ? (score++, breakdown.push({ text: `✅ Vol ${volRatio.toFixed(2)}x (≥${volThrB}x)`, pass: true })) : breakdown.push({ text: `❌ Vol ${volRatio.toFixed(2)}x (need ≥${volThrB}x)`, pass: false });
-        vsspy >= -1.0 ? (score++, breakdown.push({ text: `✅ ${vsspy >= 0 ? '+' : ''}${vsspy.toFixed(2)}% vs SPY`, pass: true })) : breakdown.push({ text: `❌ ${vsspy.toFixed(2)}% vs SPY`, pass: false });
     }
 
     const recentlyReclaimedDMA20 = (currentPrice > dma20) &&
